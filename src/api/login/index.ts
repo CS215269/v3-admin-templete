@@ -5,14 +5,18 @@ import type * as Login from "./types/login"
 export function getLoginCodeApi() {
   return request<Login.LoginCodeResponseData>({
     url: "login/code",
-    method: "get"
+    method: "get",
+    /** 内网穿透用,跳过无意义的响应 */
+    headers: {
+      "ngrok-skip-browser-warning": "123"
+    }
   })
 }
 
 /** 登录并返回 Token */
 export function loginApi(data: Login.LoginRequestData) {
   return request<Login.LoginResponseData>({
-    url: "users/login",
+    url: "admin/login",
     method: "post",
     data
   })
