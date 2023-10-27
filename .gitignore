@@ -4,6 +4,7 @@
 node_modules
 dist
 dist-ssr
+情况*
 .eslintcache
 
 # Local env files

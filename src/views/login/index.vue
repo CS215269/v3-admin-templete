@@ -21,7 +21,7 @@ const codeUrl = ref("")
 const loginFormData: LoginRequestData = reactive({
   username: "admin",
   password: "12345678",
-  code: ""
+  code: "it1knq"
 })
 /** 登录表单校验规则 */
 const loginFormRules: FormRules = {
