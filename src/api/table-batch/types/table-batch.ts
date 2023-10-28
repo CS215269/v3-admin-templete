@@ -1,16 +1,16 @@
 export interface CreateTableRequestData {
   name: string
   open: number
-  startime: Date
-  deadline: Date
+  startime: string
+  deadline: string
 }
 
 export interface UpdateTableRequestData {
   id: number
   name: string
   open: number
-  startime: Date
-  deadline: Date
+  startime: string
+  deadline: string
 }
 
 export interface GetTableRequestData {
@@ -28,8 +28,9 @@ export interface GetTableBatchData {
   name: string
   id: number
   open: number
-  startime: Date | null
-  deadline: Date | null
+  positionNum: number
+  startime: string
+  deadline: string
 }
 
 export type GetTableResponseData = ApiResponseData<{

@@ -5,6 +5,7 @@ import { type GetTableBatchData } from "@/api/table-batch/types/table-batch"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
 import { usePagination } from "@/hooks/usePagination"
+import moment from "moment"
 
 defineOptions({
   // 命名当前组件
@@ -20,27 +21,20 @@ const formRef = ref<FormInstance | null>(null)
 const formData = reactive({
   name: "x",
   open: 0,
-  startime: new Date(),
-  deadline: new Date()
+  startime: "",
+  deadline: ""
 })
 const formRules: FormRules = reactive({
-  name: [{ required: true, trigger: "blur", message: "请输入用户名" }],
-  account: [
-    { required: true, trigger: "blur", message: "请输入账号" },
-    {
-      pattern: /^[1-9]\d{5}(?:18|19|20)\d{2}(?:0[1-9]|10|11|12)(?:0[1-9]|[1-2]\d|30|31)\d{3}[\dXx]$/,
-      trigger: "blur",
-      message: "请输入有效的身份证号码"
-    }
-    // dsa validator: isChineseIdCard,
-  ],
-  pwd: [{ required: true, trigger: "blur", message: "请输入密码" }],
-  phone: [{ required: true, trigger: "blur", message: "请输入电话" }]
+  name: [{ required: true, trigger: "blur", message: "请输入批次名" }],
+  open: [{ required: true, trigger: "blur", message: "请输入状态" }],
+  startime: [{ required: true, trigger: "blur", message: "请输入开始时间" }]
 })
 const handleCreate = () => {
   formRef.value?.validate((valid: boolean, fields) => {
     if (valid) {
       if (currentUpdateId.value === undefined) {
+        formData.startime = moment(formData.startime).format("YYYY-MM-DD")
+        formData.deadline = moment(formData.deadline).format("YYYY-MM-DD")
         createTableDataApi(formData)
           .then(() => {
             ElMessage.success("新增成功")
@@ -54,8 +48,8 @@ const handleCreate = () => {
           id: currentUpdateId.value,
           name: formData.name,
           open: formData.open,
-          startime: formData.startime,
-          deadline: formData.deadline
+          startime: moment(formData.startime).format("YYYY-MM-DD"),
+          deadline: moment(formData.deadline).format("YYYY-MM-DD")
         })
           .then(() => {
             ElMessage.success("修改成功")
@@ -73,15 +67,15 @@ const handleCreate = () => {
 const resetForm = () => {
   currentUpdateId.value = undefined
   formData.name = ""
-  formData.open = 1
-  formData.startime = new Date()
-  formData.deadline = new Date()
+  formData.open = 0
+  formData.startime = ""
+  formData.deadline = ""
 }
 //#endregion
 
 //#region 删
 const handleDelete = (row: GetTableBatchData) => {
-  ElMessageBox.confirm(`正在删除用户：${row.name}，确认删除？`, "提示", {
+  ElMessageBox.confirm(`正在删除批次：${row.name}，确认删除？`, "提示", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning"
@@ -99,6 +93,9 @@ const currentUpdateId = ref<undefined | number>(undefined)
 const handleUpdate = (row: GetTableBatchData) => {
   currentUpdateId.value = row.id
   formData.name = row.name
+  formData.open = row.open
+  formData.startime = moment(row.startime).format("YYYY-MM-DD")
+  formData.deadline = moment(row.deadline).format("YYYY-MM-DD")
   dialogVisible.value = true
 }
 //#endregion
@@ -146,7 +143,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
   <div class="app-container">
     <el-card v-loading="loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
-        <el-form-item prop="username" label="用户名">
+        <el-form-item prop="username" label="批次名称">
           <el-input v-model="searchData.name" placeholder="请输入" />
         </el-form-item>
         <el-form-item prop="open" label="状态">
@@ -164,7 +161,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
     <el-card v-loading="loading" shadow="never">
       <div class="toolbar-wrapper">
         <div>
-          <el-button type="primary" :icon="CirclePlus" @click="dialogVisible = true">新增用户</el-button>
+          <el-button type="primary" :icon="CirclePlus" @click="dialogVisible = true">新增批次</el-button>
           <el-button type="danger" :icon="Delete">批量删除</el-button>
         </div>
         <div>
@@ -186,7 +183,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               <el-tag v-else type="warning" effect="plain">禁用</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="account" label="账号" align="center" />
+          <el-table-column prop="positionNum" label="岗位数量" align="center" />
+          <el-table-column prop="startime" label="开始时间" align="center" />
+          <el-table-column prop="deadline" label="截止时间" align="center" />
           <el-table-column fixed="right" label="操作" width="150" align="center">
             <template #default="scope">
               <el-button type="primary" text bg size="small" @click="handleUpdate(scope.row)">修改</el-button>
@@ -211,7 +210,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
     <!-- 新增/修改 -->
     <el-dialog
       v-model="dialogVisible"
-      :title="currentUpdateId === undefined ? '新增用户' : '修改用户'"
+      :title="currentUpdateId === undefined ? '新增批次' : '修改批次'"
       @close="resetForm"
       width="30%"
     >
