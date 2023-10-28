@@ -62,16 +62,80 @@ export const constantRoutes: RouteRecordRaw[] = [
     ]
   },
   {
-    path: "/unocss",
+    path: "/adminTable",
     component: Layouts,
-    redirect: "/unocss/index",
+    redirect: "/adminTable/index",
     children: [
       {
         path: "index",
-        component: () => import("@/views/unocss/index.vue"),
-        name: "UnoCSS",
+        component: () => import("@/views/table-admin/index.vue"),
+        name: "管理员信息",
         meta: {
-          title: "UnoCSS",
+          title: "管理员",
+          svgIcon: "unocss"
+        }
+      }
+    ]
+  },
+  {
+    path: "/batchTable",
+    component: Layouts,
+    redirect: "/batchTable/index",
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/table-batch/index.vue"),
+        name: "批次信息",
+        meta: {
+          title: "批次",
+          svgIcon: "unocss"
+        }
+      }
+    ]
+  },
+  {
+    path: "/departmentTable",
+    component: Layouts,
+    redirect: "/departmentTable/index",
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/table-department/index.vue"),
+        name: "部门信息",
+        meta: {
+          title: "部门",
+          svgIcon: "unocss"
+        }
+      }
+    ]
+  },
+  {
+    path: "/positionTable",
+    component: Layouts,
+    redirect: "/positionTable/index",
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/table-position/index.vue"),
+        name: "岗位信息",
+        meta: {
+          title: "岗位",
+          svgIcon: "unocss"
+        }
+      }
+    ]
+  },
+  {
+    path: "/thingTable",
+    component: Layouts,
+    redirect: "/thingTable/index",
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/table-thing/index.vue"),
+        name: "管理员信息",
+        meta: {
+          title: "管理员",
           svgIcon: "unocss"
         }
       }
