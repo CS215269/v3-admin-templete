@@ -1,6 +1,8 @@
 export interface RegisterRequestData {
   /** 注册密码 */
   password: string
+  /** 验证密码 */
+  confirmPassword: string
   /** 注册手机号 */
   phone: string
   /** 验证码 */

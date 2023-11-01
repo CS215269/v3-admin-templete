@@ -125,7 +125,7 @@ createCode()
               </template>
             </el-input>
           </el-form-item>
-          <a href="#/register">去注册</a>
+          <el-text>没有账号? <el-link href="#/register">去注册</el-link></el-text>
           <el-button :loading="loading" type="primary" size="large" @click.prevent="handleLogin">登 录</el-button>
         </el-form>
       </div>
@@ -174,6 +174,11 @@ createCode()
           cursor: pointer;
           text-align: center;
         }
+      }
+      aaa {
+        color: #a39; /* 设置超链接文本颜色 */
+        text-decoration: none; /* 去除下划线 */
+        margin-left: 10px; /* 调整超链接与按钮之间的间距 */
       }
       .el-button {
         width: 100%;

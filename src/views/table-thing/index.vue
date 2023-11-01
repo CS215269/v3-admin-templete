@@ -118,6 +118,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <div class="table-wrapper">
         <el-table :data="tableData">
           <el-table-column type="selection" width="50" align="center" />
+          <el-table-column prop="batchname" label="批次" align="center" />
           <el-table-column prop="jobTitle" label="岗位名称" align="center" />
           <el-table-column prop="department" label="所属部门" align="center" />
           <el-table-column prop="username" label="用户姓名" align="center" />

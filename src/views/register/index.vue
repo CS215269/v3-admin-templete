@@ -12,8 +12,6 @@ const router = useRouter()
 
 /** 注册表单元素的引用 */
 const registerFormRef = ref<FormInstance | null>(null)
-/** 验证密码输入框 */
-const confirmPassword = ref("mlb")
 /** 注册按钮 Loading */
 const loading = ref(false)
 /** 验证码图片 URL */
@@ -21,6 +19,7 @@ const codeUrl = ref("")
 /** 注册表单数据 */
 const registerFormData: RegisterRequestData = reactive({
   password: "12345678",
+  confirmPassword: "1234567",
   phone: "12345678",
   code: "it1knq"
 })
@@ -124,18 +123,7 @@ createCode()
           </el-form-item>
           <el-form-item prop="confirmPassword">
             <el-input
-              v-model.trim="confirmPassword"
-              placeholder="确认密码"
-              type="password"
-              tabindex="2"
-              :prefix-icon="Lock"
-              size="large"
-              show-password
-            />
-          </el-form-item>
-          <el-form-item prop="confirmPassword">
-            <el-input
-              v-model.trim="confirmPassword"
+              v-model.trim="registerFormData.confirmPassword"
               placeholder="确认密码"
               type="password"
               tabindex="2"
