@@ -11,6 +11,23 @@ defineOptions({
   name: "TablePosition"
 })
 
+// 计算属性
+const getDegreeLabel = (row: { degree: number }) => {
+  switch (row.degree) {
+    case 1:
+      return "中专"
+    case 2:
+      return "大专"
+    case 3:
+      return "本科"
+    case 4:
+      return "硕士"
+    case 5:
+      return "博士"
+    default:
+      return "异常"
+  }
+}
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
 
@@ -19,19 +36,19 @@ const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
 const formData = reactive({
   jobTitle: "",
-  department: "",
+  departmentId: 0,
   degree: "",
   info: ""
 })
 const formRules: FormRules = reactive({
   name: [{ required: true, trigger: "blur", message: "请输入岗位名称" }],
   account: [
-    { required: true, trigger: "blur", message: "请输入账号" },
-    {
-      pattern: /^[1-9]\d{5}(?:18|19|20)\d{2}(?:0[1-9]|10|11|12)(?:0[1-9]|[1-2]\d|30|31)\d{3}[\dXx]$/,
-      trigger: "blur",
-      message: "请输入有效的身份证号码"
-    }
+    { required: true, trigger: "blur", message: "请输入账号" }
+    // {
+    //   pattern: /^[1-9]\d{5}(?:18|19|20)\d{2}(?:0[1-9]|10|11|12)(?:0[1-9]|[1-2]\d|30|31)\d{3}[\dXx]$/,
+    //   trigger: "blur",
+    //   message: "请输入有效的身份证号码"
+    // }
     // dsa validator: isChineseIdCard,
   ],
   pwd: [{ required: true, trigger: "blur", message: "请输入密码" }],
@@ -53,7 +70,7 @@ const handleCreate = () => {
         updateTableDataApi({
           id: currentUpdateId.value,
           jobTitle: formData.jobTitle,
-          department: formData.department,
+          departmentId: formData.departmentId,
           degree: formData.degree,
           info: formData.info
         })
@@ -73,7 +90,7 @@ const handleCreate = () => {
 const resetForm = () => {
   currentUpdateId.value = undefined
   formData.jobTitle = ""
-  formData.department = ""
+  formData.departmentId = 0
   formData.degree = ""
   formData.info = ""
 }
@@ -99,7 +116,7 @@ const currentUpdateId = ref<undefined | number>(undefined)
 const handleUpdate = (row: GetTablePositionData) => {
   currentUpdateId.value = row.id
   formData.jobTitle = row.jobTitle
-  formData.department = row.department
+  formData.departmentId = row.departmentId
   formData.degree = row.degree
   formData.info = row.info
   dialogVisible.value = true
@@ -111,7 +128,7 @@ const tableData = ref<GetTablePositionData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
   jobTitle: "",
-  department: ""
+  departmentId: ""
 })
 const getTableData = () => {
   loading.value = true
@@ -119,7 +136,7 @@ const getTableData = () => {
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
     jobTitle: searchData.jobTitle || undefined,
-    department: searchData.department || undefined
+    department: searchData.departmentId || undefined
   })
     .then((res) => {
       paginationData.total = res.data.total
@@ -152,8 +169,10 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-form-item prop="username" label="岗位名">
           <el-input v-model="searchData.jobTitle" placeholder="请输入" />
         </el-form-item>
-        <el-form-item prop="open" label="状态">
-          <el-input v-model="searchData.department" placeholder="请输入" />
+        <el-form-item prop="open" label="所属部门">
+          <el-select v-model="searchData.departmentId" placeholder="请输入">
+            <el-option label="name" value="value" />
+          </el-select>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
@@ -179,14 +198,14 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <div class="table-wrapper">
         <el-table :data="tableData">
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column prop="name" label="岗位名称" align="center" />
-          <el-table-column prop="open" label="岗位状态" align="center">
+          <el-table-column prop="jobTitle" label="岗位名称" align="center" />
+          <el-table-column prop="department" label="所属部门" align="center" />
+          <el-table-column prop="degree" label="所需学历" align="center">
             <template #default="scope">
-              <el-tag v-if="scope.row.open" type="success" effect="plain">启用</el-tag>
-              <el-tag v-else type="warning" effect="plain">禁用</el-tag>
+              {{ getDegreeLabel(scope.row) }}
             </template>
           </el-table-column>
-          <el-table-column prop="account" label="账号" align="center" />
+          <el-table-column prop="info" label="介绍信息" align="center" />
           <el-table-column fixed="right" label="操作" width="150" align="center">
             <template #default="scope">
               <el-button type="primary" text bg size="small" @click="handleUpdate(scope.row)">修改</el-button>
@@ -222,7 +241,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </el-form-item>
         <el-form-item prop="open" label="所属部门">
           <!--  v-if="currentUpdateId === undefined" 让组件在修改对话框不可见 -->
-          <el-input v-model="formData.department" placeholder="请输入" />
+          <el-input v-model="formData.departmentId" placeholder="请输入" />
         </el-form-item>
         <el-form-item prop="degree" label="学历要求">
           <el-select v-model="formData.degree" placeholder="请输入" />

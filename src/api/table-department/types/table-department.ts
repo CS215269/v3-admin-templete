@@ -1,16 +1,10 @@
 export interface CreateTableRequestData {
-  jobTitle: string
-  department: string
-  degree: string
-  info: string
+  name: string
 }
 
 export interface UpdateTableRequestData {
   id: number
-  jobTitle: string
-  department: string
-  degree: string
-  info: string
+  name: string
 }
 
 export interface GetTableRequestData {
@@ -19,20 +13,16 @@ export interface GetTableRequestData {
   /** 查询条数 */
   size: number
   /** 查询参数：批次名称 */
-  jobTitle?: string
-  /** 查询参数：批次是否可用 */
-  department?: string
+  name?: string
 }
 
-export interface GetTablePositionData {
+export interface GetTableDepartmentData {
   id: number
-  jobTitle: string
-  department: string
-  degree: string
-  info: string
+  name: string
+  positionNum: number
 }
 
 export type GetTableResponseData = ApiResponseData<{
-  list: GetTablePositionData[]
+  list: GetTableDepartmentData[]
   total: number
 }>

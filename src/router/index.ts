@@ -45,6 +45,13 @@ export const constantRoutes: RouteRecordRaw[] = [
     }
   },
   {
+    path: "/register",
+    component: () => import("@/views/register/index.vue"),
+    meta: {
+      hidden: true
+    }
+  },
+  {
     path: "/",
     component: Layouts,
     redirect: "/dashboard",
@@ -57,86 +64,6 @@ export const constantRoutes: RouteRecordRaw[] = [
           title: "首页",
           svgIcon: "dashboard",
           affix: true
-        }
-      }
-    ]
-  },
-  {
-    path: "/adminTable",
-    component: Layouts,
-    redirect: "/adminTable/index",
-    children: [
-      {
-        path: "index",
-        component: () => import("@/views/table-admin/index.vue"),
-        name: "管理员信息",
-        meta: {
-          title: "管理员",
-          svgIcon: "unocss"
-        }
-      }
-    ]
-  },
-  {
-    path: "/batchTable",
-    component: Layouts,
-    redirect: "/batchTable/index",
-    children: [
-      {
-        path: "index",
-        component: () => import("@/views/table-batch/index.vue"),
-        name: "批次信息",
-        meta: {
-          title: "批次",
-          svgIcon: "unocss"
-        }
-      }
-    ]
-  },
-  {
-    path: "/departmentTable",
-    component: Layouts,
-    redirect: "/departmentTable/index",
-    children: [
-      {
-        path: "index",
-        component: () => import("@/views/table-department/index.vue"),
-        name: "部门信息",
-        meta: {
-          title: "部门",
-          svgIcon: "unocss"
-        }
-      }
-    ]
-  },
-  {
-    path: "/positionTable",
-    component: Layouts,
-    redirect: "/positionTable/index",
-    children: [
-      {
-        path: "index",
-        component: () => import("@/views/table-position/index.vue"),
-        name: "岗位信息",
-        meta: {
-          title: "岗位",
-          svgIcon: "unocss"
-        }
-      }
-    ]
-  },
-  {
-    path: "/thingTable",
-    component: Layouts,
-    redirect: "/thingTable/index",
-    children: [
-      {
-        path: "index",
-        component: () => import("@/views/table-thing/index.vue"),
-        name: "管理员信息",
-        meta: {
-          title: "管理员",
-          svgIcon: "unocss"
         }
       }
     ]
@@ -320,6 +247,138 @@ export const constantRoutes: RouteRecordRaw[] = [
  * 必须带有 Name 属性
  */
 export const asyncRoutes: RouteRecordRaw[] = [
+  {
+    path: "/adminTable",
+    component: Layouts,
+    redirect: "/adminTable/index",
+    name: "adminTable",
+    meta: {
+      title: "管理员",
+      svgIcon: "lock",
+      roles: ["admin"] // 可以在根路由中设置角色
+    },
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/table-admin/index.vue"),
+        name: "管理员信息",
+        meta: {
+          title: "管理员",
+          svgIcon: "lock"
+        }
+      }
+    ]
+  },
+  {
+    path: "/batchTable",
+    component: Layouts,
+    redirect: "/batchTable/index",
+    name: "batchTable",
+    meta: {
+      title: "批次",
+      svgIcon: "unocss",
+      roles: ["admin"]
+    },
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/table-batch/index.vue"),
+        name: "批次信息",
+        meta: {
+          title: "批次",
+          svgIcon: "unocss"
+        }
+      }
+    ]
+  },
+  {
+    path: "/departmentTable",
+    component: Layouts,
+    redirect: "/departmentTable/index",
+    name: "departmentTable",
+    meta: {
+      title: "部门",
+      svgIcon: "unocss",
+      roles: ["admin"]
+    },
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/table-department/index.vue"),
+        name: "部门信息",
+        meta: {
+          title: "部门",
+          svgIcon: "unocss"
+        }
+      }
+    ]
+  },
+  {
+    path: "/positionTable",
+    component: Layouts,
+    redirect: "/positionTable/index",
+    name: "positionTable",
+    meta: {
+      title: "岗位",
+      svgIcon: "unocss",
+      roles: ["admin"]
+    },
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/table-position/index.vue"),
+        name: "岗位信息",
+        meta: {
+          title: "岗位",
+          svgIcon: "unocss"
+        }
+      }
+    ]
+  },
+  {
+    path: "/thingTable",
+    component: Layouts,
+    redirect: "/thingTable/index",
+    name: "thingTable",
+    meta: {
+      title: "投递",
+      svgIcon: "unocss",
+      roles: ["admin"]
+    },
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/table-thing/index.vue"),
+        name: "投递信息",
+        meta: {
+          title: "投递",
+          svgIcon: "unocss"
+        }
+      }
+    ]
+  },
+  {
+    path: "/user-thing",
+    component: Layouts,
+    redirect: "/user-thing/index",
+    name: "user-thing",
+    meta: {
+      title: "投递",
+      svgIcon: "unocss",
+      roles: ["editor"]
+    },
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/user-thing/index.vue"),
+        name: "投递信息",
+        meta: {
+          title: "投递",
+          svgIcon: "unocss"
+        }
+      }
+    ]
+  },
   {
     path: "/permission",
     component: Layouts,

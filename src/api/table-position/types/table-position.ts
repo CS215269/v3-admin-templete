@@ -1,6 +1,6 @@
 export interface CreateTableRequestData {
   jobTitle: string
-  department: string
+  departmentId: number
   degree: string
   info: string
 }
@@ -8,7 +8,7 @@ export interface CreateTableRequestData {
 export interface UpdateTableRequestData {
   id: number
   jobTitle: string
-  department: string
+  departmentId: number
   degree: string
   info: string
 }
@@ -30,6 +30,7 @@ export interface GetTablePositionData {
   department: string
   degree: string
   info: string
+  departmentId: number
 }
 
 export type GetTableResponseData = ApiResponseData<{

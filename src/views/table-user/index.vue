@@ -11,6 +11,23 @@ defineOptions({
   name: "TableUser"
 })
 
+// 计算属性
+const getDegreeLabel = (row: { degree: number }) => {
+  switch (row.degree) {
+    case 1:
+      return "中专"
+    case 2:
+      return "大专"
+    case 3:
+      return "本科"
+    case 4:
+      return "硕士"
+    case 5:
+      return "博士"
+    default:
+      return "异常"
+  }
+}
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
 
@@ -21,7 +38,7 @@ const formData = reactive({
   name: "",
   sex: "",
   age: "",
-  degree: "",
+  degree: 0,
   zzmm: "",
   school: "",
   native_place: ""
@@ -106,7 +123,7 @@ const tableData = ref<GetTableUserData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
   name: "",
-  degree: ""
+  degree: 0
 })
 const getTableData = () => {
   loading.value = true
@@ -151,7 +168,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-form-item prop="username" label="用户名">
           <el-input v-model="searchData.name" placeholder="请输入" />
         </el-form-item>
-        <el-form-item prop="open" label="状态">
+        <el-form-item prop="degree" label="学历">
           <el-input v-model="searchData.degree" placeholder="请输入" />
         </el-form-item>
         <el-form-item>
@@ -182,6 +199,11 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-table-column prop="sex" label="性别" align="center" />
           <el-table-column prop="age" label="年龄" align="center" />
           <el-table-column prop="zzmm" label="政治面貌" align="center" />
+          <el-table-column prop="degree" label="学历" align="center">
+            <template #default="scope">
+              {{ getDegreeLabel(scope.row) }}
+            </template>
+          </el-table-column>
           <el-table-column prop="school" label="毕业院校" align="center" />
           <el-table-column prop="native_place" label="籍贯" align="center" />
           <el-table-column fixed="right" label="操作" width="150" align="center">

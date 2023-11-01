@@ -1,9 +1,9 @@
 import { request } from "@/utils/service"
-import type * as Login from "./types/login"
+import type * as Register from "./types/register"
 
-/** 获取登录验证码 */
-export function getLoginCodeApi() {
-  return request<Login.LoginCodeResponseData>({
+/** 获取注册验证码 */
+export function getRegisterCodeApi() {
+  return request<Register.RegisterCodeResponseData>({
     url: "login/code",
     method: "get",
     /** 内网穿透用,跳过无意义的响应 */
@@ -13,10 +13,10 @@ export function getLoginCodeApi() {
   })
 }
 
-/** 登录并返回 Token */
-export function loginApi(data: Login.LoginRequestData) {
-  return request<Login.LoginResponseData>({
-    url: "admin/login",
+/** 注册并返回 Token */
+export function registerApi(data: Register.RegisterRequestData) {
+  return request<Register.RegisterResponseData>({
+    url: "user/register",
     method: "post",
     data
   })
@@ -24,7 +24,7 @@ export function loginApi(data: Login.LoginRequestData) {
 
 /** 获取用户详情 */
 export function getUserInfoApi() {
-  return request<Login.UserInfoResponseData>({
+  return request<Register.UserInfoResponseData>({
     url: "users/info",
     method: "get",
     /** 内网穿透用,跳过无意义的响应 */

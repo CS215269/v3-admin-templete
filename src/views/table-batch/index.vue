@@ -215,7 +215,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       width="30%"
     >
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
-        <p>关于批次的一些建议</p>
+        <p>批次名称建议带有排序或年份,如XX年第二批</p>
         <el-form-item prop="name" label="批次名称">
           <el-input v-model="formData.name" placeholder="请输入" />
         </el-form-item>

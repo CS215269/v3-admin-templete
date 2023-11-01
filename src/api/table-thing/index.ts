@@ -1,27 +1,28 @@
 import { request } from "@/utils/service"
 import type * as Table from "./types/table-thing"
 
-/** 增 */
-export function createTableDataApi(data: Table.CreateTableRequestData) {
+/** 同意 */
+export function createTableDataApi(data: number) {
   return request({
-    url: "tablePosition",
+    url: "tableThing",
     method: "post",
     data
   })
 }
 
-/** 删 */
-export function deleteTableDataApi(id: number) {
+/** 拒绝 */
+export function refuseThingDataApi(data: number) {
   return request({
-    url: `tablePosition/${id}`,
-    method: "delete"
+    url: "tableThing",
+    method: "post",
+    data
   })
 }
 
-/** 改 */
-export function updateTableDataApi(data: Table.UpdateTableRequestData) {
+/** 打印准考证 */
+export function updateTableDataApi(data: number) {
   return request({
-    url: "tablePosition",
+    url: "tableThing",
     method: "put",
     data
   })
@@ -30,7 +31,7 @@ export function updateTableDataApi(data: Table.UpdateTableRequestData) {
 /** 查 */
 export function getTableDataApi(params: Table.GetTableRequestData) {
   return request<Table.GetTableResponseData>({
-    url: "tablePosition",
+    url: "tableThing",
     method: "get",
     headers: {
       "ngrok-skip-browser-warning": "123"

@@ -1,10 +1,10 @@
 import { request } from "@/utils/service"
-import type * as Login from "./types/login"
+import type * as Redirect from "./types/redirect"
 
 /** 获取登录验证码 */
-export function getLoginCodeApi() {
-  return request<Login.LoginCodeResponseData>({
-    url: "login/code",
+export function getRedirectCodeApi() {
+  return request<Redirect.RedirectCodeResponseData>({
+    url: "redirect/code",
     method: "get",
     /** 内网穿透用,跳过无意义的响应 */
     headers: {
@@ -14,8 +14,8 @@ export function getLoginCodeApi() {
 }
 
 /** 登录并返回 Token */
-export function loginApi(data: Login.LoginRequestData) {
-  return request<Login.LoginResponseData>({
+export function loginApi(data: Redirect.RedirectRequestData) {
+  return request<Redirect.RedirectResponseData>({
     url: "admin/login",
     method: "post",
     data
@@ -24,7 +24,7 @@ export function loginApi(data: Login.LoginRequestData) {
 
 /** 获取用户详情 */
 export function getUserInfoApi() {
-  return request<Login.UserInfoResponseData>({
+  return request<Redirect.UserInfoResponseData>({
     url: "users/info",
     method: "get",
     /** 内网穿透用,跳过无意义的响应 */

@@ -8,6 +8,8 @@ import { getToken, removeToken, setToken } from "@/utils/cache/cookies"
 import router, { resetRouter } from "@/router"
 import { loginApi, getUserInfoApi } from "@/api/login"
 import { type LoginRequestData } from "@/api/login/types/login"
+import { registerApi } from "@/api/register"
+import { RegisterRequestData } from "@/api/register/types/register"
 import { type RouteRecordRaw } from "vue-router"
 import routeSettings from "@/config/route"
 
@@ -27,6 +29,12 @@ export const useUserStore = defineStore("user", () => {
   /** 登录 */
   const login = async ({ username, password, code }: LoginRequestData) => {
     const { data } = await loginApi({ username, password, code })
+    setToken(data.token)
+    token.value = data.token
+  }
+  /** 注册 */
+  const register = async ({ username, password, phone, code }: RegisterRequestData) => {
+    const { data } = await registerApi({ username, password, phone, code })
     setToken(data.token)
     token.value = data.token
   }
@@ -72,7 +80,7 @@ export const useUserStore = defineStore("user", () => {
     }
   }
 
-  return { token, roles, username, setRoles, login, getInfo, changeRoles, logout, resetToken }
+  return { token, roles, username, setRoles, login, register, getInfo, changeRoles, logout, resetToken }
 })
 
 /** 在 setup 外使用 */

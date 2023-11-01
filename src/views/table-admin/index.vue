@@ -8,7 +8,7 @@ import { usePagination } from "@/hooks/usePagination"
 
 defineOptions({
   // 命名当前组件
-  name: "ElementPlus"
+  name: "TableAdmin"
 })
 
 const loading = ref<boolean>(false)

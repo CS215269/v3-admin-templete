@@ -40,6 +40,12 @@ router.beforeEach(async (to, _from, next) => {
     return next({ path: "/" })
   }
 
+  // 如果已经登录，并准备进入 Register 页面，则重定向到主页
+  if (to.path === "/register") {
+    NProgress.done()
+    return next({ path: "/" })
+  }
+
   // 如果用户已经获得其权限角色
   if (userStore.roles.length !== 0) return next()
 
