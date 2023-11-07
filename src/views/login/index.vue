@@ -138,6 +138,10 @@ createCode()
   display: flex;
   justify-content: center;
   align-items: center;
+  background-image: url("@/assets/login-background/2182a0f90c935273ba9cb6fbbd647a25_800_375.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   width: 100%;
   min-height: 100%;
   .theme-switch {

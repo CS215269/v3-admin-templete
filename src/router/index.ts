@@ -374,7 +374,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
         name: "投递信息",
         meta: {
           title: "投递信息",
-          svgIcon: "unocss"
+          svgIcon: "keyboard-down"
         }
       }
     ]
