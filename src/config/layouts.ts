@@ -34,7 +34,7 @@ export interface LayoutSettings {
 
 /** 默认配置 */
 const defaultSettings: LayoutSettings = {
-  layoutMode: "left",
+  layoutMode: "left-top",
   showSettings: true,
   showTagsView: true,
   fixedHeader: true,
