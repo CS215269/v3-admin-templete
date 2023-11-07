@@ -10,11 +10,23 @@ export function createTableDataApi(data: Table.CreateTableRequestData) {
   })
 }
 
-/** 删 */
-export function deleteTableDataApi(id: number) {
-  return request({
-    url: `tableBatch/${id}`,
-    method: "delete"
+export function getPositionDataApi(batchid: number) {
+  return request<Table.GetPositionResponseData>({
+    url: `positions/${batchid}`,
+    headers: {
+      "ngrok-skip-browser-warning": "123"
+    },
+    method: "get"
+  })
+}
+
+export function getBatchDataApi() {
+  return request<Table.GetBatchResponseData>({
+    url: `batchs`,
+    headers: {
+      "ngrok-skip-browser-warning": "123"
+    },
+    method: "get"
   })
 }
 
@@ -27,14 +39,14 @@ export function updateTableDataApi(data: Table.UpdateTableRequestData) {
   })
 }
 
-/** 查 */
-export function getTableDataApi(params: Table.GetTableRequestData) {
-  return request<Table.GetTableResponseData>({
-    url: "tableBatch",
-    method: "get",
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
-    params
-  })
-}
+// /** 查 */
+// export function getBatchDataApi(params: Table.GetTableRequestData) {
+//   return request<Table.GetTableResponseData>({
+//     url: "tableBatch",
+//     method: "get",
+//     headers: {
+//       "ngrok-skip-browser-warning": "123"
+//     },
+//     params
+//   })
+// }

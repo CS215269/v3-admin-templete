@@ -1,41 +1,46 @@
+<script lang="ts" setup>
+import { defineProps } from "vue"
+import { GetPositionData } from "@/api/user-batch/types/user-batch"
+
+const props = defineProps<{
+  position: GetPositionData
+}>()
+
+defineOptions({
+  name: "JobBatchItem"
+})
+</script>
+
 <template>
   <div>
-    <div v-for="batch in batches" :key="batch.batchid">
-      <button @click="fetchJobs(batch.batchid)">{{ batch.batchname }}</button>
-      <div v-if="openBatchId === batch.batchid">
-        <!-- 抽屉内容 -->
-        <div v-for="job in batch.jobs" :key="job.id">
-          <!-- 展示岗位信息 -->
-          <div>{{ job.jobTitle }}</div>
-          <div>{{ job.department }}</div>
-          <!-- 其他岗位信息... -->
+    <el-card class="position-card" shadow="hover">
+      <template #header>
+        <div class="card-header">
+          <span class="head-title">{{ props.position.jobTitle }}</span>
+          <el-button class="button" text>投递</el-button>
         </div>
+      </template>
+      <div>
+        <el-text>所属部门:{{ position.department }}</el-text>
+        <br />
+        <el-text>学历要求:{{ position.degree }}</el-text>
+        <br />
+        <el-text>详细信息:{{ position.info }}</el-text>
       </div>
-    </div>
+    </el-card>
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      batches: [], // 批次数据
-      openBatchId: null // 当前展开的批次ID
-    }
-  },
-  methods: {
-    fetchJobs(batchId) {
-      // 发起AJAX请求获取批次ID对应的招聘岗位信息
-      // 将数据赋值给对应的batch.jobs
-      console.log("发送获取批次" + batchId + "号对应招聘岗位")
-    },
-    toggleDrawer(batchId) {
-      if (this.openBatchId === batchId) {
-        this.openBatchId = null // 关闭抽屉
-      } else {
-        this.openBatchId = batchId // 展开抽屉
-      }
+<style lang="scss" scoped>
+.position-card {
+  margin-bottom: 0.4em;
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .card-header {
+      tab-size: 1.5em;
     }
   }
 }
-</script>
+</style>

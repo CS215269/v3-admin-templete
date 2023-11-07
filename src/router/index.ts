@@ -373,7 +373,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/user-thing/index.vue"),
         name: "投递信息",
         meta: {
-          title: "投递",
+          title: "投递信息",
           svgIcon: "unocss"
         }
       }

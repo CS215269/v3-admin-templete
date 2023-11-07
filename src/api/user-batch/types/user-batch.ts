@@ -24,19 +24,30 @@ export interface GetTableRequestData {
   open?: number
 }
 
-export interface GetPositionThingData {
+export interface GetPositionData {
   id: number
   jobTitle: string
-  positionId: number
   department: string
   departmentId: number
-  batchid: number
-  batchname: string
   degree: number
   focus: number
+  info: string
 }
 
-export type GetTableResponseData = ApiResponseData<{
-  list: GetPositionThingData[]
+export interface GetBatchData {
+  id: number
+  name: string
+  startime: string
+  deadline: string
+  positionNum: number
+}
+
+export type GetBatchResponseData = ApiResponseData<{
+  list: GetBatchData[]
+  total: number
+}>
+
+export type GetPositionResponseData = ApiResponseData<{
+  list: GetPositionData[]
   total: number
 }>
