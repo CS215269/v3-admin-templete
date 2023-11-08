@@ -33,8 +33,8 @@ export const useUserStore = defineStore("user", () => {
     token.value = data.token
   }
   /** 注册 */
-  const register = async ({ username, password, phone, code }: RegisterRequestData) => {
-    const { data } = await registerApi({ username, password, phone, code })
+  const register = async ({ confirmPassword, password, phone, code }: RegisterRequestData) => {
+    const { data } = await registerApi({ confirmPassword, password, phone, code })
     setToken(data.token)
     token.value = data.token
   }
