@@ -22,7 +22,6 @@ const fetchData = async (id: number) => {
     console.error(error)
   }
 }
-
 onMounted(() => fetchData(props.batch.id))
 // onMounted(async () => {
 //   try {
@@ -35,7 +34,6 @@ onMounted(() => fetchData(props.batch.id))
 </script>
 
 <template>
-  <!-- batch.name应该在父组件中获取并传到该组件,待实现 -->
   <el-collapse-item :title="props.batch.name">
     <!-- Placeholder content for each batch -->
     <JobBatchItem v-for="position in positions" :key="position.id" :position="position" />
