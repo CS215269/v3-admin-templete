@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from "vue"
+import { ref } from "vue"
 import { getPositionDataApi } from "@/api/user-batch"
 import { GetPositionData, GetBatchData } from "@/api/user-batch/types/user-batch"
 import JobBatchItem from "@/components/JobBatch/JobBatchItem.vue"
@@ -14,6 +14,8 @@ defineOptions({
 
 const positions = ref<GetPositionData[]>([])
 
+const isExpanded = ref(false)
+
 const fetchData = async (id: number) => {
   try {
     const response = await getPositionDataApi(id)
@@ -22,20 +24,21 @@ const fetchData = async (id: number) => {
     console.error(error)
   }
 }
-onMounted(() => fetchData(props.batch.id))
-// onMounted(async () => {
-//   try {
-//     const response = await getPositionDataApi(props.batch.id)
-//     positions.value = response.data.list
-//   } catch (error) {
-//     console.error(error)
-//   }
-// })
+
+const handleChange = (status: boolean) => {
+  isExpanded.value = status
+  console.log("变化:" + isExpanded.value)
+  if (status) {
+    fetchData(props.batch.id)
+  }
+}
 </script>
 
 <template>
-  <el-collapse-item :title="props.batch.name">
+  <el-collapse-item :title="props.batch.name" @change="handleChange">
     <!-- Placeholder content for each batch -->
-    <JobBatchItem v-for="position in positions" :key="position.id" :position="position" />
+    <template v-if="isExpanded">
+      <JobBatchItem v-for="position in positions" :key="position.id" :position="position" />
+    </template>
   </el-collapse-item>
 </template>

@@ -74,12 +74,15 @@ const headers = {
                 </el-select>
               </el-form-item>
             </el-form>
+            <el-text>
+              您正在投递我校 {{ position.department }} 的 {{ props.position.jobTitle }} 职位
+              我们不会所要你的其他隐私,请您注意甄别违法、虚假、高风险招聘信息，警惕索要隐私信息的行为。
+            </el-text>
             <el-text> 请核对个人信息并上传相关文件 </el-text>
-
             <el-text> 图片: </el-text>
             <el-upload
               v-model:file-list="fileList"
-              action="https://supposedly-credible-cougar.ngrok-free.app/api/resume"
+              action="https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume"
               list-type="picture-card"
               :on-preview="handlePictureCardPreview"
               :on-remove="handleRemove"
@@ -91,7 +94,7 @@ const headers = {
             <el-upload
               v-model:file-list="fileList"
               class="upload-demo"
-              action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+              action="https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume"
               :on-change="handleChange"
             >
               <el-button type="primary">Click to upload</el-button>
