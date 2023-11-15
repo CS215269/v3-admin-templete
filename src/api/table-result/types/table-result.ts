@@ -1,18 +1,16 @@
+/** 添加数据结构 */
 export interface CreateTableRequestData {
-  jobTitle: string
-  departmentId: number
-  degree: string
-  info: string
+  positionId: number
+  batchId: number
 }
-
+/** 修改数据结构 */
 export interface UpdateTableRequestData {
+  positionId: number
+  batchId: number
   id: number
-  jobTitle: string
-  departmentId: number
-  degree: string
-  info: string
 }
 
+/** 搜索数据结构 */
 export interface GetTableRequestData {
   /** 当前页码 */
   currentPage: number
@@ -20,25 +18,23 @@ export interface GetTableRequestData {
   size: number
   /** 查询参数：批次名称 */
   jobTitle?: string
-  /** 查询参数：批次是否可用 */
-  department?: string
+  /** 查询参数：批次名称 */
+  batchName?: string[]
 }
 
-export interface GetTablePositionData {
-  id: number
+/** 表格数据结构 */
+export interface GetTableResultData {
+  recruitId: number
   jobTitle: string
   department: string
   degree: string
-  info: string
   departmentId: number
+  positionId: number
+  batchId: number
+  batchname: string
 }
 
 export type GetTableResponseData = ApiResponseData<{
-  list: GetTablePositionData[]
-  total: number
-}>
-
-export type GetPositionOptionData = ApiResponseData<{
-  list: { id: number; jobTitle: string }[]
+  list: GetTableResultData[]
   total: number
 }>

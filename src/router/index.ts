@@ -187,6 +187,28 @@ export const asyncRoutes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: "/thingResult",
+    component: Layouts,
+    redirect: "/thingResult/index",
+    name: "thingResult",
+    meta: {
+      title: "招聘",
+      svgIcon: "unocss",
+      roles: ["admin"]
+    },
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/table-result/index.vue"),
+        name: "公开的招聘岗位",
+        meta: {
+          title: "招聘岗位",
+          svgIcon: "unocss"
+        }
+      }
+    ]
+  },
+  {
     path: "/user-thing",
     component: Layouts,
     redirect: "/user-thing/index",

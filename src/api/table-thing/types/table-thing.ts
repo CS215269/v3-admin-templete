@@ -14,12 +14,12 @@ export interface GetTableRequestData {
 }
 
 export interface GetTableThingData {
-  id: number
+  recruitId: number
   jobTitle: string
   positionId: number
   department: string
   departmentId: number
-  batchid: number
+  batchId: number
   batchname: string
   degree: number
   userId: number

@@ -1,11 +1,14 @@
 import { request } from "@/utils/service"
-import type * as Table from "./types/table-batch"
+import type * as Table from "./types/table-result"
 
 /** 增 */
 export function createTableDataApi(data: Table.CreateTableRequestData) {
   return request({
-    url: "tableBatch",
+    url: "tableResult",
     method: "post",
+    headers: {
+      "ngrok-skip-browser-warning": "123"
+    },
     data
   })
 }
@@ -13,7 +16,10 @@ export function createTableDataApi(data: Table.CreateTableRequestData) {
 /** 删 */
 export function deleteTableDataApi(id: number) {
   return request({
-    url: `tableBatch/${id}`,
+    url: `tableResult/${id}`,
+    headers: {
+      "ngrok-skip-browser-warning": "123"
+    },
     method: "delete"
   })
 }
@@ -21,31 +27,25 @@ export function deleteTableDataApi(id: number) {
 /** 改 */
 export function updateTableDataApi(data: Table.UpdateTableRequestData) {
   return request({
-    url: "tableBatch",
+    url: "tableResult",
     method: "put",
+    headers: {
+      "ngrok-skip-browser-warning": "123"
+    },
     data
   })
 }
 
 /** 查 */
 export function getTableDataApi(params: Table.GetTableRequestData) {
+  // const temp = params.jobTitle as unknown as []
+  // temp.l
   return request<Table.GetTableResponseData>({
-    url: "tableBatch",
+    url: "tableResult",
     method: "get",
     headers: {
       "ngrok-skip-browser-warning": "123"
     },
     params
-  })
-}
-
-/** 查 */
-export function getBatchOptionsApi() {
-  return request<Table.GetBatchOptionData>({
-    url: "tableBatchOption",
-    method: "get",
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    }
   })
 }

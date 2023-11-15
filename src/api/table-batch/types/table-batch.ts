@@ -37,3 +37,7 @@ export type GetTableResponseData = ApiResponseData<{
   list: GetTableBatchData[]
   total: number
 }>
+
+export type GetBatchOptionData = ApiResponseData<{
+  list: { id: number; name: string }[]
+}>

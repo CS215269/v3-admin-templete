@@ -38,3 +38,14 @@ export function getTableDataApi(params: Table.GetTableRequestData) {
     params
   })
 }
+
+/** 查 */
+export function getPositionOptionApi() {
+  return request<Table.GetPositionOptionData>({
+    url: "getPositionOption",
+    method: "get",
+    headers: {
+      "ngrok-skip-browser-warning": "123"
+    }
+  })
+}
