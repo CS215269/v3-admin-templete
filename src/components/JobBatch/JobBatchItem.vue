@@ -82,7 +82,7 @@ const headers = {
             <el-text> 图片: </el-text>
             <el-upload
               v-model:file-list="fileList"
-              action="https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume"
+              action="api/resume"
               list-type="picture-card"
               :on-preview="handlePictureCardPreview"
               :on-remove="handleRemove"
@@ -91,12 +91,8 @@ const headers = {
               <el-icon><Plus /></el-icon>
             </el-upload>
             <el-text> PDF或world: </el-text>
-            <el-upload
-              v-model:file-list="fileList"
-              class="upload-demo"
-              action="https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume"
-              :on-change="handleChange"
-            >
+
+            <el-upload v-model:file-list="fileList" class="upload-demo" action="api/resume" :on-change="handleChange">
               <el-button type="primary">Click to upload</el-button>
               <template #tip>
                 <div class="el-upload__tip">jpg/png files with a size less than 500kb</div>
