@@ -52,10 +52,10 @@ onMounted(getTableData)
             :title="position.jobTitle"
           >
             <div>
-              <el-text>详细信息</el-text>
+              <el-text>进度信息</el-text>
             </div>
             <div>
-              <el-steps :space="200" :active="1" finish-status="success">
+              <el-steps :space="200" :active="position.status + 1" finish-status="success">
                 <el-step title="用户投递" />
                 <el-step title="人事部初审" />
                 <el-step title="下载准考证" />

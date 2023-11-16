@@ -40,8 +40,6 @@ const getBatchData = () => {
   getBatchDataApi()
     .then((res) => {
       batches.value = res.data.list
-      console.log("\n用户看批次\n" + res.data.list)
-      console.log("\n用户看批次\n" + batches.value)
     })
 
     .catch(() => {
@@ -51,14 +49,12 @@ const getBatchData = () => {
       loading.value = false
     })
 }
+
 onMounted(getBatchData)
 </script>
 
 <template>
   <div class="app-container">
-    <el-card loading="loading" shadow="never" class="search-wrapper">
-      <!-- Search form code here -->
-    </el-card>
     <el-card loading="loading" shadow="never">
       <div class="toolbar-wrapper">
         <!-- Toolbar buttons code here -->

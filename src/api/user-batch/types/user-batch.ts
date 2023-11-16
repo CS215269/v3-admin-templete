@@ -26,6 +26,7 @@ export interface GetTableRequestData {
 
 export interface GetPositionData {
   id: number
+  recruitId: number
   jobTitle: string
   department: string
   departmentId: number

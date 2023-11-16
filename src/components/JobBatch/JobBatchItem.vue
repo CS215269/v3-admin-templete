@@ -2,6 +2,7 @@
 import { defineProps, reactive, ref } from "vue"
 import { GetPositionData } from "@/api/user-batch/types/user-batch"
 import type { UploadProps, UploadUserFile } from "element-plus"
+import { submitThingApi } from "@/api/user-thing"
 
 const dialogFormVisible = ref(false)
 const formLabelWidth = "140px"
@@ -50,6 +51,17 @@ const handleChange: UploadProps["onChange"] = () => {
   /** 最多5个文件,多余的将被覆盖 */
   fileList.value = fileList.value.slice(-5)
 }
+
+const submit = (id: number) => {
+  dialogFormVisible.value = false
+  // loading.value = true
+  submitThingApi(id)
+    .then(() => {})
+    .catch(() => {})
+    .finally(() => {
+      // loading.value = false
+    })
+}
 const headers = {
   "ngrok-skip-browser-warning": "123"
 }
@@ -74,12 +86,14 @@ const headers = {
                 </el-select>
               </el-form-item>
             </el-form>
-            <el-text>
+            <el-text size="large" tag="p">
               您正在投递我校 {{ position.department }} 的 {{ props.position.jobTitle }} 职位
               我们不会所要你的其他隐私,请您注意甄别违法、虚假、高风险招聘信息，警惕索要隐私信息的行为。
             </el-text>
-            <el-text> 请核对个人信息并上传相关文件 </el-text>
-            <el-text> 图片: </el-text>
+            <el-text tag="p"> 请核对个人信息并上传相关文件 </el-text>
+            <el-text type="warning" tag="p"> 最多5个文件,多余的将被覆盖 </el-text>
+            <el-text type="danger" tag="p"> 请勿上传虚假信息 </el-text>
+            <el-text size="large" tag="p"> 图片: </el-text>
             <el-upload
               v-model:file-list="fileList"
               action="https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume"
@@ -90,16 +104,13 @@ const headers = {
             >
               <el-icon><Plus /></el-icon>
             </el-upload>
-            <el-text> PDF或world: </el-text>
-            <el-upload
-              v-model:file-list="fileList"
-              class="upload-demo"
-              action="https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume"
-              :on-change="handleChange"
-            >
-              <el-button type="primary">Click to upload</el-button>
+            <el-text size="large"> PDF或world: </el-text>
+
+            <!-- action="https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume" -->
+            <el-upload v-model:file-list="fileList" class="upload-demo" action="api/resume" :on-change="handleChange">
+              <el-button type="primary">选择文件</el-button>
               <template #tip>
-                <div class="el-upload__tip">jpg/png files with a size less than 500kb</div>
+                <div class="el-upload__tip">文件大小必须小于 500kb</div>
               </template>
             </el-upload>
 
@@ -108,8 +119,8 @@ const headers = {
             </el-dialog>
             <template #footer>
               <span class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">Cancel</el-button>
-                <el-button type="primary" @click="dialogFormVisible = false"> Confirm </el-button>
+                <el-button @click="dialogFormVisible = false"> 取消 </el-button>
+                <el-button type="primary" @click="submit(position.recruitId)"> 确定 </el-button>
               </span>
             </template>
           </el-dialog>

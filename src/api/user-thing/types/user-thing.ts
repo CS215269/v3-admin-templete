@@ -9,3 +9,4 @@ export interface GetTableRequestData {
 }
 
 export type GetUserThingResponseData = ApiResponseData<GetTableRequestData[]>
+export type SubmitThingResponseData = ApiResponseData<null>
