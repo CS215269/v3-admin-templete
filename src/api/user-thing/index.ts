@@ -20,6 +20,13 @@ export function getUserThingDataApi() {
   })
 }
 
+export function submitThingApi(params: number) {
+  return request<Table.SubmitThingResponseData>({
+    url: `submit`,
+    method: "get",
+    params
+  })
+}
 // /** 改 */
 // export function updateTableDataApi(data: Table.UpdateTableRequestData) {
 //   return request({
