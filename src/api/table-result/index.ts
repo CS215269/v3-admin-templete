@@ -6,9 +6,6 @@ export function createTableDataApi(data: Table.CreateTableRequestData) {
   return request({
     url: "tableResult",
     method: "post",
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     data
   })
 }
@@ -17,9 +14,6 @@ export function createTableDataApi(data: Table.CreateTableRequestData) {
 export function deleteTableDataApi(id: number) {
   return request({
     url: `tableResult/${id}`,
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     method: "delete"
   })
 }
@@ -29,9 +23,6 @@ export function updateTableDataApi(data: Table.UpdateTableRequestData) {
   return request({
     url: "tableResult",
     method: "put",
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     data
   })
 }
@@ -43,9 +34,6 @@ export function getTableDataApi(params: Table.GetTableRequestData) {
   return request<Table.GetTableResponseData>({
     url: "tableResult",
     method: "get",
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     params
   })
 }

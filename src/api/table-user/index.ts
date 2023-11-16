@@ -32,9 +32,6 @@ export function getTableDataApi(params: Table.GetTableRequestData) {
   return request<Table.GetTableResponseData>({
     url: "tablePosition",
     method: "get",
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     params
   })
 }

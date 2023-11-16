@@ -5,11 +5,7 @@ import type * as Redirect from "./types/redirect"
 export function getRedirectCodeApi() {
   return request<Redirect.RedirectCodeResponseData>({
     url: "redirect/code",
-    method: "get",
-    /** 内网穿透用,跳过无意义的响应 */
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    }
+    method: "get"
   })
 }
 
@@ -26,10 +22,6 @@ export function loginApi(data: Redirect.RedirectRequestData) {
 export function getUserInfoApi() {
   return request<Redirect.UserInfoResponseData>({
     url: "users/info",
-    method: "get",
-    /** 内网穿透用,跳过无意义的响应 */
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    }
+    method: "get"
   })
 }

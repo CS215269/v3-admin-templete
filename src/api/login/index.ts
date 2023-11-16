@@ -5,11 +5,8 @@ import type * as Login from "./types/login"
 export function getLoginCodeApi() {
   return request<Login.LoginCodeResponseData>({
     url: "login/code",
-    method: "get",
+    method: "get"
     /** 内网穿透用,跳过无意义的响应 */
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    }
   })
 }
 
@@ -26,10 +23,7 @@ export function loginApi(data: Login.LoginRequestData) {
 export function getUserInfoApi() {
   return request<Login.UserInfoResponseData>({
     url: "users/info",
-    method: "get",
+    method: "get"
     /** 内网穿透用,跳过无意义的响应 */
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    }
   })
 }

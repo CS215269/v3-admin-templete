@@ -13,9 +13,6 @@ export function createTableDataApi(data: Table.CreateTableRequestData) {
 export function getPositionDataApi(batchid: number) {
   return request<Table.GetPositionResponseData>({
     url: `positions/${batchid}`,
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     method: "get"
   })
 }
@@ -23,9 +20,6 @@ export function getPositionDataApi(batchid: number) {
 export function getBatchDataApi() {
   return request<Table.GetBatchResponseData>({
     url: `batchs`,
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     method: "get"
   })
 }

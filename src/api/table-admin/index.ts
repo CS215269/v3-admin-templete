@@ -6,10 +6,6 @@ export function createTableDataApi(data: Table.CreateTableRequestData) {
   return request({
     url: "tableAdmin",
     method: "post",
-    /** 绕过ngrok新人弹窗 */
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     data
   })
 }
@@ -18,10 +14,6 @@ export function createTableDataApi(data: Table.CreateTableRequestData) {
 export function deleteTableDataApi(id: string) {
   return request({
     url: `tableAdmin/${id}`,
-    /** 绕过ngrok新人弹窗 */
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     method: "delete"
   })
 }
@@ -31,10 +23,6 @@ export function updateTableDataApi(data: Table.UpdateTableRequestData) {
   return request({
     url: "tableAdmin",
     method: "put",
-    /** 绕过ngrok新人弹窗 */
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     data
   })
 }
@@ -44,10 +32,6 @@ export function getTableDataApi(params: Table.GetTableRequestData) {
   return request<Table.GetTableResponseData>({
     url: "tableAdmin",
     method: "get",
-    /** 绕过ngrok新人弹窗 */
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     params
   })
 }
