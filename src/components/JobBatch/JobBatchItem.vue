@@ -107,7 +107,12 @@ const headers = {
             <el-text size="large"> PDF或world: </el-text>
 
             <!-- action="https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume" -->
-            <el-upload v-model:file-list="fileList" class="upload-demo" action="api/resume" :on-change="handleChange">
+            <el-upload
+              v-model:file-list="fileList"
+              class="upload-demo"
+              action="https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume"
+              :on-change="handleChange"
+            >
               <el-button type="primary">选择文件</el-button>
               <template #tip>
                 <div class="el-upload__tip">文件大小必须小于 500kb</div>
