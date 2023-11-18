@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { defineProps, reactive, ref } from "vue"
 import { GetPositionData } from "@/api/user-batch/types/user-batch"
-import type { UploadProps, UploadUserFile } from "element-plus"
+import { ElMessage, UploadProps, UploadUserFile } from "element-plus"
 import { submitThingApi } from "@/api/user-thing"
 
 const dialogFormVisible = ref(false)
@@ -36,20 +36,58 @@ const handlePictureCardPreview: UploadProps["onPreview"] = (uploadFile) => {
   dialogImageUrl.value = uploadFile.url!
   dialogVisible.value = true
 }
-const fileList = ref<UploadUserFile[]>([
-  {
-    name: "food.jpeg",
-    url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100"
-  },
-  {
-    name: "plant-1.png",
-    url: "/images/plant-1.png"
+
+const updateSuccess: UploadProps["onSuccess"] = (uploadFile) => {
+  ElMessage.success(uploadFile.message)
+}
+
+const updateImgSuccess: UploadProps["onSuccess"] = (uploadFile) => {
+  console.log(uploadFile)
+  ElMessage.success(uploadFile.message)
+}
+
+const beforeImgUpload: UploadProps["beforeUpload"] = (rawFile) => {
+  if (rawFile.type !== "image/jpeg" && rawFile.type !== "image/png") {
+    ElMessage.error("只能上传 JPG 或 PNG 格式的图片!")
+    return false
+  } else if (rawFile.size / 1024 / 1024 > 2) {
+    ElMessage.error("文件大小必须小于2MB!")
+    return false
   }
-])
+  console.log(rawFile.name + "开始上传")
+  ElMessage.info(rawFile.name + " 开始上传")
+  return true
+}
+
+const beforeFileUpload: UploadProps["beforeUpload"] = (rawFile) => {
+  if (
+    rawFile.type !== "application/msword" &&
+    rawFile.type !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  ) {
+    ElMessage.error("只能上传 DOCX 格式的文件!")
+    return false
+  } else if (rawFile.size / 1024 / 1024 > 2) {
+    ElMessage.error("文件大小必须小于2MB!")
+    return false
+  }
+  console.log(rawFile.name + "开始上传")
+  ElMessage.info(rawFile.name + " 开始上传")
+  return true
+}
+
+const fileimgList = ref<UploadUserFile[]>([])
+const fileList = ref<UploadUserFile[]>([])
+
+const handleImgChange: UploadProps["onChange"] = () => {
+  /** 最多5个文件,多余的将被覆盖 */
+  fileimgList.value = fileimgList.value.slice(-5)
+  console.log("fileImg List" + fileimgList.value)
+}
 
 const handleChange: UploadProps["onChange"] = () => {
   /** 最多5个文件,多余的将被覆盖 */
   fileList.value = fileList.value.slice(-5)
+  console.log("fileList" + fileList.value)
 }
 
 const submit = (id: number) => {
@@ -92,14 +130,18 @@ const headers = {
             </el-text>
             <el-text tag="p"> 请核对个人信息并上传相关文件 </el-text>
             <el-text type="warning" tag="p"> 最多5个文件,多余的将被覆盖 </el-text>
+            <el-text type="warning" tag="p"> 文件大小必须小于 2mb </el-text>
             <el-text type="danger" tag="p"> 请勿上传虚假信息 </el-text>
             <el-text size="large" tag="p"> 图片: </el-text>
             <el-upload
-              v-model:file-list="fileList"
+              v-model:file-list="fileimgList"
               action="https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume"
               list-type="picture-card"
               :on-preview="handlePictureCardPreview"
               :on-remove="handleRemove"
+              :on-change="handleImgChange"
+              :on-success="updateImgSuccess"
+              :before-upload="beforeImgUpload"
               :headers="headers"
             >
               <el-icon><Plus /></el-icon>
@@ -111,7 +153,10 @@ const headers = {
               v-model:file-list="fileList"
               class="upload-demo"
               action="https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume"
+              :headers="headers"
               :on-change="handleChange"
+              :on-success="updateSuccess"
+              :before-upload="beforeFileUpload"
             >
               <el-button type="primary">选择文件</el-button>
               <template #tip>

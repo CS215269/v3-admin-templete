@@ -55,7 +55,7 @@ onMounted(getBatchData)
 
 <template>
   <div class="app-container">
-    <el-card loading="loading" shadow="never">
+    <el-card v-loading="loading" shadow="never">
       <div class="toolbar-wrapper">
         <!-- Toolbar buttons code here -->
       </div>

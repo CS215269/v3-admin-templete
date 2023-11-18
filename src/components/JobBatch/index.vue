@@ -27,7 +27,7 @@ const fetchData = async (id: number) => {
 
 const handleChange = (status: boolean) => {
   isExpanded.value = status
-  console.log("变化:" + isExpanded.value)
+  console.log("折叠面板打开的:" + isExpanded.value)
   if (status) {
     fetchData(props.batch.id)
   }
