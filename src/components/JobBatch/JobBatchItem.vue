@@ -93,9 +93,14 @@ const handleChange: UploadProps["onChange"] = () => {
 const submit = (id: number) => {
   dialogFormVisible.value = false
   // loading.value = true
-  submitThingApi(id)
-    .then(() => {})
-    .catch(() => {})
+  console.log("用户投了" + id)
+  submitThingApi({ recruitId: id })
+    .then(() => {
+      ElMessage.success("投递成功")
+    })
+    .catch(() => {
+      ElMessage.error("发生异常,请重试")
+    })
     .finally(() => {
       // loading.value = false
     })
@@ -126,7 +131,7 @@ const headers = {
             </el-form>
             <el-text size="large" tag="p">
               您正在投递我校 {{ position.department }} 的 {{ props.position.jobTitle }} 职位
-              我们不会所要你的其他隐私,请您注意甄别违法、虚假、高风险招聘信息，警惕索要隐私信息的行为。
+              我们不会索要你的其他隐私,请您注意甄别违法、虚假、高风险招聘信息，警惕索要隐私信息的行为。
             </el-text>
             <el-text tag="p"> 请核对个人信息并上传相关文件 </el-text>
             <el-text type="warning" tag="p"> 最多5个文件,多余的将被覆盖 </el-text>

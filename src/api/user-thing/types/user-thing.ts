@@ -8,5 +8,9 @@ export interface GetTableRequestData {
   status: number
 }
 
+export interface SubmitThingRequestData {
+  recruitId: number
+}
+
 export type GetUserThingResponseData = ApiResponseData<GetTableRequestData[]>
 export type SubmitThingResponseData = ApiResponseData<null>

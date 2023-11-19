@@ -18,17 +18,14 @@ const getTableData = () => {
   getUserThingDataApi()
     .then((res) => {
       positions.value = res.data
-      console.log("res.data.list" + res.data)
     })
     .catch((error) => {
-      console.log("前端异常")
-      console.error(error)
+      console.log("获取用户的投递异常,error= " + error)
       positions.value = []
     })
     .finally(() => {
       loading.value = false
     })
-  console.log(positions.value)
 }
 
 onMounted(getTableData)
@@ -59,8 +56,8 @@ onMounted(getTableData)
                 <el-step title="用户投递" />
                 <el-step title="人事部初审" />
                 <el-step title="下载准考证" />
+                <el-step title="笔试通过" />
                 <el-step title="面试通过" />
-                <el-step title="任职中" />
               </el-steps>
             </div>
           </el-collapse-item>

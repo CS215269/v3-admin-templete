@@ -20,10 +20,14 @@ export function getUserThingDataApi() {
   })
 }
 
-export function submitThingApi(params: number) {
+export function submitThingApi(params: Table.SubmitThingRequestData) {
+  console.log(params)
   return request<Table.SubmitThingResponseData>({
     url: `submit`,
     method: "get",
+    headers: {
+      "ngrok-skip-browser-warning": "123"
+    },
     params
   })
 }
