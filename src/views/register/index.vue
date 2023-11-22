@@ -2,7 +2,7 @@
 import { reactive, ref } from "vue"
 import { useRouter } from "vue-router"
 import { useUserStore } from "@/store/modules/user"
-import { type FormInstance, type FormRules } from "element-plus"
+import { ElMessage, type FormInstance, type FormRules } from "element-plus"
 import { Lock, Key, Picture, Loading, Phone } from "@element-plus/icons-vue"
 import { getRegisterCodeApi } from "@/api/register"
 import { type RegisterRequestData } from "@/api/register/types/register"
@@ -25,7 +25,6 @@ const registerFormData: RegisterRequestData = reactive({
 })
 /** 确认密码校验规则 */
 const validatePassword2 = (rule: any, value: string, callback: Function) => {
-  console.log("规则生效,判断式" + value + " == " + registerFormData.password)
   if (value !== registerFormData.password) {
     callback(new Error("两次输入的密码不一致"))
   } else {
@@ -68,6 +67,7 @@ const handleRegister = () => {
         })
     } else {
       console.error("表单校验不通过", fields)
+      ElMessage.error("表单校验不通过")
     }
   })
 }
@@ -158,6 +158,7 @@ createCode()
               </template>
             </el-input>
           </el-form-item>
+          <el-text>已有账号? <el-link href="#/login">去登录</el-link></el-text>
           <el-button :loading="loading" type="primary" size="large" @click.prevent="handleRegister">注 册</el-button>
         </el-form>
       </div>
