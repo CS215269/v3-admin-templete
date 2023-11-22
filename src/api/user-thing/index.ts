@@ -13,9 +13,6 @@ import type * as Table from "./types/user-thing"
 export function getUserThingDataApi() {
   return request<Table.GetUserThingResponseData>({
     url: `userAboutThing`,
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     method: "get"
   })
 }
@@ -25,9 +22,6 @@ export function submitThingApi(params: Table.SubmitThingRequestData) {
   return request<Table.SubmitThingResponseData>({
     url: `submit`,
     method: "get",
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     params
   })
 }
