@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { reactive, ref, watch } from "vue"
-import { getTableDataApi } from "@/api/table-thing"
+import { acceptThingApi, getTableDataApi } from "@/api/table-thing"
 import { type GetTableThingData } from "@/api/table-thing/types/table-thing"
-import { type FormInstance } from "element-plus"
+import { ElMessage, type FormInstance } from "element-plus"
 // import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Download, RefreshRight, Dish } from "@element-plus/icons-vue"
 import { usePagination } from "@/hooks/usePagination"
@@ -28,6 +28,18 @@ const getDegreeLabel = (row: { degree: number }) => {
       return "硕士"
     case 5:
       return "博士"
+    default:
+      return "异常"
+  }
+}
+const progressFormatter = (row: { status: number }) => {
+  switch (row.status) {
+    case 0:
+      return "未处理"
+    case 1:
+      return "已同意"
+    case 2:
+      return "已打印"
     default:
       return "异常"
   }
@@ -70,11 +82,30 @@ const resetSearch = () => {
 }
 //#endregion
 
+const tableRowClassName = ({ row, rowIndex }: { row: GetTableThingData; rowIndex: number }) => {
+  if (row.status === 1) {
+    console.log(rowIndex + "啊?" + row)
+    return "success-row"
+  }
+  // else if (rowIndex === 3) {
+  //   return "warning-row"
+  // }
+  return ""
+}
+
 const showinfo = (row: GetTableThingData) => {
   console.log(row)
 }
 
 const agree = (row: GetTableThingData) => {
+  loading.value = true
+  acceptThingApi({ thingId: row.thingId })
+    .then(() => {
+      ElMessage.success(row.username + "的" + row.jobTitle + "成功")
+    })
+    .catch()
+    .finally(getTableData)
+  loading.value = false
   console.log(row)
 }
 /** 监听分页参数的变化 */
@@ -116,7 +147,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </div>
       </div>
       <div class="table-wrapper">
-        <el-table :data="tableData">
+        <el-table :data="tableData" :row-class-name="tableRowClassName">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="batchname" label="批次" align="center" />
           <el-table-column prop="jobTitle" label="岗位名称" align="center" />
@@ -126,6 +157,25 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-table-column prop="degree" label="学历" align="center">
             <template #default="degreeScope">
               {{ getDegreeLabel(degreeScope.row) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="status" label="审核进度" align="center" :formatter="progressFormatter">
+            <template #default="scope">
+              <el-popover effect="light" trigger="hover" placement="top" width="auto">
+                <template #default>
+                  <div>审核流程:</div>
+                  <div>用户投递>管理员初审>笔试>面试</div>
+                </template>
+                <template v-if="scope.row.status === 0" #reference>
+                  <el-tag type="warning">未处理</el-tag>
+                </template>
+                <template v-else-if="scope.row.status === 1" #reference>
+                  <el-tag>已同意</el-tag>
+                </template>
+                <template v-else-if="scope.row.status === 2" #reference>
+                  <el-tag type="success">已打印</el-tag>
+                </template>
+              </el-popover>
             </template>
           </el-table-column>
           <el-table-column fixed="right" label="操作" width="250" align="center">

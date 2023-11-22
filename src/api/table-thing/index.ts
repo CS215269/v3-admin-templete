@@ -2,9 +2,9 @@ import { request } from "@/utils/service"
 import type * as Table from "./types/table-thing"
 
 /** 同意 */
-export function createTableDataApi(data: number) {
+export function acceptThingApi(data: { thingId: number }) {
   return request({
-    url: "tableThing",
+    url: "accept",
     method: "post",
     data
   })
@@ -33,9 +33,6 @@ export function getTableDataApi(params: Table.GetTableRequestData) {
   return request<Table.GetTableResponseData>({
     url: "tableThing",
     method: "get",
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     params
   })
 }
