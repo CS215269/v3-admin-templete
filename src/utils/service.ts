@@ -103,6 +103,7 @@ function createRequest(service: AxiosInstance) {
     const defaultConfig = {
       headers: {
         // 携带 Token
+        "ngrok-skip-browser-warning": "123",
         Authorization: token ? `Bearer ${token}` : undefined,
         "Content-Type": "application/json"
       },
