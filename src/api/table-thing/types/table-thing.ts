@@ -14,9 +14,13 @@ export interface GetTableRequestData {
 }
 
 export interface GetTableThingData {
+  /** 用户-(岗位-批次)表的主键 */
+  thingId: number
+  /** 岗位-批次表的主键 */
   recruitId: number
-  jobTitle: string
+  /** 岗位表的主键 */
   positionId: number
+  jobTitle: string
   department: string
   departmentId: number
   batchId: number
