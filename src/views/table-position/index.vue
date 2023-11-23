@@ -2,7 +2,7 @@
 import { reactive, ref, watch } from "vue"
 import { createTableDataApi, deleteTableDataApi, updateTableDataApi, getTableDataApi } from "@/api/table-position/index"
 import { type GetTablePositionData } from "@/api/table-position/types/table-position"
-import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
+import { type FormInstance, type FormRules, ElMessage, ElMessageBox, ElTooltip, ElTooltipProps } from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
 import { usePagination } from "@/hooks/usePagination"
 
@@ -158,6 +158,11 @@ const resetSearch = () => {
 }
 //#endregion
 
+const tableTooltipOption: Partial<ElTooltipProps> = {
+  placement: "left-start",
+  effect: "light"
+}
+
 /** 监听分页参数的变化 */
 watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })
 </script>
@@ -196,7 +201,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </div>
       </div>
       <div class="table-wrapper">
-        <el-table :data="tableData">
+        <el-table :data="tableData" :tooltip-options="tableTooltipOption" tooltip-effect="light">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="jobTitle" label="岗位名称" align="center" />
           <el-table-column prop="department" label="所属部门" align="center" />
@@ -205,7 +210,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               {{ getDegreeLabel(scope.row) }}
             </template>
           </el-table-column>
-          <el-table-column prop="info" label="介绍信息" align="center" />
+          <el-table-column prop="info" label="介绍信息" align="center" show-overflow-tooltip />
           <el-table-column fixed="right" label="操作" width="150" align="center">
             <template #default="scope">
               <el-button type="primary" text bg size="small" @click="handleUpdate(scope.row)">修改</el-button>
