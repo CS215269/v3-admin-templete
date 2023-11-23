@@ -45,6 +45,13 @@ export const constantRoutes: RouteRecordRaw[] = [
     }
   },
   {
+    path: "/admin-login",
+    component: () => import("@/views/login-admin/index.vue"),
+    meta: {
+      hidden: true
+    }
+  },
+  {
     path: "/register",
     component: () => import("@/views/register/index.vue"),
     meta: {
@@ -94,6 +101,28 @@ export const asyncRoutes: RouteRecordRaw[] = [
         meta: {
           title: "管理员",
           svgIcon: "lock"
+        }
+      }
+    ]
+  },
+  {
+    path: "/userTable",
+    component: Layouts,
+    redirect: "/userTable/index",
+    name: "userTable",
+    meta: {
+      title: "用户",
+      svgIcon: "user",
+      roles: ["admin"] // 可以在根路由中设置角色
+    },
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/table-user/index.vue"),
+        name: "用户信息",
+        meta: {
+          title: "用户",
+          svgIcon: "keyboard-up"
         }
       }
     ]
@@ -225,7 +254,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
         name: "投递信息",
         meta: {
           title: "投递信息",
-          svgIcon: "keyboard-down"
+          svgIcon: "keyboard-left"
         }
       }
     ]
@@ -247,38 +276,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
         name: "我的投递",
         meta: {
           title: "我的投递",
-          svgIcon: "keyboard-down"
-        }
-      }
-    ]
-  },
-  {
-    path: "/permission",
-    component: Layouts,
-    redirect: "/permission/page",
-    name: "Permission",
-    meta: {
-      title: "权限管理",
-      svgIcon: "lock",
-      roles: ["admin", "editor"], // 可以在根路由中设置角色
-      alwaysShow: true // 将始终显示根菜单
-    },
-    children: [
-      {
-        path: "page",
-        component: () => import("@/views/permission/page.vue"),
-        name: "PagePermission",
-        meta: {
-          title: "页面权限",
-          roles: ["admin"] // 或者在子导航中设置角色
-        }
-      },
-      {
-        path: "directive",
-        component: () => import("@/views/permission/directive.vue"),
-        name: "DirectivePermission",
-        meta: {
-          title: "指令权限" // 如果未设置角色，则表示：该页面不需要权限，但会继承根路由的角色
+          svgIcon: "keyboard-right"
         }
       }
     ]
