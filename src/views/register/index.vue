@@ -92,6 +92,7 @@ createCode()
     <div class="register-card">
       <div class="title">
         <img src="@/assets/layouts/logo-text-2.png" />
+        <el-text size="large">手机号注册</el-text>
       </div>
       <div class="content">
         <el-form
@@ -171,6 +172,10 @@ createCode()
   display: flex;
   justify-content: center;
   align-items: center;
+  background-image: url("@/assets/login-background/2182a0f90c935273ba9cb6fbbd647a25_800_375.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   width: 100%;
   min-height: 100%;
   .theme-switch {
@@ -189,6 +194,7 @@ createCode()
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
       height: 150px;
       img {
         height: 100%;
