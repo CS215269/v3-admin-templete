@@ -2,7 +2,7 @@
 import { reactive, ref, watch } from "vue"
 import { createTableDataApi, deleteTableDataApi, updateTableDataApi, getTableDataApi } from "@/api/table-user"
 import { type GetTableUserData } from "@/api/table-user/types/table-user"
-import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
+import { type FormInstance, type FormRules, ElMessage, ElMessageBox, ElTooltipProps } from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
 import { usePagination } from "@/hooks/usePagination"
 
@@ -153,6 +153,11 @@ const resetSearch = () => {
 }
 //#endregion
 
+const tableTooltipOption: Partial<ElTooltipProps> = {
+  placement: "left-start",
+  effect: "light"
+}
+
 const showUserInfo = (id: number) => {
   console.log("用户信息" + id)
 }
@@ -193,24 +198,39 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </div>
       </div>
       <div class="table-wrapper">
-        <el-table :data="tableData">
+        <el-table :data="tableData" :tooltip-options="tableTooltipOption">
+          <!-- id: number
+          name: string
+          idnum: number
+          tel: number
+          sex: string
+          age: string
+          degree: number
+          zzmm: string
+          school: string
+          nation: string
+          birthday: string
+          native_place: string
+          address: string
+          graduation_time: string
+          specialty: string -->
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="name" label="姓名" align="center" />
           <el-table-column prop="sex" label="性别" align="center" />
-          <el-table-column prop="age" label="年龄" align="center" />
-          <el-table-column prop="zzmm" label="政治面貌" align="center" />
+          <el-table-column prop="idnum" label="身份证" align="center" />
           <el-table-column prop="degree" label="学历" align="center">
             <template #default="scope">
               {{ getDegreeLabel(scope.row) }}
             </template>
           </el-table-column>
+          <el-table-column prop="address" label="地址" align="center" show-overflow-tooltip />
           <el-table-column prop="school" label="毕业院校" align="center" />
-          <el-table-column prop="native_place" label="籍贯" align="center" />
-          <el-table-column fixed="right" label="操作" width="150" align="center">
+          <el-table-column prop="graduation_time" label="毕业时间" align="center" />
+          <el-table-column fixed="right" label="操作" width="250" align="center">
             <template #default="scope">
+              <el-button type="info" text bg size="small" @click="showUserInfo(scope.row)">详细</el-button>
               <el-button type="primary" text bg size="small" @click="handleUpdate(scope.row)">修改</el-button>
               <el-button type="danger" text bg size="small" @click="handleDelete(scope.row)">删除</el-button>
-              <el-button type="info" text bg size="small" @click="showUserInfo(scope.row)">详细信息</el-button>
             </template>
           </el-table-column>
         </el-table>

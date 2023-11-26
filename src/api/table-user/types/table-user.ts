@@ -33,12 +33,19 @@ export interface GetTableRequestData {
 export interface GetTableUserData {
   id: number
   name: string
+  idnum: number
+  tel: number
   sex: string
   age: string
   degree: number
   zzmm: string
   school: string
+  nation: string
+  birthday: string
   native_place: string
+  address: string
+  graduation_time: string
+  specialty: string
 }
 
 export type GetTableResponseData = ApiResponseData<{

@@ -4,7 +4,7 @@ import type * as Table from "./types/table-user"
 /** 增 */
 export function createTableDataApi(data: Table.CreateTableRequestData) {
   return request({
-    url: "tablePosition",
+    url: "tableUser",
     method: "post",
     data
   })
@@ -13,7 +13,7 @@ export function createTableDataApi(data: Table.CreateTableRequestData) {
 /** 删 */
 export function deleteTableDataApi(id: number) {
   return request({
-    url: `tablePosition/${id}`,
+    url: `tableUser/${id}`,
     method: "delete"
   })
 }
@@ -21,7 +21,7 @@ export function deleteTableDataApi(id: number) {
 /** 改 */
 export function updateTableDataApi(data: Table.UpdateTableRequestData) {
   return request({
-    url: "tablePosition",
+    url: "tableUser",
     method: "put",
     data
   })
@@ -30,11 +30,8 @@ export function updateTableDataApi(data: Table.UpdateTableRequestData) {
 /** 查 */
 export function getTableDataApi(params: Table.GetTableRequestData) {
   return request<Table.GetTableResponseData>({
-    url: "tablePosition",
+    url: "tableUser",
     method: "get",
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     params
   })
 }
