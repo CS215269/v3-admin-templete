@@ -13,9 +13,7 @@ defineOptions({
   name: "TablePosition"
 })
 
-const positionOptions = ref<{ id: number; jobTitle: string }[]>([])
 const positionList = ref<{ id: number; jobTitle: string }[]>([])
-const batchOptions = ref<{ id: number; name: string }[]>([])
 const batchList = ref<{ id: number; name: string }[]>([])
 
 onMounted(() => {
@@ -41,33 +39,6 @@ onMounted(() => {
     })
 })
 
-const remoteBatchMethod = (query: string) => {
-  if (query) {
-    loading.value = true
-    setTimeout(() => {
-      loading.value = false
-      batchOptions.value = batchList.value.filter((item) => {
-        return item.name.toLowerCase().includes(query.toLowerCase())
-      })
-    }, 200)
-  } else {
-    batchOptions.value = []
-  }
-}
-
-const remotePositionMethod = (query: string) => {
-  if (query) {
-    loading.value = true
-    setTimeout(() => {
-      loading.value = false
-      positionOptions.value = positionList.value.filter((item) => {
-        return item.jobTitle.toLowerCase().includes(query.toLowerCase())
-      })
-    }, 200)
-  } else {
-    positionOptions.value = []
-  }
-}
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
 
@@ -98,11 +69,6 @@ const handleCreate = () => {
     const position = positionList.value.find((item) => item.jobTitle === formData.positionId)
     if (valid) {
       if (currentUpdateId.value === undefined) {
-        console.log("add")
-        console.log("formData.batchId" + formData.batchId)
-        console.log("formData.positionId" + formData.positionId)
-        console.log("batch" + batch)
-        console.log("position" + position)
         createTableDataApi({
           batchId: batch != undefined ? Number(batch.id) : Number(formData.batchId),
           positionId: position != undefined ? Number(position.id) : Number(formData.positionId)
@@ -115,11 +81,6 @@ const handleCreate = () => {
             dialogVisible.value = false
           })
       } else {
-        console.log("update")
-        console.log("formData.batchId" + formData.batchId)
-        console.log("formData.positionId" + formData.positionId)
-        console.log("batch" + batch)
-        console.log("position" + position)
         updateTableDataApi({
           id: currentUpdateId.value,
           batchId: batch != undefined ? Number(batch.id) : Number(formData.batchId),
@@ -167,9 +128,6 @@ const handleUpdate = (row: GetTableResultData) => {
   formData.positionId = positionList.value.find((item) => item.id === row.positionId)?.jobTitle as string
   formData.batchId = batchList.value.find((item) => item.id === row.batchId)?.name as string
   dialogVisible.value = true
-  console.log("pre-update")
-  console.log("formData.positionId" + formData.positionId)
-  console.log("formData.batchId" + formData.batchId)
 }
 //#endregion
 
@@ -182,9 +140,6 @@ const searchData = reactive({
 })
 const getTableData = () => {
   loading.value = true
-  console.log("选完结果")
-  console.log(searchData.jobTitle)
-  console.log(searchData.batchName)
   getTableDataApi({
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
@@ -213,8 +168,6 @@ const resetSearch = () => {
 
 const batchSort = (a: GetTableResultData, b: GetTableResultData) => {
   // 根据batchId属性进行比较并返回排序结果
-  console.log("a.batchId" + a.batchId)
-  console.log("b.batchId" + b.batchId)
   return a.batchId - b.batchId
 }
 // }
@@ -295,28 +248,13 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
         <p>关于岗位的一些建议</p>
         <el-form-item prop="batchId" label="所属批次">
-          <el-select
-            v-model="formData.batchId"
-            remote
-            :remote-method="remoteBatchMethod"
-            :loading="loading"
-            :filterable="true"
-            placeholder="请输入关键字进行搜索"
-          >
-            <el-option v-for="item in batchOptions" :key="item.id" :label="item.name" :value="item.id"
+          <el-select v-model="formData.batchId" filterable placeholder="Select">
+            <el-option v-for="item in batchList" :key="item.id" :label="item.name" :value="item.id"
           /></el-select>
         </el-form-item>
         <el-form-item prop="positionId" label="岗位名称">
-          <el-select
-            v-model="formData.positionId"
-            filterable
-            remote
-            reserve-keyword
-            :remote-method="remotePositionMethod"
-            :loading="loading"
-            placeholder="请输入批次名称关键字进行搜索"
-          >
-            <el-option v-for="item in positionOptions" :key="item.id" :label="item.jobTitle" :value="item.id" />
+          <el-select v-model="formData.positionId" filterable placeholder="岗位">
+            <el-option v-for="item in positionList" :key="item.id" :label="item.jobTitle" :value="item.id" />
           </el-select>
         </el-form-item>
       </el-form>
