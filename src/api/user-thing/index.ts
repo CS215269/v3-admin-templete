@@ -18,11 +18,18 @@ export function getUserThingDataApi() {
 }
 
 export function submitThingApi(params: Table.SubmitThingRequestData) {
-  console.log(params)
   return request<Table.SubmitThingResponseData>({
     url: `submit`,
     method: "get",
     params
+  })
+}
+
+export function setUserInfoApi(data: Table.setUserInfoRequestData) {
+  return request<Table.setUserInfoResponseData>({
+    url: `userInfo`,
+    method: "post",
+    data
   })
 }
 // /** 改 */
