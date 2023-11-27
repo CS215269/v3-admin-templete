@@ -17,6 +17,12 @@ function createService() {
   // 请求拦截
   service.interceptors.request.use(
     (config) => config,
+
+    // if (config.method === 'get') {
+    //   config.paramsSerializer = function(params) {
+    //     return qs.stringify(params, { arrayFormat: 'repeat' })
+    //   }
+
     // 发送失败
     (error) => Promise.reject(error)
   )
