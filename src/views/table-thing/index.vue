@@ -82,17 +82,6 @@ const resetSearch = () => {
 }
 //#endregion
 
-const tableRowClassName = ({ row, rowIndex }: { row: GetTableThingData; rowIndex: number }) => {
-  if (row.status === 1) {
-    console.log(rowIndex + "啊?" + row)
-    return "success-row"
-  }
-  // else if (rowIndex === 3) {
-  //   return "warning-row"
-  // }
-  return ""
-}
-
 const showinfo = (row: GetTableThingData) => {
   console.log(row)
 }
@@ -147,7 +136,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </div>
       </div>
       <div class="table-wrapper">
-        <el-table :data="tableData" :row-class-name="tableRowClassName">
+        <el-table :data="tableData">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="batchname" label="批次" align="center" />
           <el-table-column prop="jobTitle" label="岗位名称" align="center" />

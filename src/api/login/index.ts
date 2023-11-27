@@ -30,10 +30,6 @@ export function loginApi(data: Login.LoginRequestData) {
 export function getUserInfoApi() {
   return request<Login.UserInfoResponseData>({
     url: "users/info",
-    method: "get",
-    /** 内网穿透用,跳过无意义的响应 */
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    }
+    method: "get"
   })
 }
