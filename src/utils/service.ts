@@ -108,8 +108,9 @@ function createRequest(service: AxiosInstance) {
     const token = getToken()
     const defaultConfig = {
       headers: {
+        // 内网穿透服务跳过欢迎页面
+        "ngrok-skip-browser-warning": "true",
         // 携带 Token
-        "ngrok-skip-browser-warning": "123",
         Authorization: token ? `Bearer ${token}` : undefined,
         "Content-Type": "application/json"
       },
