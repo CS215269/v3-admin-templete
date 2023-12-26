@@ -36,6 +36,10 @@ const logout = () => {
   userStore.logout()
   router.push("/login")
 }
+
+const handleClick = () => {
+  console.log("click")
+}
 </script>
 
 <template>
@@ -49,12 +53,15 @@ const logout = () => {
       <ThemeSwitch v-if="showThemeSwitch" class="right-menu-item" />
       <Notify v-if="showNotify" class="right-menu-item" />
       <el-dropdown class="right-menu-item">
-        <div class="right-menu-avatar">
+        <div class="right-menu-avatar" @click="handleClick">
           <el-avatar :icon="UserFilled" :size="30" />
           <span>{{ userStore.username }}</span>
         </div>
         <template #dropdown>
           <el-dropdown-menu>
+            <el-dropdown-item divided @click="logout">
+              <span style="display: block">个人信息</span>
+            </el-dropdown-item>
             <a target="_blank" href="https://github.com/un-pany/v3-admin-vite">
               <el-dropdown-item>GitHub</el-dropdown-item>
             </a>
