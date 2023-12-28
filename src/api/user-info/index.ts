@@ -1,5 +1,5 @@
 import { request } from "@/utils/service"
-import type * as Table from "./types/user-thing"
+import type * as Table from "./types/user-info"
 
 // /** 增 */
 // export function createTableDataApi(data: Table.CreateTableRequestData) {
@@ -10,21 +10,20 @@ import type * as Table from "./types/user-thing"
 //   })
 // }
 
-export function getUserThingDataApi() {
-  return request<Table.GetUserThingResponseData>({
-    url: `userAboutThing`,
+export function getUserInfoApi() {
+  return request<Table.GetUserInfoResponseData>({
+    url: `userInfo`,
     method: "get"
   })
 }
 
-export function submitThingApi(params: Table.SubmitThingRequestData) {
-  return request<Table.SubmitThingResponseData>({
-    url: `submit`,
-    method: "get",
-    params
+export function setUserInfoApi(data: Table.SetUserInfoRequestData) {
+  return request<Table.SetUserInfoResponseData>({
+    url: `userInfo`,
+    method: "post",
+    data
   })
 }
-
 // /** 改 */
 // export function updateTableDataApi(data: Table.UpdateTableRequestData) {
 //   return request({
