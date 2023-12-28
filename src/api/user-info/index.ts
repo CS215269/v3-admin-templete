@@ -17,7 +17,7 @@ export function getUserInfoApi() {
   })
 }
 
-export function setUserInfoApi(data: Table.SetUserInfoRequestData) {
+export function setUserInfoApi(data: Table.UserInfoData) {
   return request<Table.SetUserInfoResponseData>({
     url: `userInfo`,
     method: "post",

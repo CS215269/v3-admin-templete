@@ -5,9 +5,9 @@ export interface UserInfoData {
   /** 姓名 */
   name: string
   /** 身份证号码 */
-  idnum: number
+  idnum: string
   /** 电话号码 */
-  tel: number
+  tel: string
   /** 性别 */
   sex: string
   /** 年龄 */
