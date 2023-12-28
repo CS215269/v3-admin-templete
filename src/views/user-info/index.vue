@@ -1,56 +1,32 @@
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from "vue"
-import { getBatchDataApi, getPositionDataApi } from "@/api/user-batch"
-import { GetBatchData, GetPositionData } from "@/api/user-batch/types/user-batch"
-import JobBatchItem from "@/components/JobBatch/JobBatchItem.vue"
+import { onMounted, ref } from "vue"
+import { getUserInfoApi } from "@/api/user-info"
+import { UserInfoData } from "@/api/user-info/types/user-info"
 
 defineOptions({
-  name: "UserThing"
+  name: "UserInfo"
 })
 
 const loading = ref<boolean>(false)
-/** 假设你已经有了一个批次列表 */
-const batches = ref<GetBatchData[]>([])
-/** 用于控制哪些 collapse 是展开的 */
-const activeNames = ref<string[]>([])
-/** 用于控制哪些 collapse 已经加载过数据 */
-const isExpanded = reactive<boolean[]>([])
-/** 用于存储每个 collapse 的数据 */
-const positions = reactive<GetPositionData[][]>([])
 
-const fetchData = async (index: number) => {
-  try {
-    const response = await getPositionDataApi(batches.value[index].id)
-    positions[index] = response.data.list
-  } catch (error) {
-    console.error(error)
-  }
-}
+const userinfo = ref<UserInfoData>()
 
-const handleChange = (index: number) => {
-  console.log("变化" + activeNames.value)
-  if (activeNames.value.includes(index.toString()) && !isExpanded[index]) {
-    fetchData(index)
-    isExpanded[index] = true
-  }
-}
-
-const getBatchData = () => {
+const getUserData = () => {
   loading.value = true
-  getBatchDataApi()
+  getUserInfoApi()
     .then((res) => {
-      batches.value = res.data.list
+      userinfo.value = res.data
     })
 
     .catch(() => {
-      batches.value = []
+      userinfo.value = undefined
     })
     .finally(() => {
       loading.value = false
     })
 }
 
-onMounted(getBatchData)
+onMounted(getUserData)
 </script>
 
 <template>
@@ -60,22 +36,27 @@ onMounted(getBatchData)
         <!-- Toolbar buttons code here -->
       </div>
       <div class="table-wrapper">
-        <el-collapse v-model="activeNames">
-          <el-collapse-item
-            v-for="(batch, index) in batches"
-            :key="batch.id"
-            :name="index.toString()"
-            :title="batch.name"
-            @click="handleChange(index)"
+        <el-descriptions title="Customized style list" :column="3" border>
+          <el-descriptions-item
+            label="Username"
+            label-align="right"
+            align="center"
+            label-class-name="my-label"
+            class-name="my-content"
+            width="150px"
+            >{{ userinfo?.name }}</el-descriptions-item
           >
-            <template v-if="isExpanded[index]">
-              <JobBatchItem v-for="position in positions[index]" :key="position.id" :position="position" />
-            </template>
-          </el-collapse-item>
-        </el-collapse>
-        <!-- <el-collapse v-model="activeCollapse">
-          <Batches v-for="batch in batches" :key="batch.id" :batch="batch" />
-        </el-collapse> -->
+          <el-descriptions-item label="Telephone" label-align="right" align="center">{{
+            userinfo?.idnum
+          }}</el-descriptions-item>
+          <el-descriptions-item label="Place" label-align="right" align="center">Suzhou</el-descriptions-item>
+          <el-descriptions-item label="Remarks" label-align="right" align="center">
+            <el-tag size="small">School</el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="Address" label-align="right" align="center"
+            >No.1188, Wuzhong Avenue, Wuzhong District, Suzhou, Jiangsu Province</el-descriptions-item
+          >
+        </el-descriptions>
       </div>
       <div class="pager-wrapper">
         <!-- Pagination code here -->
@@ -83,3 +64,12 @@ onMounted(getBatchData)
     </el-card>
   </div>
 </template>
+
+<style scoped>
+:deep(.my-label) {
+  background: var(--el-color-success-light-9) !important;
+}
+:deep(.my-content) {
+  background: var(--el-color-danger-light-9);
+}
+</style>

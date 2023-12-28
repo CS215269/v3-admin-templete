@@ -89,7 +89,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     redirect: "/adminTable/index",
     name: "adminTable",
     meta: {
-      title: "管理员",
+      title: "管理员后台",
       svgIcon: "lock",
       roles: ["admin"] // 可以在根路由中设置角色
     },
@@ -111,7 +111,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     redirect: "/userTable/index",
     name: "userTable",
     meta: {
-      title: "用户",
+      title: "管理员后台",
       svgIcon: "user",
       roles: ["admin"] // 可以在根路由中设置角色
     },
@@ -133,7 +133,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     redirect: "/batchTable/index",
     name: "batchTable",
     meta: {
-      title: "批次",
+      title: "管理员后台",
       svgIcon: "unocss",
       roles: ["admin"]
     },
@@ -155,7 +155,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     redirect: "/departmentTable/index",
     name: "departmentTable",
     meta: {
-      title: "部门",
+      title: "管理员后台",
       svgIcon: "unocss",
       roles: ["admin"]
     },
@@ -177,7 +177,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     redirect: "/positionTable/index",
     name: "positionTable",
     meta: {
-      title: "岗位",
+      title: "管理员后台",
       svgIcon: "unocss",
       roles: ["admin"]
     },
@@ -199,7 +199,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     redirect: "/thingTable/index",
     name: "thingTable",
     meta: {
-      title: "投递",
+      title: "管理员后台",
       svgIcon: "unocss",
       roles: ["admin"]
     },
@@ -277,6 +277,28 @@ export const asyncRoutes: RouteRecordRaw[] = [
         meta: {
           title: "我的投递",
           svgIcon: "keyboard-right"
+        }
+      }
+    ]
+  },
+  {
+    path: "/user-info",
+    component: Layouts,
+    redirect: "/user-info/index",
+    name: "my-info",
+    meta: {
+      title: "投递",
+      svgIcon: "unocss",
+      roles: ["editor"]
+    },
+    children: [
+      {
+        path: "index",
+        component: () => import("@/views/user-info/index.vue"),
+        name: "个人信息",
+        meta: {
+          title: "个人信息",
+          svgIcon: "fullscreen"
         }
       }
     ]
