@@ -37,6 +37,11 @@ const logout = () => {
   router.push("/login")
 }
 
+/** 登出 */
+const userInfo = () => {
+  router.push("/user-info")
+}
+
 const handleClick = () => {
   console.log("click")
 }
@@ -59,7 +64,7 @@ const handleClick = () => {
         </div>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item divided @click="logout">
+            <el-dropdown-item divided @click="userInfo">
               <span style="display: block">个人信息</span>
             </el-dropdown-item>
             <a target="_blank" href="https://github.com/un-pany/v3-admin-vite">
