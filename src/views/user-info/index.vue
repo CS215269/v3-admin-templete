@@ -100,7 +100,12 @@ const getUserData = () => {
 const startEditing = () => {
   isEditing.value = true
   if (userinfo.value) {
-    editedUserinfo.value = userinfo.value
+    console.log("备份成编辑模式")
+    /* 深拷贝赋值,否则是将对象的引用赋值给左值 */
+    const obj = JSON.parse(JSON.stringify(userinfo.value))
+    editedUserinfo.value = obj
+  } else {
+    ElMessage.error("出现异常,请联系管理员")
   }
 }
 const saveChanges = () => {
@@ -110,6 +115,9 @@ const saveChanges = () => {
   setUserInfoApi(editedUserinfo.value)
     .then((res) => {
       ElMessage.info(res.message)
+      /* 深拷贝赋值,否则是将对象的引用赋值给左值 */
+      const obj = JSON.parse(JSON.stringify(editedUserinfo.value))
+      userinfo.value = obj
     })
     .catch(() => {
       ElMessage.error("提交修改失败,请重试")
@@ -121,7 +129,9 @@ const saveChanges = () => {
 const cancelEditing = () => {
   isEditing.value = false
   if (userinfo.value) {
-    editedUserinfo.value = userinfo.value
+    /* 深拷贝赋值,否则是将对象的引用赋值给左值 */
+    const obj = JSON.parse(JSON.stringify(userinfo.value))
+    editedUserinfo.value = obj
   }
 }
 onMounted(getUserData)
@@ -173,12 +183,12 @@ const validateInput = () => {
           ></el-descriptions-item>
           <el-descriptions-item label="年龄" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.age }}</template>
-            <template v-else> <el-input id="userid" v-model="editedUserinfo.age" @blur="validateInput" /> </template
+            <template v-else> <el-input id="userage" v-model="editedUserinfo.age" @blur="validateInput" /> </template
           ></el-descriptions-item>
           <el-descriptions-item label="性别" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.sex }}</template>
             <template v-else>
-              <el-select v-model="editedUserinfo.sex">
+              <el-select id="usersex" v-model="editedUserinfo.sex">
                 <el-option label="男" value="男" />
                 <el-option label="女" value="女" />
               </el-select> </template
@@ -186,7 +196,7 @@ const validateInput = () => {
           <el-descriptions-item label="学历" label-align="center" align="left">
             <template v-if="!isEditing">{{ getDegreeLabel(userinfo?.degree) }}</template>
             <template v-else>
-              <el-select v-model="editedUserinfo.degree">
+              <el-select id="userdegree" v-model="editedUserinfo.degree">
                 <el-option label="中专" value="1" />
                 <el-option label="大专" value="2" />
                 <el-option label="本科" value="3" />
@@ -195,8 +205,13 @@ const validateInput = () => {
               </el-select> </template
           ></el-descriptions-item>
           <el-descriptions-item label="政治面貌" label-align="center" align="left">
-            <template v-if="!isEditing">{{ userinfo?.zzmm }}</template>
-            <template v-else> <el-input v-model="editedUserinfo.zzmm" /> </template
+            <template v-if="!isEditing">{{ userinfo?.zzmm }}<span>啊啊啊</span></template>
+            <template v-else
+              ><el-select id="userzzmm" v-model="editedUserinfo.zzmm">
+                <el-option label="群众" value="群众" />
+                <el-option label="团员" value="团员" />
+                <el-option label="党员" value="党员" />
+              </el-select> </template
           ></el-descriptions-item>
           <el-descriptions-item label="籍贯" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.native_place }}</template>
@@ -204,7 +219,14 @@ const validateInput = () => {
           ></el-descriptions-item>
           <el-descriptions-item label="出生日期" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.birthday }}</template>
-            <template v-else> <el-input v-model="editedUserinfo.birthday" /> </template
+            <template v-else>
+              <el-date-picker
+                v-model="editedUserinfo.birthday"
+                type="date"
+                placeholder="选择日期"
+                format="YYYY/MM/DD"
+                value-format="YYYY-MM-DD"
+              /> </template
           ></el-descriptions-item>
           <el-descriptions-item label="民族" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.nation }}</template>

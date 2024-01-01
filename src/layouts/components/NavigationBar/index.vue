@@ -37,8 +37,9 @@ const logout = () => {
   router.push("/login")
 }
 
-/** 登出 */
+/** 用户信息 */
 const userInfo = () => {
+  userStore.getInfo().then(() => {})
   router.push("/user-info")
 }
 
