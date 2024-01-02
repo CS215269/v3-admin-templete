@@ -90,7 +90,7 @@ const getUserData = () => {
         graduation_time: "",
         specialty: ""
       }
-      ElMessage.error("获取信息失败,请重试")
+      ElMessage.error("获取个人信息失败,请重试")
     })
     .finally(() => {
       loading.value = false

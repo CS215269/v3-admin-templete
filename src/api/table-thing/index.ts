@@ -29,10 +29,18 @@ export function updateTableDataApi(data: number) {
 }
 
 /** 查 */
-export function getTableDataApi(params: Table.GetTableRequestData) {
+export function getTableDataApi() {
   return request<Table.GetTableResponseData>({
     url: "tableThing",
-    method: "get",
-    params
+    method: "get"
+  })
+}
+
+/** 查 */
+export function getTableDataBySearchApi(data: Table.GetTableRequestData) {
+  return request<Table.GetTableResponseData>({
+    url: "tableThing2",
+    method: "post",
+    data
   })
 }

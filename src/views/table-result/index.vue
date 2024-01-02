@@ -135,7 +135,7 @@ const handleUpdate = (row: GetTableResultData) => {
 const tableData = ref<GetTableResultData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
-  jobTitle: "",
+  jobTitle: [],
   batchName: []
 })
 const getTableData = () => {
@@ -143,7 +143,7 @@ const getTableData = () => {
   getTableDataApi({
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
-    jobTitle: searchData.jobTitle || undefined,
+    jobTitle: searchData.jobTitle,
     batchName: searchData.batchName || undefined
   })
     .then((res) => {
@@ -180,12 +180,12 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
   <div class="app-container">
     <el-card v-loading="loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
-        <el-form-item prop="jobTitle" label="批次">
+        <el-form-item prop="jobTitle" label="批次" size="large">
           <el-select v-model="searchData.batchName" multiple placeholder="请输入">
             <el-option v-for="item in batchList" :key="item.id" :label="item.name" :value="item.name" />
           </el-select>
         </el-form-item>
-        <el-form-item prop="batchName" label="岗位名称">
+        <el-form-item prop="batchName" label="岗位名称" size="large">
           <el-select v-model="searchData.jobTitle" multiple placeholder="请输入">
             <el-option v-for="item in positionList" :key="item.id" :label="item.jobTitle" :value="item.jobTitle" />
           </el-select>

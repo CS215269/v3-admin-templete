@@ -37,15 +37,10 @@ export function updateTableDataApi(data: Table.UpdateTableRequestData) {
 }
 
 /** 查 */
-export function getTableDataApi(params: Table.GetTableRequestData) {
-  // const temp = params.jobTitle as unknown as []
-  // temp.l
+export function getTableDataApi(data: Table.GetTableRequestData) {
   return request<Table.GetTableResponseData>({
-    url: "tableResult",
-    method: "get",
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
-    params
+    url: "tableResult2",
+    method: "post",
+    data
   })
 }

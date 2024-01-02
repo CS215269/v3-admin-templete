@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { reactive, ref, watch } from "vue"
-import { acceptThingApi, getTableDataApi } from "@/api/table-thing"
+import { acceptThingApi, getTableDataBySearchApi } from "@/api/table-thing"
 import { type GetTableThingData } from "@/api/table-thing/types/table-thing"
 import { ElMessage, type FormInstance } from "element-plus"
 // import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
@@ -55,7 +55,7 @@ const searchData = reactive({
 })
 const getTableData = () => {
   loading.value = true
-  getTableDataApi({
+  getTableDataBySearchApi({
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
     batch: searchData.batch || undefined,
@@ -93,9 +93,10 @@ const agree = (row: GetTableThingData) => {
       ElMessage.success(row.username + "的" + row.jobTitle + "成功")
     })
     .catch()
-    .finally(getTableData)
-  loading.value = false
-  console.log(row)
+    .finally(() => {
+      getTableData()
+      loading.value = false
+    })
 }
 /** 监听分页参数的变化 */
 watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })

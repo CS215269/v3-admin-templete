@@ -17,7 +17,7 @@ export interface GetTableRequestData {
   /** 查询条数 */
   size: number
   /** 查询参数：批次名称 */
-  jobTitle?: string
+  jobTitle?: string[]
   /** 查询参数：批次名称 */
   batchName?: string[]
 }
