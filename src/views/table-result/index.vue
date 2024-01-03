@@ -181,12 +181,26 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
     <el-card v-loading="loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
         <el-form-item prop="jobTitle" label="批次" size="large">
-          <el-select v-model="searchData.batchName" multiple placeholder="请输入">
+          <el-select
+            v-model="searchData.batchName"
+            filterable
+            collapse-tags
+            collapse-tags-tooltip
+            multiple
+            placeholder="请输入"
+          >
             <el-option v-for="item in batchList" :key="item.id" :label="item.name" :value="item.name" />
           </el-select>
         </el-form-item>
         <el-form-item prop="batchName" label="岗位名称" size="large">
-          <el-select v-model="searchData.jobTitle" multiple placeholder="请输入">
+          <el-select
+            v-model="searchData.jobTitle"
+            filterable
+            collapse-tags
+            collapse-tags-tooltip
+            multiple
+            placeholder="请输入"
+          >
             <el-option v-for="item in positionList" :key="item.id" :label="item.jobTitle" :value="item.jobTitle" />
           </el-select>
         </el-form-item>
@@ -248,7 +262,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
         <p>关于岗位的一些建议</p>
         <el-form-item prop="batchId" label="所属批次">
-          <el-select v-model="formData.batchId" filterable placeholder="Select">
+          <el-select v-model="formData.batchId" filterable placeholder="请选择所属批次">
             <el-option v-for="item in batchList" :key="item.id" :label="item.name" :value="item.id"
           /></el-select>
         </el-form-item>
