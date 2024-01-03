@@ -143,8 +143,8 @@ const getTableData = () => {
   getTableDataApi({
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
-    jobTitle: searchData.jobTitle,
-    batchName: searchData.batchName || undefined
+    jobTitles: searchData.jobTitle,
+    batches: searchData.batchName || undefined
   })
     .then((res) => {
       paginationData.total = res.data.total
