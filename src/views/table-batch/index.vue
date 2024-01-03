@@ -215,11 +215,11 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       width="30%"
     >
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
-        <p>批次名称建议带有排序或年份,如XX年第二批</p>
+        <p>批次名称建议带有序号或年份,如2023年第2批</p>
         <el-form-item prop="name" label="批次名称">
           <el-input v-model="formData.name" placeholder="请输入" />
         </el-form-item>
-        <el-form-item prop="open" label="批次状态">
+        <el-form-item prop="open" label="批次状态" aria-placeholder="请选择">
           <!--  v-if="currentUpdateId === undefined" 让组件在修改对话框不可见 -->
           <el-select v-model="formData.open" placeholder="请输入">
             <el-option label="已启用" value="1" />
@@ -227,10 +227,22 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           </el-select>
         </el-form-item>
         <el-form-item prop="startime" label="开始时间">
-          <el-date-picker v-model="formData.startime" placeholder="请输入" />
+          <el-date-picker
+            v-model="formData.startime"
+            type="date"
+            placeholder="选择日期"
+            format="YYYY/MM/DD"
+            value-format="YYYY-MM-DD"
+          />
         </el-form-item>
         <el-form-item prop="deadline" label="结束时间">
-          <el-date-picker v-model="formData.deadline" placeholder="请输入" />
+          <el-date-picker
+            v-model="formData.deadline"
+            type="date"
+            placeholder="选择日期"
+            format="YYYY/MM/DD"
+            value-format="YYYY-MM-DD"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
