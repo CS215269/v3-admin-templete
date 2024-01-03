@@ -32,9 +32,13 @@ export function getTableDataApi(params: Table.GetTableRequestData) {
   return request<Table.GetTableResponseData>({
     url: "tableDepartment",
     method: "get",
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    },
     params
+  })
+}
+
+export function getDepartmentOptionApi() {
+  return request<Table.GetDepartmenOptionData>({
+    url: "getDepartmentOption",
+    method: "get"
   })
 }

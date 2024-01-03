@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { reactive, ref, watch } from "vue"
+import { onMounted, reactive, ref, watch } from "vue"
 import { createTableDataApi, deleteTableDataApi, updateTableDataApi, getTableDataApi } from "@/api/table-position/index"
 import { type GetTablePositionData } from "@/api/table-position/types/table-position"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox, ElTooltip, ElTooltipProps } from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
 import { usePagination } from "@/hooks/usePagination"
+import { getDepartmentOptionApi } from "@/api/table-department"
 
 defineOptions({
   // 命名当前组件
@@ -158,10 +159,26 @@ const resetSearch = () => {
 }
 //#endregion
 
+/** 配置气泡提示 */
 const tableTooltipOption: Partial<ElTooltipProps> = {
   placement: "left-start",
   effect: "light"
 }
+
+/** 下拉框数据:部门 */
+const departmentList = ref<{ id: number; name: string }[]>([])
+onMounted(() => {
+  getDepartmentOptionApi()
+    .then((res) => {
+      departmentList.value = res.data.list
+    })
+    .catch(() => {
+      departmentList.value = []
+    })
+    .finally(() => {
+      loading.value = false
+    })
+})
 
 /** 监听分页参数的变化 */
 watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })
@@ -240,19 +257,36 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       width="30%"
     >
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
-        <p>关于岗位的一些建议</p>
+        <p>添加岗位,所属批次关闭时次岗位对用户不可见</p>
         <el-form-item prop="jobTitle" label="岗位名称">
           <el-input v-model="formData.jobTitle" placeholder="请输入" />
         </el-form-item>
         <el-form-item prop="open" label="所属部门">
           <!--  v-if="currentUpdateId === undefined" 让组件在修改对话框不可见 -->
-          <el-input v-model="formData.departmentId" placeholder="请输入" />
+          <el-select v-model="formData.departmentId" filterable placeholder="岗位">
+            <el-option v-for="item in departmentList" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
         </el-form-item>
         <el-form-item prop="degree" label="学历要求">
-          <el-select v-model="formData.degree" placeholder="请输入" />
+          <el-select v-model="formData.degree" placeholder="请选择">
+            <!-- <el-option v-for="item in positionList" :key="item.id" :label="item.jobTitle" :value="item.id" /> -->
+            <el-option label="高职" value="1" />
+            <el-option label="大专" value="2" />
+            <el-option label="本科" value="3" />
+            <el-option label="硕士" value="4" />
+            <el-option label="博士" value="5" />
+          </el-select>
         </el-form-item>
         <el-form-item prop="info" label="介绍信息">
-          <el-text v-model="formData.info" placeholder="请输入" />
+          <el-text placeholder="请输入" />
+          <el-input
+            v-model="formData.info"
+            :rows="2"
+            type="textarea"
+            placeholder="请输入"
+            maxlength="50"
+            show-word-limit
+          />
         </el-form-item>
       </el-form>
       <template #footer>

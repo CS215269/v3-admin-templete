@@ -26,3 +26,7 @@ export type GetTableResponseData = ApiResponseData<{
   list: GetTableDepartmentData[]
   total: number
 }>
+
+export type GetDepartmenOptionData = ApiResponseData<{
+  list: { id: number; name: string }[]
+}>
