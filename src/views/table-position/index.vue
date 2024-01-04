@@ -2,7 +2,15 @@
 import { onMounted, reactive, ref, watch } from "vue"
 import { createTableDataApi, deleteTableDataApi, updateTableDataApi, getTableDataApi } from "@/api/table-position/index"
 import { type GetTablePositionData } from "@/api/table-position/types/table-position"
-import { type FormInstance, type FormRules, ElMessage, ElMessageBox, ElTooltip, ElTooltipProps } from "element-plus"
+import {
+  type FormInstance,
+  type FormRules,
+  ElMessage,
+  ElMessageBox,
+  ElTooltip,
+  ElTooltipProps,
+  ElTable
+} from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
 import { usePagination } from "@/hooks/usePagination"
 import { getDepartmentOptionApi } from "@/api/table-department"
@@ -180,6 +188,39 @@ onMounted(() => {
     })
 })
 
+const multipleSelection = ref<GetTablePositionData[]>([])
+const handleSelectionChange = (val: GetTablePositionData[]) => {
+  multipleSelection.value = val
+}
+
+/** 添加删除选中行的方法 */
+const deleteLoading = ref<boolean>(false)
+/** 添加删除选中行的方法 */
+const deleteSelection = () => {
+  deleteLoading.value = true
+  if (!multipleSelection.value || multipleSelection.value.length === 0) {
+    deleteLoading.value = false
+    return ElMessage.warning("请选择要删除的行")
+  }
+  const ids = multipleSelection.value.map((item: { id: any }) => item.id)
+  ElMessageBox.confirm(`确定删除选中的${ids.length}条数据?`, "删除数据", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning"
+  }).then(() => {
+    deleteTableDataApi(ids)
+      .then(() => {
+        ElMessage.success("删除成功")
+        getTableData()
+      })
+      .catch(() => {
+        ElMessage.error("删除失败")
+      })
+      .finally(() => {
+        deleteLoading.value = false
+      })
+  })
+}
 /** 监听分页参数的变化 */
 watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })
 </script>
@@ -206,7 +247,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <div class="toolbar-wrapper">
         <div>
           <el-button type="primary" :icon="CirclePlus" @click="dialogVisible = true">新增岗位</el-button>
-          <el-button type="danger" :icon="Delete">批量删除</el-button>
+          <el-button type="danger" :icon="Delete" @click="deleteSelection" :loading="deleteLoading">批量删除</el-button>
         </div>
         <div>
           <el-tooltip content="下载">
@@ -218,7 +259,12 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </div>
       </div>
       <div class="table-wrapper">
-        <el-table :data="tableData" :tooltip-options="tableTooltipOption" tooltip-effect="light">
+        <el-table
+          :data="tableData"
+          :tooltip-options="tableTooltipOption"
+          @selection-change="handleSelectionChange"
+          tooltip-effect="light"
+        >
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="jobTitle" label="岗位名称" align="center" />
           <el-table-column prop="department" label="所属部门" align="center" />

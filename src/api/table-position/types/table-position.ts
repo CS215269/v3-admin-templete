@@ -42,3 +42,8 @@ export type GetPositionOptionData = ApiResponseData<{
   list: { id: number; jobTitle: string }[]
   total: number
 }>
+
+export type DeleteResult = ApiResponseData<{
+  total: number
+  error: number
+}>

@@ -11,10 +11,12 @@ export function createTableDataApi(data: Table.CreateTableRequestData) {
 }
 
 /** 删 */
-export function deleteTableDataApi(id: number) {
-  return request({
-    url: `tablePosition/${id}`,
-    method: "delete"
+export function deleteTableDataApi(id: number | number[]) {
+  const data = Array.isArray(id) ? id : [id]
+  return request<Table.DeleteResult>({
+    url: `tablePositionDel`,
+    method: "post",
+    data
   })
 }
 
@@ -43,9 +45,6 @@ export function getTableDataApi(params: Table.GetTableRequestData) {
 export function getPositionOptionApi() {
   return request<Table.GetPositionOptionData>({
     url: "getPositionOption",
-    method: "get",
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    }
+    method: "get"
   })
 }
