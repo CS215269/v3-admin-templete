@@ -251,7 +251,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
       {
         path: "index",
         component: () => import("@/views/user-thing/index.vue"),
-        name: "投递信息",
+        name: "我的投递信息",
         meta: {
           title: "投递信息",
           svgIcon: "keyboard-left"
@@ -272,7 +272,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     children: [
       {
         path: "index",
-        component: () => import("@/views/my-thing/index.vue"),
+        component: () => import("@/views/user-mything/index.vue"),
         name: "我的投递",
         meta: {
           title: "我的投递",
