@@ -30,7 +30,7 @@ export interface GetTableThingData {
   status: number
 }
 
-export interface GetThingInfoData {
+export interface ThingInfoData {
   /** 用户id */
   userId: number
   /** 姓名 */
@@ -79,3 +79,4 @@ export type GetTableResponseData = ApiResponseData<{
   list: GetTableThingData[]
   total: number
 }>
+export type GetThingInfoData = ApiResponseData<{ data: ThingInfoData }>

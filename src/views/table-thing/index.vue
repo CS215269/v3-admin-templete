@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref, watch } from "vue"
 import { acceptThingApi, getTableDataBySearchApi, getThingInfoApi } from "@/api/table-thing"
-import { GetThingInfoData, type GetTableThingData } from "@/api/table-thing/types/table-thing"
+import { ThingInfoData, type GetTableThingData } from "@/api/table-thing/types/table-thing"
 import { ElMessage, type FormInstance } from "element-plus"
 // import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Download, RefreshRight, Dish } from "@element-plus/icons-vue"
@@ -143,7 +143,7 @@ onMounted(() => {
 /** 详细信息弹框开关 */
 const dialogVisible = ref<boolean>(false)
 /** 详细信息 */
-const thingInfo = ref<GetThingInfoData>({
+const thingInfo = ref<ThingInfoData>({
   /** 用户id */
   userId: 0,
   /** 姓名 */
@@ -193,7 +193,8 @@ const showinfo = (row: GetTableThingData) => {
   getThingInfoApi(row.thingId)
     .then((res) => {
       dialogVisible.value = true
-      thingInfo.value = res
+      console.log(res)
+      thingInfo.value = res.data.data
     })
     .catch(() => {
       ElMessage.error("获取投递详情失败,请重试")
