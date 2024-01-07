@@ -189,7 +189,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             multiple
             placeholder="请输入"
           >
-            <el-option v-for="item in batchList" :key="item.id" :label="item.name" :value="item.name" />
+            <el-option v-for="item in batchList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item prop="batchName" label="岗位名称" size="large">
@@ -201,7 +201,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             multiple
             placeholder="请输入"
           >
-            <el-option v-for="item in positionList" :key="item.id" :label="item.jobTitle" :value="item.jobTitle" />
+            <el-option v-for="item in positionList" :key="item.id" :label="item.jobTitle" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item>

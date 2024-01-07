@@ -20,7 +20,7 @@ export function refuseThingDataApi(data: number) {
 }
 
 /** 打印准考证 */
-export function updateTableDataApi(data: number) {
+export function updateTableDataApi(data: { id: number }) {
   return request({
     url: "tableThing",
     method: "put",
@@ -28,10 +28,10 @@ export function updateTableDataApi(data: number) {
   })
 }
 
-/** 查 */
-export function getTableDataApi() {
-  return request<Table.GetTableResponseData>({
-    url: "tableThing",
+/** 查详细 */
+export function getThingInfoApi(id: number) {
+  return request<Table.GetThingInfoData>({
+    url: `tableThing/${id}`,
     method: "get"
   })
 }

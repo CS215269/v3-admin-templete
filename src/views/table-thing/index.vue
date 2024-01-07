@@ -1,11 +1,14 @@
 <script lang="ts" setup>
-import { reactive, ref, watch } from "vue"
-import { acceptThingApi, getTableDataBySearchApi } from "@/api/table-thing"
-import { type GetTableThingData } from "@/api/table-thing/types/table-thing"
+import { onMounted, reactive, ref, watch } from "vue"
+import { acceptThingApi, getTableDataBySearchApi, getThingInfoApi } from "@/api/table-thing"
+import { GetThingInfoData, type GetTableThingData } from "@/api/table-thing/types/table-thing"
 import { ElMessage, type FormInstance } from "element-plus"
 // import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Download, RefreshRight, Dish } from "@element-plus/icons-vue"
 import { usePagination } from "@/hooks/usePagination"
+import { getBatchOptionsApi } from "@/api/table-batch"
+import { getPositionOptionApi } from "@/api/table-position"
+import { getDepartmentOptionApi } from "@/api/table-department"
 
 defineOptions({
   // 命名当前组件
@@ -18,6 +21,24 @@ const { paginationData, handleCurrentChange, handleSizeChange } = usePagination(
 // 计算属性
 const getDegreeLabel = (row: { degree: number }) => {
   switch (row.degree) {
+    case 1:
+      return "中专"
+    case 2:
+      return "大专"
+    case 3:
+      return "本科"
+    case 4:
+      return "硕士"
+    case 5:
+      return "博士"
+    default:
+      return "异常"
+  }
+}
+
+// 计算属性
+const getDegreeLabel2 = (degree: number) => {
+  switch (degree) {
     case 1:
       return "中专"
     case 2:
@@ -49,18 +70,18 @@ const progressFormatter = (row: { status: number }) => {
 const tableData = ref<GetTableThingData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
-  batch: "",
-  jobTitle: "",
-  department: ""
+  batches: [],
+  jobTitle: [],
+  department: []
 })
 const getTableData = () => {
   loading.value = true
   getTableDataBySearchApi({
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
-    batch: searchData.batch || undefined,
-    jobTitle: searchData.jobTitle || undefined,
-    department: searchData.department || undefined
+    batches: searchData.batches,
+    jobTitles: searchData.jobTitle,
+    departments: searchData.department
   })
     .then((res) => {
       paginationData.total = res.data.total
@@ -82,8 +103,104 @@ const resetSearch = () => {
 }
 //#endregion
 
+const departmentList = ref<{ id: number; name: string }[]>([])
+const positionList = ref<{ id: number; jobTitle: string }[]>([])
+const batchList = ref<{ id: number; name: string }[]>([])
+
+onMounted(() => {
+  getBatchOptionsApi()
+    .then((res) => {
+      batchList.value = res.data.list
+    })
+    .catch(() => {
+      batchList.value = []
+    })
+    .finally(() => {
+      loading.value = false
+    })
+  getPositionOptionApi()
+    .then((res) => {
+      positionList.value = res.data.list
+    })
+    .catch(() => {
+      positionList.value = []
+    })
+    .finally(() => {
+      loading.value = false
+    })
+  getDepartmentOptionApi()
+    .then((res) => {
+      departmentList.value = res.data.list
+    })
+    .catch(() => {
+      positionList.value = []
+    })
+    .finally(() => {
+      loading.value = false
+    })
+})
+
+/** 详细信息弹框开关 */
+const dialogVisible = ref<boolean>(false)
+/** 详细信息 */
+const thingInfo = ref<GetThingInfoData>({
+  /** 用户id */
+  userId: 0,
+  /** 姓名 */
+  name: "",
+  /** 身份证号码 */
+  idnum: 0,
+  /** 电话号码 */
+  tel: 0,
+  /** 性别 */
+  sex: "",
+  /** 年龄 */
+  age: "",
+  /** 学历 */
+  userDegree: 0,
+  /** 政治面貌 */
+  zzmm: "",
+  /** 毕业学校 */
+  school: "",
+  /** 民族 */
+  nation: "",
+  /** 出生日期 */
+  birthday: "",
+  /** 籍贯 */
+  native_place: "",
+  /** 现居地址 */
+  address: "",
+  /** 毕业时间 */
+  graduation_time: "",
+  /** 专业 */
+  specialty: "",
+  /** 资历图片 */
+  imgs: "",
+
+  /** 岗位id */
+  pid: 0,
+  /** 岗位名称 */
+  jobTitle: "",
+  /** 部门 */
+  department: "",
+  degree: 0,
+  info: "",
+  departmentId: 0
+})
 const showinfo = (row: GetTableThingData) => {
+  loading.value = true
   console.log(row)
+  getThingInfoApi(row.thingId)
+    .then((res) => {
+      dialogVisible.value = true
+      thingInfo.value = res
+    })
+    .catch(() => {
+      ElMessage.error("获取投递详情失败,请重试")
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 const agree = (row: GetTableThingData) => {
@@ -106,14 +223,41 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
   <div class="app-container">
     <el-card v-loading="loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
-        <el-form-item prop="batch" label="批次">
-          <el-input v-model="searchData.jobTitle" placeholder="请输入" />
+        <el-form-item prop="batches" label="批次" size="large">
+          <el-select
+            v-model="searchData.batches"
+            filterable
+            collapse-tags
+            collapse-tags-tooltip
+            multiple
+            placeholder="请输入"
+          >
+            <el-option v-for="item in batchList" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
         </el-form-item>
-        <el-form-item prop="username" label="岗位名">
-          <el-input v-model="searchData.jobTitle" placeholder="请输入" />
+        <el-form-item prop="jobTitle" label="岗位名" size="large">
+          <el-select
+            v-model="searchData.jobTitle"
+            filterable
+            collapse-tags
+            collapse-tags-tooltip
+            multiple
+            placeholder="请输入"
+          >
+            <el-option v-for="item in positionList" :key="item.id" :label="item.jobTitle" :value="item.id" />
+          </el-select>
         </el-form-item>
-        <el-form-item prop="department" label="部门">
-          <el-input v-model="searchData.department" placeholder="请输入" />
+        <el-form-item prop="department" label="部门" size="large">
+          <el-select
+            v-model="searchData.department"
+            filterable
+            collapse-tags
+            collapse-tags-tooltip
+            multiple
+            placeholder="请输入"
+          >
+            <el-option v-for="item in departmentList" :key="item.id" :label="item.name" :value="item.id" />
+          </el-select>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
@@ -189,24 +333,87 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         />
       </div>
     </el-card>
-    <!-- 新增/修改 -->
-    <!-- <el-dialog
-      v-model="dialogVisible"
-      :title="currentUpdateId === undefined ? '新增岗位' : '修改岗位'"
-      @close="resetForm"
-      width="30%"
-    >
-      <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
-        <p>关于事务的一些建议</p>
-        <el-form-item prop="name" label="事务名称">
-          <el-input v-model="formData.jobTitle" placeholder="请输入" />
-        </el-form-item>
-      </el-form>
+    <!-- 详细信息 -->
+    <el-dialog v-model="dialogVisible" title="简历详情" width="80%">
+      <el-row :gutter="20">
+        <el-col :span="16">
+          <el-descriptions title="投递人" :column="3" border size="small">
+            <el-descriptions-item label="Username" label-align="right" align="center" label-class-name="my-label">
+              {{ thingInfo.name }}
+            </el-descriptions-item>
+
+            <el-descriptions-item label="用户名" label-align="center" align="left">
+              {{ thingInfo?.name }}</el-descriptions-item
+            >
+            <el-descriptions-item label="年龄" label-align="center" align="left">
+              {{ thingInfo?.age }}</el-descriptions-item
+            >
+            <el-descriptions-item label="性别" label-align="center" align="left">
+              {{ thingInfo?.sex }}
+            </el-descriptions-item>
+            <el-descriptions-item label="学历" label-align="center" align="left">
+              {{ getDegreeLabel2(thingInfo?.degree) }}
+            </el-descriptions-item>
+            <el-descriptions-item label="政治面貌" label-align="center" align="left"
+              >{{ thingInfo?.zzmm }}
+            </el-descriptions-item>
+            <el-descriptions-item label="籍贯" label-align="center" align="left"
+              >{{ thingInfo?.native_place }}
+            </el-descriptions-item>
+            <el-descriptions-item label="出生日期" label-align="center" align="left"
+              >{{ thingInfo?.birthday }}
+            </el-descriptions-item>
+            <el-descriptions-item label="民族" label-align="center" align="left"
+              >{{ thingInfo?.nation }}
+            </el-descriptions-item>
+            <el-descriptions-item label="毕业院校" label-align="center" align="left"
+              >{{ thingInfo?.school }}
+            </el-descriptions-item>
+            <el-descriptions-item label="毕业时间" label-align="center" align="left"
+              >{{ thingInfo?.graduation_time }}
+            </el-descriptions-item>
+            <el-descriptions-item label="专业" label-align="center" align="left"
+              >{{ thingInfo?.specialty }}
+            </el-descriptions-item>
+            <el-descriptions-item label="身份证号码" label-align="center" align="left"
+              >{{ thingInfo?.idnum }}
+            </el-descriptions-item>
+            <el-descriptions-item label="手机号" label-align="center" align="left"
+              >{{ thingInfo?.tel }}
+            </el-descriptions-item>
+            <el-descriptions-item label="现居地址" :span="2" label-align="center" align="left"
+              >{{ thingInfo?.address }}
+            </el-descriptions-item>
+          </el-descriptions>
+        </el-col>
+        <el-col :span="8">
+          <el-descriptions title="意愿岗位" :column="2" border size="small">
+            <el-descriptions-item
+              label="Username"
+              label-align="right"
+              align="center"
+              label-class-name="my-label"
+              class-name="my-content"
+              >{{ thingInfo.jobTitle }}</el-descriptions-item
+            >
+            <el-descriptions-item label="Telephone" label-align="right" align="center"
+              >18100000000</el-descriptions-item
+            >
+            <el-descriptions-item label="Place" label-align="right" align="center">Suzhou</el-descriptions-item>
+            <el-descriptions-item label="Remarks" label-align="right" align="center">
+              <el-tag size="small">School</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="Address" label-align="right" align="center"
+              >No.1188, Wuzhong Avenue, Wuzhong District, Suzhou, Jiangsu Province</el-descriptions-item
+            >
+          </el-descriptions>
+        </el-col>
+      </el-row>
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleCreate">确认</el-button>
+        <el-button type="danger" @click="dialogVisible = false">拒绝</el-button>
+        <el-button type="primary" @click="dialogVisible = false">同意</el-button>
       </template>
-    </el-dialog> -->
+    </el-dialog>
   </div>
 </template>
 

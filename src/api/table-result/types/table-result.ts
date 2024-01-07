@@ -16,10 +16,10 @@ export interface GetTableRequestData {
   currentPage: number
   /** 查询条数 */
   size: number
+  /** 查询参数：岗位名称 */
+  jobTitles?: number[]
   /** 查询参数：批次名称 */
-  jobTitles?: string[]
-  /** 查询参数：批次名称 */
-  batches?: string[]
+  batches?: number[]
 }
 
 /** 表格数据结构 */
