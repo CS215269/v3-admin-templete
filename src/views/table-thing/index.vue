@@ -2,7 +2,7 @@
 import { onMounted, reactive, ref, watch } from "vue"
 import { acceptThingApi, getTableDataBySearchApi, getThingInfoApi } from "@/api/table-thing"
 import { ThingInfoData, type GetTableThingData } from "@/api/table-thing/types/table-thing"
-import { ElMessage, type FormInstance } from "element-plus"
+import { ElMessage, ElTable, type FormInstance } from "element-plus"
 // import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Download, RefreshRight, Dish } from "@element-plus/icons-vue"
 import { usePagination } from "@/hooks/usePagination"
@@ -211,6 +211,14 @@ const showinfo = (row: GetTableThingData) => {
     })
 }
 
+/** 表格引用 */
+const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+/** 选中行 */
+const multipleSelection = ref<GetTableThingData[]>([])
+const handleSelectionChange = (val: GetTableThingData[]) => {
+  multipleSelection.value = val
+}
+
 const agree = (row: GetTableThingData) => {
   loading.value = true
   acceptThingApi({ thingId: row.thingId })
@@ -223,6 +231,12 @@ const agree = (row: GetTableThingData) => {
       loading.value = false
     })
 }
+
+/** 批量打印准考证 */
+const printCertificates = () => {
+  console.log("批量打印,列表长度" + multipleSelection.value.length)
+}
+
 /** 监听分页参数的变化 */
 watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })
 </script>
@@ -277,7 +291,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <div class="toolbar-wrapper">
         <div>
           <el-button type="primary" :icon="CirclePlus" @click="null">批量同意</el-button>
-          <el-button type="danger" :icon="Dish">打印准考证</el-button>
+          <el-button type="danger" :icon="Dish" @click="printCertificates()">打印准考证</el-button>
         </div>
         <div>
           <el-tooltip content="下载">
@@ -289,7 +303,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </div>
       </div>
       <div class="table-wrapper">
-        <el-table :data="tableData">
+        <el-table ref="multipleTableRef" :data="tableData" stripe @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="batchname" label="批次" align="center" />
           <el-table-column prop="jobTitle" label="岗位名称" align="center" />
@@ -323,7 +337,8 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-table-column fixed="right" label="操作" width="250" align="center">
             <template #default="scope">
               <el-button type="info" text bg size="small" @click="showinfo(scope.row)">详细信息</el-button>
-              <el-button type="primary" text bg size="small" @click="agree(scope.row)">同意</el-button>
+              <el-button type="primary" text bg size="small" @click="agree(scope.row)">初审通过</el-button>
+              <el-button type="danger" text bg size="small" @click="agree(scope.row)">拒绝</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -441,8 +456,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </el-col>
       </el-row>
       <template #footer>
-        <el-button type="danger" @click="dialogVisible = false">拒绝</el-button>
-        <el-button type="primary" @click="dialogVisible = false">同意</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确定</el-button>
       </template>
     </el-dialog>
   </div>
