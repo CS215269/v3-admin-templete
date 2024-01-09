@@ -226,7 +226,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </div>
       </div>
       <div class="table-wrapper">
-        <el-table :data="tableData" stripe height="60vh">
+        <el-table :data="tableData" stripe>
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="batchname" sortable :sort-method="batchSort" label="批次" align="center" />
           <el-table-column prop="jobTitle" sortable label="岗位名称" align="center" />
