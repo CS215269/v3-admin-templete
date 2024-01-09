@@ -416,13 +416,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             :initial-index="0"
             fit="cover"
           /> -->
-          <img :src="imgList.at(2)" />
-          <img src="/Recruit/user_resume_files/1001/1002/1003/1004/img/消防作品二维码.png" />
-          <img src="/user_resume_files/1001/1002/1003/1004/img/消防作品二维码.png" />
-          <img
-            src="https://supposedly-credible-cougar.ngrok-free.app/Recruit/user_resume_files/1001/1002/1003/1004/img/消防作品二维码.png"
-          />
-          <img src="user_resume_files/1001/1002/1003/1004/img/消防作品二维码.png" />
         </el-col>
         <el-col :span="8">
           <el-descriptions title="意愿岗位" :column="2" border size="small">
