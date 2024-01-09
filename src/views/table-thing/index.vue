@@ -143,6 +143,10 @@ onMounted(() => {
 /** 详细信息弹框开关 */
 const dialogVisible = ref<boolean>(false)
 /** 详细信息 */
+const imgList = ref<string[]>([""])
+/** 详细信息 */
+const fileList = ref<string[]>([""])
+/** 详细信息 */
 const thingInfo = ref<ThingInfoData>({
   /** 用户id */
   userId: 0,
@@ -195,12 +199,15 @@ const showinfo = (row: GetTableThingData) => {
       dialogVisible.value = true
       console.log(res)
       thingInfo.value = res.data.data
+      imgList.value = res.data.img.reverse()
+      fileList.value = res.data.file
     })
     .catch(() => {
       ElMessage.error("获取投递详情失败,请重试")
     })
     .finally(() => {
       loading.value = false
+      console.log("小图1地址" + imgList.value.at(0))
     })
 }
 
@@ -386,6 +393,36 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               >{{ thingInfo?.address }}
             </el-descriptions-item>
           </el-descriptions>
+          <template v-for="url in imgList" :key="url">
+            <el-image
+              :src="url"
+              :zoom-rate="1.2"
+              :max-scale="4"
+              :min-scale="0.4"
+              :preview-src-list="imgList"
+              :initial-index="0"
+              fit="cover"
+              style="width: 100px; height: 100px"
+            />
+            <img :src="url" />
+          </template>
+          <!-- <el-image
+            style="width: 100px; height: 100px"
+            :src="imgList.at(0)"
+            :zoom-rate="1.2"
+            :max-scale="4"
+            :min-scale="0.4"
+            :preview-src-list="imgList"
+            :initial-index="0"
+            fit="cover"
+          /> -->
+          <img :src="imgList.at(2)" />
+          <img src="/Recruit/user_resume_files/1001/1002/1003/1004/img/消防作品二维码.png" />
+          <img src="/user_resume_files/1001/1002/1003/1004/img/消防作品二维码.png" />
+          <img
+            src="https://supposedly-credible-cougar.ngrok-free.app/Recruit/user_resume_files/1001/1002/1003/1004/img/消防作品二维码.png"
+          />
+          <img src="user_resume_files/1001/1002/1003/1004/img/消防作品二维码.png" />
         </el-col>
         <el-col :span="8">
           <el-descriptions title="意愿岗位" :column="2" border size="small">

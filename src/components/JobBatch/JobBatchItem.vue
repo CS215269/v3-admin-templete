@@ -2,22 +2,31 @@
 import { defineProps, reactive, ref } from "vue"
 import { GetPositionData } from "@/api/user-batch/types/user-batch"
 import { ElMessage, FormRules, UploadProps, UploadUserFile } from "element-plus"
-import { setUserInfoApi, submitThingApi } from "@/api/user-thing"
-import { setUserInfoRequestData } from "@/api/user-thing/types/user-thing"
-
-const dialogFormVisible = ref(false)
-const formLabelWidth = "140px"
-
-const props = defineProps<{
-  position: GetPositionData
-}>()
+import { submitThingApi } from "@/api/user-thing"
+// import { setUserInfoRequestData } from "@/api/user-thing/types/user-thing"
+import { useUserStore } from "@/store/modules/user"
 
 defineOptions({
   name: "JobBatchItem"
 })
 
+/** 详情对话框是否可视 */
+const dialogFormVisible = ref(false)
+/** 表单宽度 */
+const formLabelWidth = "140px"
+
+/** 用户图片文件列表 */
+const fileimgList = ref<UploadUserFile[]>([])
+/** 用户文件列表 */
+const fileList = ref<UploadUserFile[]>([])
+
+const props = defineProps<{
+  position: GetPositionData
+  batchid: number
+}>()
+
 /** 用户信息是否完成 */
-const userInfoComplete = ref(false)
+// const userInfoComplete = ref(false)
 
 /** 用户表单引用 */
 const form = reactive({
@@ -41,21 +50,58 @@ const setUserInfoFormRules = reactive<FormRules<typeof form>>({
   ]
 })
 /** 设置用户信息方法 */
-const setUserInfo = (form: setUserInfoRequestData) => {
-  setUserInfoApi(form)
-    .then(() => {
-      ElMessage.success("修改成功")
-      userInfoComplete.value = true
+// const setUserInfo = (form: setUserInfoRequestData) => {
+// setUserInfoApi(form)
+//   .then(() => {
+//     ElMessage.success("修改成功")
+//     userInfoComplete.value = true
+//   })
+//   .catch(() => {
+//     ElMessage.error("发生异常,请重试")
+//   })
+//   .finally(() => {
+//     // loading.value = false
+//   })
+// }
+
+/** 自定义上传方法 */
+const myUpload = (isImg: boolean, formData: FormData) => {
+  // 发送带有参数的请求
+
+  formData.append("isImg", isImg ? "T" : "F")
+  formData.append("batchname", String(props.batchid))
+  formData.append("department", String(props.position.departmentId))
+  formData.append("jobTitle", String(props.position.id))
+  const token = useUserStore().token
+  //  getToken()
+  const myHeaders = new Headers()
+  myHeaders.append("ngrok-skip-browser-warning", "true")
+  if (token) {
+    myHeaders.append("Authorization", `Bearer ${token}`)
+  }
+
+  fetch("https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume", {
+    headers: myHeaders,
+    method: "POST",
+    body: formData
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // 处理返回的数据
+      console.log("上传图片的返回" + data)
     })
-    .catch(() => {
-      ElMessage.error("发生异常,请重试")
+    .catch((error) => {
+      // 处理请求错误
+      ElMessage.error(error)
     })
-    .finally(() => {
-      // loading.value = false
-    })
+
+  // 返回false，阻止el-upload组件默认的上传行为
+  return false
 }
 
+/** 上传时图片预览链接 */
 const dialogImageUrl = ref("")
+/** 上传时图片预览框 */
 const dialogVisible = ref(false)
 
 const handleRemove: UploadProps["onRemove"] = (uploadFile, uploadFiles) => {
@@ -78,6 +124,7 @@ const updateImgSuccess: UploadProps["onSuccess"] = (uploadFile) => {
 
 const beforeImgUpload: UploadProps["beforeUpload"] = (rawFile) => {
   if (rawFile.type !== "image/jpeg" && rawFile.type !== "image/png") {
+    console.log("上传时:批次id" + props.batchid)
     ElMessage.error("只能上传 JPG 或 PNG 格式的图片!")
     return false
   } else if (rawFile.size / 1024 / 1024 > 2) {
@@ -86,7 +133,11 @@ const beforeImgUpload: UploadProps["beforeUpload"] = (rawFile) => {
   }
   console.log(rawFile.name + "开始上传")
   ElMessage.info(rawFile.name + " 开始上传")
-  return true
+
+  const formData = new FormData()
+  formData.append("file", rawFile) // 添加文件
+  myUpload(true, formData)
+  return false
 }
 
 const beforeFileUpload: UploadProps["beforeUpload"] = (rawFile) => {
@@ -102,11 +153,11 @@ const beforeFileUpload: UploadProps["beforeUpload"] = (rawFile) => {
   }
   console.log(rawFile.name + "开始上传")
   ElMessage.info(rawFile.name + " 开始上传")
-  return true
+  const formData = new FormData()
+  formData.append("file", rawFile) // 添加文件
+  myUpload(false, formData)
+  return false
 }
-
-const fileimgList = ref<UploadUserFile[]>([])
-const fileList = ref<UploadUserFile[]>([])
 
 const handleImgChange: UploadProps["onChange"] = () => {
   /** 最多5个文件,多余的将被覆盖 */
@@ -169,7 +220,8 @@ const headers = {
                   </el-select>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="setUserInfo(form)">Submit</el-button>
+                  <!-- setUserInfo(form) @click="return 0" -->
+                  <el-button type="primary">Submit</el-button>
                 </el-form-item>
               </el-form>
             </el-card>

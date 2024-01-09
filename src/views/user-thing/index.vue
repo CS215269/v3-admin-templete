@@ -3,7 +3,6 @@ import { onMounted, reactive, ref } from "vue"
 import { getBatchDataApi, getPositionDataApi } from "@/api/user-batch"
 import { GetBatchData, GetPositionData } from "@/api/user-batch/types/user-batch"
 import JobBatchItem from "@/components/JobBatch/JobBatchItem.vue"
-
 defineOptions({
   name: "UserThing"
 })
@@ -69,7 +68,12 @@ onMounted(getBatchData)
             @click="handleChange(index)"
           >
             <template v-if="isExpanded[index]">
-              <JobBatchItem v-for="position in positions[index]" :key="position.id" :position="position" />
+              <JobBatchItem
+                v-for="position in positions[index]"
+                :key="position.id"
+                :position="position"
+                :batchid="batch.id"
+              />
             </template>
           </el-collapse-item>
         </el-collapse>
