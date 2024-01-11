@@ -422,6 +422,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           </el-descriptions>
           <template v-for="url in imgList" :key="url">
             <el-image
+              style="width: 100px; height: 100px"
               :src="url"
               :zoom-rate="1.2"
               :max-scale="4"
@@ -429,7 +430,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               :preview-src-list="imgList"
               :initial-index="0"
               fit="cover"
-              style="width: 100px; height: 100px"
             />
             <img :src="url" />
           </template>
