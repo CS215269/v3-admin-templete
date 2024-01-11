@@ -68,7 +68,7 @@ onMounted(getTableData)
             v-for="(position, index) in positions"
             :key="position.recruitId"
             :name="index.toString()"
-            :title="position.jobTitle"
+            :title="position.batchname + ' ' + position.jobTitle"
           >
             <div>
               <el-text>进度信息</el-text>
