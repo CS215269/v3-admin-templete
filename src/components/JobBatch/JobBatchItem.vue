@@ -79,8 +79,9 @@ const myUpload = (isImg: boolean, formData: FormData) => {
   if (token) {
     myHeaders.append("Authorization", `Bearer ${token}`)
   }
+  //
   // const devImgUploadPath="https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume"
-  const ImgUploadPath = "api/resume"
+  const ImgUploadPath = "Recruit/api/resume"
   fetch(ImgUploadPath, {
     headers: myHeaders,
     method: "POST",
