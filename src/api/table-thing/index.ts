@@ -20,10 +20,10 @@ export function refuseThingDataApi(data: number) {
 }
 
 /** 打印准考证 */
-export function updateTableDataApi(data: { id: number }) {
-  return request({
-    url: "tableThing",
-    method: "put",
+export function printfCertificatesApi(data: { id: number[] }) {
+  return request<Table.ThingIdToPrintResult>({
+    url: "print",
+    method: "post",
     data
   })
 }

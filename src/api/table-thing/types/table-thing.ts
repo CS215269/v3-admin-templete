@@ -75,8 +75,13 @@ export interface ThingInfoData {
   departmentId: number
 }
 
+export interface ThingIdToPrint {
+  thingId: number[]
+}
+
 export type GetTableResponseData = ApiResponseData<{
   list: GetTableThingData[]
   total: number
 }>
 export type GetThingInfoData = ApiResponseData<{ data: ThingInfoData; file: string[]; img: string[] }>
+export type ThingIdToPrintResult = ApiResponseData<{ total: number; error: number }>

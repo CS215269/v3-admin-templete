@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref, watch } from "vue"
-import { acceptThingApi, getTableDataBySearchApi, getThingInfoApi } from "@/api/table-thing"
+import { acceptThingApi, getTableDataBySearchApi, getThingInfoApi, printfCertificatesApi } from "@/api/table-thing"
 import { ThingInfoData, type GetTableThingData } from "@/api/table-thing/types/table-thing"
 import { ElMessage, ElTable, type FormInstance } from "element-plus"
 // import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
@@ -234,7 +234,19 @@ const agree = (row: GetTableThingData) => {
 
 /** 批量打印准考证 */
 const printCertificates = () => {
-  console.log("批量打印,列表长度" + multipleSelection.value.length)
+  loading.value = false
+  const thingIds = multipleSelection.value.map((item) => item.thingId)
+  printfCertificatesApi({ id: thingIds })
+    .then((res) => {
+      if (res.data.error != 0) ElMessage.error(`输出结果:成功${res.data.total},失败${res.data.error}`)
+      else ElMessage.success(`输出成功:成功${res.data.total},总数${thingIds.length}`)
+    })
+    .catch(() => {
+      ElMessage.error("生成准考证服务异常")
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 /** 监听分页参数的变化 */
