@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import { GetTableRequestData } from "@/api/user-thing/types/user-thing"
-import { getUserThingDataApi } from "@/api/user-thing"
+import { getUserThingDataApi, userDownload } from "@/api/user-thing"
+import { ElMessage } from "element-plus"
 
 defineOptions({
   name: "UserThing"
@@ -22,6 +23,27 @@ const getTableData = () => {
     .catch((error) => {
       console.log("获取用户的投递异常,error= " + error)
       positions.value = []
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+const download = (batchId: number) => {
+  loading.value = true
+  userDownload(batchId)
+    .then((res) => {
+      console.log(res)
+      const blob = new Blob([res])
+      const url = window.URL.createObjectURL(blob)
+
+      const a = document.createElement("a")
+      a.href = url
+      a.download = "准考证.docx"
+      a.click()
+      ElMessage.success("下载准考证成功")
+    })
+    .catch((error) => {
+      console.log("下载准考证失败" + error)
     })
     .finally(() => {
       loading.value = false
@@ -59,6 +81,7 @@ onMounted(getTableData)
                 <el-step title="笔试通过" />
                 <el-step title="面试通过" />
               </el-steps>
+              <el-button v-if="position.status == 2" @click="download(position.batchId)">下载准考证</el-button>
             </div>
           </el-collapse-item>
         </el-collapse>

@@ -34,14 +34,11 @@ export function submitThingApi(params: Table.SubmitThingRequestData) {
 //   })
 // }
 
-// /** 查 */
-// export function getBatchDataApi(params: Table.GetTableRequestData) {
-//   return request<Table.GetTableResponseData>({
-//     url: "tableBatch",
-//     method: "get",
-//     headers: {
-//       "ngrok-skip-browser-warning": "123"
-//     },
-//     params
-//   })
-// }
+/** 下载 */
+export function userDownload(batchId: number) {
+  return request<BlobPart>({
+    responseType: "blob",
+    url: `userDownload/${batchId}`,
+    method: "get"
+  })
+}

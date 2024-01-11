@@ -4,6 +4,7 @@ export interface GetTableRequestData {
   recruitId: number
   positionId: number
   jobTitle: string
+  batchId: number
   batchname: string
   status: number
 }
