@@ -431,7 +431,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               :initial-index="0"
               fit="cover"
             />
-            <img :src="url" />
           </template>
           <!-- <el-image
             style="width: 100px; height: 100px"

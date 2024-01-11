@@ -81,7 +81,7 @@ const myUpload = (isImg: boolean, formData: FormData) => {
   }
   //
   // const devImgUploadPath="https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume"
-  const ImgUploadPath = "Recruit/api/resume"
+  const ImgUploadPath = "api/resume"
   fetch(ImgUploadPath, {
     headers: myHeaders,
     method: "POST",
