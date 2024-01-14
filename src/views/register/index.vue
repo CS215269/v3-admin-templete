@@ -3,7 +3,7 @@ import { reactive, ref } from "vue"
 import { useRouter } from "vue-router"
 import { useUserStore } from "@/store/modules/user"
 import { ElMessage, type FormInstance, type FormRules } from "element-plus"
-import { Lock, Key, Picture, Loading, Phone } from "@element-plus/icons-vue"
+import { Lock, Key, Phone } from "@element-plus/icons-vue"
 import { getRegisterCodeApi } from "@/api/register"
 import { type RegisterRequestData } from "@/api/register/types/register"
 import ThemeSwitch from "@/components/ThemeSwitch/index.vue"
@@ -14,13 +14,11 @@ const router = useRouter()
 const registerFormRef = ref<FormInstance | null>(null)
 /** 注册按钮 Loading */
 const loading = ref(false)
-/** 验证码图片 URL */
-const codeUrl = ref("")
 /** 注册表单数据 */
 const registerFormData: RegisterRequestData = reactive({
   password: "12345678",
   confirmPassword: "1234567",
-  phone: "12345678",
+  phone: "17756800661",
   code: "it1knq"
 })
 /** 确认密码校验规则 */
@@ -59,7 +57,6 @@ const handleRegister = () => {
           router.push({ path: "/" })
         })
         .catch(() => {
-          createCode()
           registerFormData.password = ""
         })
         .finally(() => {
@@ -71,19 +68,34 @@ const handleRegister = () => {
     }
   })
 }
-/** 创建验证码 */
+
+/** 短信验证码冷却 */
+const registerCode = ref<boolean>(false)
+/** 短信验证码冷却 */
+const registerCodeCD = ref<number>(0)
+/** 获取短信验证码 */
 const createCode = () => {
   // 先清空验证码的输入
   registerFormData.code = ""
-  // 获取验证码
-  codeUrl.value = ""
-  getRegisterCodeApi().then((res) => {
-    codeUrl.value = res.data
-  })
-}
+  registerCode.value = true
+  getRegisterCodeApi({ phone: registerFormData.phone })
+    .then((res) => {
+      ElMessage.success(res.message)
+    })
+    .catch(() => {
+      ElMessage.error("系统异常,请联系管理员")
+    })
 
-/** 初始化验证码 */
-createCode()
+  registerCodeCD.value = 60
+  registerCode.value = true
+  const interval = setInterval(() => {
+    registerCodeCD.value--
+    if (registerCodeCD.value <= 0) {
+      clearInterval(interval)
+      registerCode.value = false
+    }
+  }, 1000)
+}
 </script>
 
 <template>
@@ -144,18 +156,9 @@ createCode()
               size="large"
             >
               <template #append>
-                <el-image :src="codeUrl" @click="createCode" draggable="false">
-                  <template #placeholder>
-                    <el-icon>
-                      <Picture />
-                    </el-icon>
-                  </template>
-                  <template #error>
-                    <el-icon>
-                      <Loading />
-                    </el-icon>
-                  </template>
-                </el-image>
+                <el-button @click="createCode()" :loading="registerCode" style="width: 215px">
+                  {{ registerCode ? `${registerCodeCD} 秒后重新发送` : "获取验证码" }}
+                </el-button>
               </template>
             </el-input>
           </el-form-item>

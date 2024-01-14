@@ -1,15 +1,12 @@
 import { request } from "@/utils/service"
 import type * as Register from "./types/register"
 
-/** 获取注册验证码 */
-export function getRegisterCodeApi() {
+/** 获取注册手机号验证码 */
+export function getRegisterCodeApi(data: { phone: string }) {
   return request<Register.RegisterCodeResponseData>({
-    url: "login/code",
-    method: "get",
-    /** 内网穿透用,跳过无意义的响应 */
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    }
+    url: "register/code",
+    method: "post",
+    data
   })
 }
 
