@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue"
-import { getUserInfoApi, setUserInfoApi } from "@/api/user-info"
+import { onMounted, reactive, ref } from "vue"
+import { getUserInfoApi, setRealNameInfoApi, setUserInfoApi } from "@/api/user-info"
 import { UserInfoData } from "@/api/user-info/types/user-info"
-import { ElMessage } from "element-plus"
+import { ElMessage, FormInstance, FormRules } from "element-plus"
 
 defineOptions({
   name: "UserInfo"
@@ -13,6 +13,46 @@ const loading = ref<boolean>(false)
 const isEditing = ref<boolean>(false)
 /** 当前用户id,默认0 */
 const uid = ref<number>(0)
+
+/** 用户是否实名认证过 */
+const infoIntegrity = ref<boolean>(false)
+/** 实名认证表单展示 */
+const showRealNameMessageBox = ref<boolean>(false)
+/** 实名认证正在执行 */
+const realNameLoading = ref<boolean>(false)
+/** 实名认证表单引用 */
+const formRef = ref<FormInstance | null>(null)
+/** 实名认证表单值绑定 */
+const formData = reactive({
+  idnum: "",
+  name: ""
+})
+/** 实名认证表单效验 */
+const formRules: FormRules = reactive({
+  name: [{ required: true, trigger: "blur", message: "请输入岗位名称" }],
+  idnum: [
+    { required: true, trigger: "blur", message: "请输入账号" },
+    {
+      pattern: /^[1-9]\d{5}(?:18|19|20)\d{2}(?:0[1-9]|10|11|12)(?:0[1-9]|[1-2]\d|30|31)\d{3}[\dXx]$/,
+      trigger: "blur",
+      message: "请输入有效的身份证号码"
+    }
+    // dsa validator: isChineseIdCard,
+  ]
+})
+const sendRealName = () => {
+  realNameLoading.value = true
+  setRealNameInfoApi(formData)
+    .then(() => {
+      ElMessage.success("实名成功")
+      infoIntegrity.value = true
+    })
+    .catch(() => {})
+    .finally(() => {
+      showRealNameMessageBox.value = false
+      realNameLoading.value = false
+    })
+}
 
 // 计算用户学历属性
 const getDegreeLabel = (degree: number | undefined) => {
@@ -27,10 +67,8 @@ const getDegreeLabel = (degree: number | undefined) => {
       return "硕士"
     case 5:
       return "博士"
-    case undefined:
-      return ""
     default:
-      return "异常"
+      return "未知"
   }
 }
 const userinfo = ref<UserInfoData>()
@@ -110,7 +148,6 @@ const startEditing = () => {
 }
 const saveChanges = () => {
   // 处理数据并发送put请求到服务器
-  // 示例代码，实际情况根据你的后端接口来实现
   editedUserinfo.value.degree = Number(editedUserinfo.value.degree)
   setUserInfoApi(editedUserinfo.value)
     .then((res) => {
@@ -205,7 +242,7 @@ const validateInput = () => {
               </el-select> </template
           ></el-descriptions-item>
           <el-descriptions-item label="政治面貌" label-align="center" align="left">
-            <template v-if="!isEditing">{{ userinfo?.zzmm }}<span>啊啊啊</span></template>
+            <template v-if="!isEditing">{{ userinfo?.zzmm }}</template>
             <template v-else
               ><el-select id="userzzmm" v-model="editedUserinfo.zzmm">
                 <el-option label="群众" value="群众" />
@@ -238,19 +275,29 @@ const validateInput = () => {
           ></el-descriptions-item>
           <el-descriptions-item label="毕业时间" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.graduation_time }}</template>
-            <template v-else> <el-input v-model="editedUserinfo.graduation_time" /> </template
+            <template v-else>
+              <el-date-picker
+                v-model="editedUserinfo.graduation_time"
+                type="date"
+                placeholder="选择日期"
+                format="YYYY/MM/DD"
+                value-format="YYYY-MM-DD"
+              /> </template
           ></el-descriptions-item>
           <el-descriptions-item label="专业" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.specialty }}</template>
             <template v-else> <el-input v-model="editedUserinfo.specialty" /> </template
           ></el-descriptions-item>
           <el-descriptions-item label="身份证号码" label-align="center" align="left">
-            <template v-if="!isEditing">{{ userinfo?.idnum }}</template>
-            <template v-else
-              ><el-tooltip class="box-item" content="身份证号不可修改" placement="top">
+            <template v-if="!isEditing && userinfo?.idnum">{{ userinfo.idnum }}</template>
+            <template v-else-if="!isEditing && !userinfo?.idnum">
+              <el-button @click="showRealNameMessageBox = true">实名认证</el-button>
+            </template>
+            <template v-else>
+              <el-tooltip class="box-item" content="身份证号不可修改" placement="top">
                 {{ userinfo?.idnum }}
-              </el-tooltip></template
-            >
+              </el-tooltip>
+            </template>
           </el-descriptions-item>
           <el-descriptions-item label="手机号" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.tel }}</template>
@@ -266,6 +313,22 @@ const validateInput = () => {
         <!-- Pagination code here -->
       </div>
     </el-card>
+    <el-dialog v-model="showRealNameMessageBox" title="开始投递前,请先进行实名认证" width="30%">
+      <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
+        <el-form-item prop="name" label="姓名">
+          <el-input v-model="formData.name" placeholder="请输入姓名" clearable />
+        </el-form-item>
+        <el-form-item prop="idnum" label="身份证号码">
+          <el-input v-model="formData.idnum" placeholder="请输入身份证号" clearable />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="showRealNameMessageBox = false">取消</el-button>
+          <el-button type="primary" @click="sendRealName()"> 确定 </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 

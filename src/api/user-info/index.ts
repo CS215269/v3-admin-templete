@@ -24,16 +24,16 @@ export function setUserInfoApi(data: Table.UserInfoData) {
     data
   })
 }
-// /** 改 */
-// export function updateTableDataApi(data: Table.UpdateTableRequestData) {
-//   return request({
-//     url: "userThing",
-//     method: "put",
-//     data
-//   })
-// }
+/** 实名认证提交 */
+export function setRealNameInfoApi(data: Table.SetRealNameRequestData) {
+  return request({
+    url: "realName",
+    method: "post",
+    data
+  })
+}
 
-// /** 查 */
+// /** 查询是否实名认证 */
 // export function getBatchDataApi(params: Table.GetTableRequestData) {
 //   return request<Table.GetTableResponseData>({
 //     url: "tableBatch",

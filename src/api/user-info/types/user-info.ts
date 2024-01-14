@@ -32,12 +32,10 @@ export interface UserInfoData {
   specialty: string
 }
 
-export interface SetUserInfoRequestData {
+export interface SetRealNameRequestData {
   name: string
-  idNum: string
-  degree: number
+  idnum: string
 }
 
 export type GetUserInfoResponseData = ApiResponseData<UserInfoData>
 export type SetUserInfoResponseData = ApiResponseData<null>
-// export type GetUserThingResponseData = ApiResponseData<GetUserInfoRequestData>
