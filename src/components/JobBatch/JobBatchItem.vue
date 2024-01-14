@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { defineProps, reactive, ref } from "vue"
+import { defineProps, ref } from "vue"
 import { GetPositionData } from "@/api/user-batch/types/user-batch"
-import { ElMessage, FormRules, UploadProps, UploadUserFile } from "element-plus"
+import { ElMessage, UploadProps, UploadUserFile } from "element-plus"
 import { submitThingApi } from "@/api/user-thing"
 // import { setUserInfoRequestData } from "@/api/user-thing/types/user-thing"
 import { useUserStore } from "@/store/modules/user"
@@ -12,8 +12,6 @@ defineOptions({
 
 /** 详情对话框是否可视 */
 const dialogFormVisible = ref(false)
-/** 表单宽度 */
-const formLabelWidth = "140px"
 
 /** 用户图片文件列表 */
 const fileimgList = ref<UploadUserFile[]>([])
@@ -25,81 +23,27 @@ const props = defineProps<{
   batchid: number
 }>()
 
-/** 用户信息是否完成 */
-// const userInfoComplete = ref(false)
+const formDataImg = new FormData()
+formDataImg.append("isImg", "1")
+formDataImg.append("batchname", String(props.batchid))
+formDataImg.append("department", String(props.position.departmentId))
+formDataImg.append("jobTitle", String(props.position.id))
 
-/** 用户表单引用 */
-const form = reactive({
-  name: "",
-  idNum: "",
-  degree: 0
-})
-/** 用户信息表单校验规则 */
-const setUserInfoFormRules = reactive<FormRules<typeof form>>({
-  name: [
-    { required: true, message: "请输入姓名", trigger: "blur" },
-    { min: 8, max: 16, message: "长度在 4 到 8 个字符", trigger: "blur" }
-  ],
-  idNum: [
-    { required: true, message: "请确认身份证", trigger: "blur" },
-    {
-      pattern: /^[1-9]\d{5}(?:18|19|20)\d{2}(?:0[1-9]|10|11|12)(?:0[1-9]|[1-2]\d|30|31)\d{3}[\dXx]$/,
-      message: "身份证不合法",
-      trigger: "blur"
-    }
-  ]
-})
-/** 设置用户信息方法 */
-// const setUserInfo = (form: setUserInfoRequestData) => {
-// setUserInfoApi(form)
-//   .then(() => {
-//     ElMessage.success("修改成功")
-//     userInfoComplete.value = true
-//   })
-//   .catch(() => {
-//     ElMessage.error("发生异常,请重试")
-//   })
-//   .finally(() => {
-//     // loading.value = false
-//   })
-// }
-
-/** 自定义上传方法 */
-const myUpload = (isImg: boolean, formData: FormData) => {
-  // 发送带有参数的请求
-
-  formData.append("isImg", isImg ? "T" : "F")
-  formData.append("batchname", String(props.batchid))
-  formData.append("department", String(props.position.departmentId))
-  formData.append("jobTitle", String(props.position.id))
-  const token = useUserStore().token
-  //  getToken()
-  const myHeaders = new Headers()
-  myHeaders.append("ngrok-skip-browser-warning", "true")
-  if (token) {
-    myHeaders.append("Authorization", `Bearer ${token}`)
-  }
-  //
-  // const devImgUploadPath="https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume"
-  const ImgUploadPath = "api/resume"
-  fetch(ImgUploadPath, {
-    headers: myHeaders,
-    method: "POST",
-    body: formData
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      // 处理返回的数据
-      console.log("上传图片的返回" + data)
-    })
-    .catch((error) => {
-      // 处理请求错误
-      ElMessage.error(error)
-    })
-
-  // 返回false，阻止el-upload组件默认的上传行为
-  return false
+const formDataFile = new FormData()
+formDataFile.append("isImg", "0")
+formDataFile.append("batchname", String(props.batchid))
+formDataFile.append("department", String(props.position.departmentId))
+formDataFile.append("jobTitle", String(props.position.id))
+const token = useUserStore().token
+//  getToken()
+const myHeaders = new Headers()
+myHeaders.append("ngrok-skip-browser-warning", "true")
+if (token) {
+  myHeaders.append("Authorization", `Bearer ${token}`)
 }
+//
+const uploadPath = "https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume"
+// const uploadPath = "api/resume"
 
 /** 上传时图片预览链接 */
 const dialogImageUrl = ref("")
@@ -135,11 +79,7 @@ const beforeImgUpload: UploadProps["beforeUpload"] = (rawFile) => {
   }
   console.log(rawFile.name + "开始上传")
   ElMessage.info(rawFile.name + " 开始上传")
-
-  const formData = new FormData()
-  formData.append("file", rawFile) // 添加文件
-  myUpload(true, formData)
-  return false
+  return true
 }
 
 const beforeFileUpload: UploadProps["beforeUpload"] = (rawFile) => {
@@ -155,10 +95,7 @@ const beforeFileUpload: UploadProps["beforeUpload"] = (rawFile) => {
   }
   console.log(rawFile.name + "开始上传")
   ElMessage.info(rawFile.name + " 开始上传")
-  const formData = new FormData()
-  formData.append("file", rawFile) // 添加文件
-  myUpload(false, formData)
-  return false
+  return true
 }
 
 const handleImgChange: UploadProps["onChange"] = () => {
@@ -187,9 +124,6 @@ const submit = (id: number) => {
       // loading.value = false
     })
 }
-const headers = {
-  "ngrok-skip-browser-warning": "123"
-}
 </script>
 
 <template>
@@ -201,37 +135,10 @@ const headers = {
           <el-button class="button" text @click="dialogFormVisible = true">投递</el-button>
           <el-dialog v-model="dialogFormVisible" title="投递岗位">
             <el-card>
-              <template #header>
-                <el-text size="large" tag="p">完善个人信息</el-text>
-                <el-text type="warning">投递前我们需要更多信息</el-text>
-              </template>
-              <el-form :model="form" :rules="setUserInfoFormRules">
-                <el-form-item label="姓名" :label-width="formLabelWidth">
-                  <el-input v-model="form.name" autocomplete="off" />
-                </el-form-item>
-                <el-form-item label="身份证号码" :label-width="formLabelWidth">
-                  <el-input v-model="form.idNum" />
-                </el-form-item>
-                <el-form-item label="学历" :label-width="formLabelWidth">
-                  <el-select v-model="form.degree">
-                    <el-option value="1" label="中专" />
-                    <el-option value="2" label="大专" />
-                    <el-option value="3" label="本科" />
-                    <el-option value="4" label="硕士" />
-                    <el-option value="5" label="博士" />
-                  </el-select>
-                </el-form-item>
-                <el-form-item>
-                  <!-- setUserInfo(form) @click="return 0" -->
-                  <el-button type="primary">Submit</el-button>
-                </el-form-item>
-              </el-form>
-            </el-card>
-            <el-divider border-style="dotted" />
-            <el-card>
               <el-text size="large" tag="p">
-                您正在投递我校 {{ position.department }} 的 {{ props.position.jobTitle }} 职位
-                我们不会索要你的其他隐私,请您注意甄别违法、虚假、高风险招聘信息，警惕索要隐私信息的行为。
+                您正在投递我校 <strong> {{ position.department }} </strong> 的
+                <strong>{{ props.position.jobTitle }} </strong>
+                职位 我们不会索要你的其他隐私,请您注意甄别违法、虚假、高风险招聘信息，警惕索要隐私信息的行为。
               </el-text>
             </el-card>
             <br />
@@ -245,14 +152,20 @@ const headers = {
               </template>
               <el-upload
                 v-model:file-list="fileimgList"
-                action="api/resume"
+                :action="uploadPath"
                 list-type="picture-card"
                 :on-preview="handlePictureCardPreview"
                 :on-remove="handleRemove"
                 :on-change="handleImgChange"
                 :on-success="updateImgSuccess"
                 :before-upload="beforeImgUpload"
-                :headers="headers"
+                :headers="myHeaders"
+                :data="{
+                  isImg: 1,
+                  batchname: props.batchid,
+                  department: props.position.departmentId,
+                  jobTitle: props.position.id
+                }"
               >
                 <el-icon><Plus /></el-icon>
               </el-upload>
@@ -271,8 +184,14 @@ const headers = {
               <el-upload
                 v-model:file-list="fileList"
                 class="upload-demo"
-                action="api/resume"
-                :headers="headers"
+                :action="uploadPath"
+                :headers="myHeaders"
+                :data="{
+                  isImg: 0,
+                  batchname: props.batchid,
+                  department: props.position.departmentId,
+                  jobTitle: props.position.id
+                }"
                 :on-change="handleChange"
                 :on-success="updateSuccess"
                 :before-upload="beforeFileUpload"
