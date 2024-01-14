@@ -25,7 +25,7 @@ const getDegreeLabel = (row: { degree: number }) => {
     case 5:
       return "博士"
     default:
-      return "异常"
+      return "未知"
   }
 }
 const loading = ref<boolean>(false)

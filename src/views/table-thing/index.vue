@@ -32,7 +32,7 @@ const getDegreeLabel = (row: { degree: number }) => {
     case 5:
       return "博士"
     default:
-      return "异常"
+      return "未知"
   }
 }
 
@@ -50,7 +50,7 @@ const getDegreeLabel2 = (degree: number) => {
     case 5:
       return "博士"
     default:
-      return "异常"
+      return "未知"
   }
 }
 const progressFormatter = (row: { status: number }) => {
@@ -62,7 +62,7 @@ const progressFormatter = (row: { status: number }) => {
     case 2:
       return "已打印"
     default:
-      return "异常"
+      return "未知"
   }
 }
 
