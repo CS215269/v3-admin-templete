@@ -44,11 +44,18 @@ export interface GetBatchData {
 }
 
 export type GetBatchResponseData = ApiResponseData<{
+  /** 岗位列表 */
   list: GetBatchData[]
   total: number
+  /** 用户是否实名认证 */
+  infoIntegrity: number
 }>
 
 export type GetPositionResponseData = ApiResponseData<{
+  /** 岗位列表 */
   list: GetPositionData[]
+  /** 列表数量 */
   total: number
+  /** 用户是否实名认证 */
+  infoIntegrity: number
 }>

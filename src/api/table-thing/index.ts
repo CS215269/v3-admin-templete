@@ -10,6 +10,24 @@ export function acceptThingApi(data: { thingId: number }) {
   })
 }
 
+/** 同意 */
+export function accept2ThingApi(data: { thingId: number }) {
+  return request({
+    url: "accept2",
+    method: "post",
+    data
+  })
+}
+
+/** 同意 */
+export function accept3ThingApi(data: { thingId: number }) {
+  return request({
+    url: "accept3",
+    method: "post",
+    data
+  })
+}
+
 /** 拒绝 */
 export function refuseThingDataApi(data: number) {
   return request({

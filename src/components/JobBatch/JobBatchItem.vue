@@ -42,8 +42,8 @@ if (token) {
   myHeaders.append("Authorization", `Bearer ${token}`)
 }
 //
-const uploadPath = "https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume"
-// const uploadPath = "api/resume"
+// const uploadPath = "https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume"
+const uploadPath = "api/resume"
 
 /** 上传时图片预览链接 */
 const dialogImageUrl = ref("")

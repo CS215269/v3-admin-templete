@@ -46,6 +46,7 @@ const sendRealName = () => {
     .then(() => {
       ElMessage.success("实名成功")
       infoIntegrity.value = true
+      getUserData()
     })
     .catch(() => {})
     .finally(() => {

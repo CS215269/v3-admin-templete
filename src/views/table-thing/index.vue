@@ -1,6 +1,13 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref, watch } from "vue"
-import { acceptThingApi, getTableDataBySearchApi, getThingInfoApi, printfCertificatesApi } from "@/api/table-thing"
+import {
+  accept2ThingApi,
+  accept3ThingApi,
+  acceptThingApi,
+  getTableDataBySearchApi,
+  getThingInfoApi,
+  printfCertificatesApi
+} from "@/api/table-thing"
 import { ThingInfoData, type GetTableThingData } from "@/api/table-thing/types/table-thing"
 import { ElMessage, ElTable, type FormInstance } from "element-plus"
 // import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
@@ -232,6 +239,32 @@ const agree = (row: GetTableThingData) => {
     })
 }
 
+const agree2 = (row: GetTableThingData) => {
+  loading.value = true
+  accept2ThingApi({ thingId: row.thingId })
+    .then(() => {
+      ElMessage.success(row.username + "的" + row.jobTitle + "成功")
+    })
+    .catch()
+    .finally(() => {
+      getTableData()
+      loading.value = false
+    })
+}
+
+const agree3 = (row: GetTableThingData) => {
+  loading.value = true
+  accept3ThingApi({ thingId: row.thingId })
+    .then(() => {
+      ElMessage.success(row.username + "的" + row.jobTitle + "成功")
+    })
+    .catch()
+    .finally(() => {
+      getTableData()
+      loading.value = false
+    })
+}
+
 /** 批量打印准考证 */
 const printCertificates = () => {
   loading.value = false
@@ -335,22 +368,44 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
                   <div>用户投递>管理员初审>笔试>面试</div>
                 </template>
                 <template v-if="scope.row.status === 0" #reference>
-                  <el-tag type="warning">未处理</el-tag>
+                  <el-tag type="danger">初审未通过</el-tag>
                 </template>
                 <template v-else-if="scope.row.status === 1" #reference>
-                  <el-tag>已同意</el-tag>
+                  <el-tag type="warning">初审通过</el-tag>
                 </template>
                 <template v-else-if="scope.row.status === 2" #reference>
-                  <el-tag type="success">已打印</el-tag>
+                  <el-tag type="success">已打印准考证</el-tag>
+                </template>
+                <template v-else-if="scope.row.status === 3" #reference>
+                  <el-tag type="success">笔试通过</el-tag>
+                </template>
+                <template v-else-if="scope.row.status === 4" #reference>
+                  <el-tag type="success">面试通过</el-tag>
                 </template>
               </el-popover>
             </template>
           </el-table-column>
-          <el-table-column fixed="right" label="操作" width="250" align="center">
+          <el-table-column fixed="right" label="操作" min-width="200px" align="left">
             <template #default="scope">
-              <el-button type="info" text bg size="small" @click="showinfo(scope.row)">详细信息</el-button>
-              <el-button type="primary" text bg size="small" @click="agree(scope.row)">初审通过</el-button>
-              <el-button type="danger" text bg size="small" @click="agree(scope.row)">拒绝</el-button>
+              <el-button type="info" bg size="small" @click="showinfo(scope.row)">详细信息</el-button>
+              <template v-if="scope.row.status === 0">
+                <el-button type="primary" size="small" @click="agree(scope.row)">初审通过</el-button>
+              </template>
+              <template v-else-if="scope.row.status === 1">
+                <el-tooltip class="box-item" effect="dark" content="请使用批量操作生成准考证" placement="top">
+                  <el-button type="primary" size="small">打印准考证</el-button>
+                </el-tooltip>
+              </template>
+              <template v-else-if="scope.row.status === 2">
+                <el-button type="primary" size="small" @click="agree2(scope.row)">笔试通过</el-button>
+              </template>
+              <template v-else-if="scope.row.status === 3">
+                <el-button type="primary" size="small" @click="agree3(scope.row)">面试通过</el-button>
+              </template>
+              <template v-else-if="scope.row.status === 4">
+                <el-button type="primary" size="small">准备就职</el-button>
+              </template>
+              <el-button type="danger" size="small" @click="agree(scope.row)">拒绝</el-button>
             </template>
           </el-table-column>
         </el-table>
