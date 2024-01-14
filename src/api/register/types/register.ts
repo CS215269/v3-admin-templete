@@ -9,7 +9,7 @@ export interface RegisterRequestData {
   code: string
 }
 
-export type RegisterCodeResponseData = ApiResponseData<string>
+export type RegisterCodeResponseData = ApiResponseData<{ code: string }>
 
 export type RegisterResponseData = ApiResponseData<{ token: string }>
 
