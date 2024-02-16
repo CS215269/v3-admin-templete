@@ -6,6 +6,8 @@ import {
   acceptThingApi,
   getTableDataBySearchApi,
   getThingInfoApi,
+  prePrintfCertificatesApi,
+  prePrintfCertificatesDataApi,
   printfCertificatesApi
 } from "@/api/table-thing"
 import { ThingInfoData, type GetTableThingData } from "@/api/table-thing/types/table-thing"
@@ -16,6 +18,7 @@ import { usePagination } from "@/hooks/usePagination"
 import { getBatchOptionsApi } from "@/api/table-batch"
 import { getPositionOptionApi } from "@/api/table-position"
 import { getDepartmentOptionApi } from "@/api/table-department"
+import { renderAsync } from "docx-preview"
 
 defineOptions({
   // 命名当前组件
@@ -122,9 +125,7 @@ onMounted(() => {
     .catch(() => {
       batchList.value = []
     })
-    .finally(() => {
-      loading.value = false
-    })
+    .finally(() => {})
   getPositionOptionApi()
     .then((res) => {
       positionList.value = res.data.list
@@ -132,9 +133,7 @@ onMounted(() => {
     .catch(() => {
       positionList.value = []
     })
-    .finally(() => {
-      loading.value = false
-    })
+    .finally(() => {})
   getDepartmentOptionApi()
     .then((res) => {
       departmentList.value = res.data.list
@@ -142,9 +141,7 @@ onMounted(() => {
     .catch(() => {
       positionList.value = []
     })
-    .finally(() => {
-      loading.value = false
-    })
+    .finally(() => {})
 })
 
 /** 详细信息弹框开关 */
@@ -265,6 +262,50 @@ const agree3 = (row: GetTableThingData) => {
     })
 }
 
+/** 打印准考证预览 */
+const previewDialog = ref<boolean>(false)
+/** 准考证预览正在加载 */
+const previewLoading = ref<boolean>(false)
+/** 准考证预览准考证号 */
+const previewCode2 = ref<number[]>([])
+/** 准考证预览岗位号 */
+const previewCode = ref<number[]>([])
+/** 打印准考证预览 */
+const prePrintCertificates = () => {
+  previewLoading.value = true
+  previewDialog.value = true
+  const thingIds = multipleSelection.value.map((item) => item.thingId)
+  prePrintfCertificatesDataApi({ id: thingIds })
+    .then((res) => {
+      previewCode.value = res.data.code
+      previewCode2.value = res.data.codeWithUser
+    })
+    .catch((e) => {
+      console.log(e)
+    })
+    .finally(() => {})
+
+  prePrintfCertificatesApi()
+    .then((res) => {
+      console.log(res)
+      const blob = new Blob([res])
+      // 在这里使用docData渲染docx文档
+      const container = document.getElementById("container_docx")
+      if (container) {
+        renderAsync(blob, container).then(() => console.log("docx: finished"))
+      } else {
+        console.log("Can not find container element")
+      }
+    })
+    .catch((e) => {
+      ElMessage.error("预览准考证服务异常")
+      console.log(e)
+    })
+    .finally(() => {
+      previewLoading.value = false
+    })
+}
+
 /** 批量打印准考证 */
 const printCertificates = () => {
   loading.value = false
@@ -336,7 +377,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <div class="toolbar-wrapper">
         <div>
           <el-button type="primary" :icon="CirclePlus" @click="null">批量同意</el-button>
-          <el-button type="danger" :icon="Dish" @click="printCertificates()">打印准考证</el-button>
+          <el-button type="danger" :icon="Dish" @click="prePrintCertificates()">打印准考证</el-button>
         </div>
         <div>
           <el-tooltip content="下载">
@@ -523,6 +564,36 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       </el-row>
       <template #footer>
         <el-button type="primary" @click="dialogVisible = false">确定</el-button>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="previewDialog" width="80%" title="打印预览">
+      <el-card v-loading="previewLoading">
+        <el-text tag="p">若要修改准考证模板文件,请前往服务端D:/*/*/**</el-text>
+        <el-text>生成 {{ multipleSelection.length }} 份准考证 </el-text>
+        <el-table :data="multipleSelection">
+          <el-table-column prop="username" label="用户姓名" align="center" />
+
+          <el-table-column prop="jobTitle" label="用户电话" align="center" />
+          <el-table-column label="岗位代码">
+            <template #default="{ $index }">
+              {{ previewCode[$index] }}
+            </template>
+          </el-table-column>
+          <el-table-column label="准考证号">
+            <template #default="{ $index }">
+              {{ previewCode2[$index] }}
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-text>准考证模板预览: </el-text>
+        <el-divider />
+        <div id="container_docx" />
+        <el-divider />
+      </el-card>
+
+      <template #footer>
+        <el-button type="warning" @click="previewDialog = false">取消</el-button>
+        <el-button type="primary" @click="printCertificates()">确定</el-button>
       </template>
     </el-dialog>
   </div>

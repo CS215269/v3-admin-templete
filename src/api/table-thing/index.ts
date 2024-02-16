@@ -37,6 +37,24 @@ export function refuseThingDataApi(data: number) {
   })
 }
 
+/** 获取预览打印准考证号等数据 */
+export function prePrintfCertificatesDataApi(data: { id: number[] }) {
+  return request<Table.prePrintfCertificatesData>({
+    url: "previewData",
+    method: "post",
+    data
+  })
+}
+
+/** 预览打印准考证 */
+export function prePrintfCertificatesApi() {
+  return request<BlobPart>({
+    responseType: "blob",
+    url: "print",
+    method: "get"
+  })
+}
+
 /** 打印准考证 */
 export function printfCertificatesApi(data: { id: number[] }) {
   return request<Table.ThingIdToPrintResult>({
