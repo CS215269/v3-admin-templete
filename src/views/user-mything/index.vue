@@ -32,7 +32,6 @@ const download = (batchId: number) => {
   loading.value = true
   userDownload(batchId)
     .then((res) => {
-      console.log(res)
       const blob = new Blob([res])
       const url = window.URL.createObjectURL(blob)
 
