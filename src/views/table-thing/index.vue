@@ -323,6 +323,11 @@ const printCertificates = () => {
     })
 }
 
+const batchSort = (a: GetTableThingData, b: GetTableThingData) => {
+  // 根据batchId属性进行比较并返回排序结果
+  return a.batchId - b.batchId
+}
+
 /** 监听分页参数的变化 */
 watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })
 </script>
@@ -391,12 +396,12 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <div class="table-wrapper">
         <el-table ref="multipleTableRef" :data="tableData" stripe @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column prop="batchname" label="批次" align="center" />
-          <el-table-column prop="jobTitle" label="岗位名称" align="center" />
-          <el-table-column prop="department" label="所属部门" align="center" />
-          <el-table-column prop="username" label="用户姓名" align="center" />
-          <el-table-column prop="school" label="毕业院校" align="center" />
-          <el-table-column prop="degree" label="学历" align="center">
+          <el-table-column prop="batchname" sortable :sort-method="batchSort" label="批次" align="center" />
+          <el-table-column prop="jobTitle" sortable label="岗位名称" align="center" />
+          <el-table-column prop="department" sortable label="所属部门" align="center" />
+          <el-table-column prop="username" sortable label="用户姓名" align="center" />
+          <el-table-column prop="school" sortable label="毕业院校" align="center" />
+          <el-table-column prop="degree" sortable label="学历" align="center">
             <template #default="degreeScope">
               {{ getDegreeLabel(degreeScope.row) }}
             </template>
