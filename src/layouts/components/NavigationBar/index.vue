@@ -6,6 +6,7 @@ import { useAppStore } from "@/store/modules/app"
 import { useSettingsStore } from "@/store/modules/settings"
 import { useUserStore } from "@/store/modules/user"
 import { UserFilled } from "@element-plus/icons-vue"
+import { checkPermission } from "@/utils/permission"
 import Hamburger from "../Hamburger/index.vue"
 import Breadcrumb from "../Breadcrumb/index.vue"
 import Sidebar from "../Sidebar/index.vue"
@@ -65,7 +66,7 @@ const handleClick = () => {
         </div>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item divided @click="userInfo">
+            <el-dropdown-item v-if="checkPermission(['editor'])" divided @click="userInfo">
               <span style="display: block">个人信息</span>
             </el-dropdown-item>
             <a target="_blank" href="https://github.com/un-pany/v3-admin-vite">
