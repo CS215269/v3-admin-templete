@@ -144,8 +144,7 @@ const getTableData = () => {
   getTableDataApi({
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
-    jobTitle: searchData.jobTitle || undefined,
-    department: searchData.departmentId || undefined
+    departments: searchData.departmentId || undefined
   })
     .then((res) => {
       paginationData.total = res.data.total
@@ -229,12 +228,19 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
   <div class="app-container">
     <el-card v-loading="loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
-        <el-form-item prop="username" label="岗位名">
+        <el-form-item prop="username" label="名称">
           <el-input v-model="searchData.jobTitle" placeholder="请输入" />
         </el-form-item>
         <el-form-item prop="open" label="所属部门">
-          <el-select v-model="searchData.departmentId" placeholder="请输入">
-            <el-option label="name" value="value" />
+          <el-select
+            v-model="searchData.departmentId"
+            filterable
+            collapse-tags
+            collapse-tags-tooltip
+            multiple
+            placeholder="请选择"
+          >
+            <el-option v-for="item in departmentList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item>

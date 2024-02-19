@@ -18,10 +18,8 @@ export interface GetTableRequestData {
   currentPage: number
   /** 查询条数 */
   size: number
-  /** 查询参数：批次名称 */
-  jobTitle?: string
-  /** 查询参数：批次是否可用 */
-  department?: string
+  /** 查询参数：部门 */
+  departments?: string
 }
 
 export interface GetTablePositionData {
