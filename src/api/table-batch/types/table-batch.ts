@@ -19,9 +19,9 @@ export interface GetTableRequestData {
   /** 查询条数 */
   size: number
   /** 查询参数：批次名称 */
-  name?: string
+  key?: string
   /** 查询参数：批次是否可用 */
-  open?: number
+  state?: number
 }
 
 export interface GetTableBatchData {

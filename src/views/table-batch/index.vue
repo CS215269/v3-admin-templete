@@ -112,8 +112,8 @@ const getTableData = () => {
   getTableDataApi({
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
-    name: searchData.name || undefined,
-    open: searchData.open || undefined
+    key: searchData.name || undefined,
+    state: searchData.open || undefined
   })
     .then((res) => {
       paginationData.total = res.data.total
@@ -148,8 +148,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </el-form-item>
         <el-form-item prop="open" label="状态">
           <el-select v-model="searchData.open" placeholder="请输入">
-            <el-option label="已启用" value="1" />
-            <el-option label="已禁用" value="0" />
+            <el-option label="全部" :value="0" />
+            <el-option label="已启用" :value="2" />
+            <el-option label="已禁用" :value="1" />
           </el-select>
         </el-form-item>
         <el-form-item>
