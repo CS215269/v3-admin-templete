@@ -90,7 +90,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     name: "adminTable",
     meta: {
       title: "管理员后台",
-      svgIcon: "lock",
+      svgIcon: "avatar",
       roles: ["admin"] // 可以在根路由中设置角色
     },
     children: [
@@ -100,7 +100,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
         name: "管理员信息",
         meta: {
           title: "管理员",
-          svgIcon: "lock"
+          svgIcon: "avatar"
         }
       }
     ]
@@ -122,7 +122,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
         name: "用户信息",
         meta: {
           title: "用户",
-          svgIcon: "keyboard-up"
+          svgIcon: "user"
         }
       }
     ]
@@ -254,7 +254,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
         name: "我的投递信息",
         meta: {
           title: "投递信息",
-          svgIcon: "keyboard-left"
+          svgIcon: "office-building"
         }
       }
     ]
@@ -276,7 +276,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
         name: "我的投递",
         meta: {
           title: "我的投递",
-          svgIcon: "keyboard-right"
+          svgIcon: "locationInformation"
         }
       }
     ]
@@ -298,7 +298,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
         name: "个人信息",
         meta: {
           title: "个人信息",
-          svgIcon: "fullscreen"
+          svgIcon: "user"
         }
       }
     ]
