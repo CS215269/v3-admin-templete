@@ -13,7 +13,7 @@ export interface GetTableRequestData {
   /** 查询条数 */
   size: number
   /** 查询参数：批次名称 */
-  name?: string
+  key?: string
 }
 
 export interface GetTableDepartmentData {

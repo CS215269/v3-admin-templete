@@ -85,15 +85,15 @@ const handleUpdate = (row: GetTableDepartmentData) => {
 const tableData = ref<GetTableDepartmentData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
-  name: "",
-  degree: ""
+  name: ""
 })
 const getTableData = () => {
   loading.value = true
+  console.log(searchData.name)
   getTableDataApi({
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
-    name: searchData.name || undefined
+    key: searchData.name || undefined
   })
     .then((res) => {
       paginationData.total = res.data.total
@@ -124,10 +124,8 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
     <el-card v-loading="loading" shadow="never" class="search-wrapper">
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
         <el-form-item prop="name" label="名称">
-          <el-input v-model="searchData.name" placeholder="请输入" />
-        </el-form-item>
-        <el-form-item prop="open" label="状态">
-          <el-input v-model="searchData.degree" placeholder="请输入" />
+          <el-input v-model="searchData.name" placeholder="请输入关键字" />
+          <el-text>{{ searchData.name }}</el-text>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
