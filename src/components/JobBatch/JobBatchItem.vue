@@ -10,6 +10,24 @@ defineOptions({
   name: "JobBatchItem"
 })
 
+// 学历计算属性
+const getDegreeLabel = (degree: number) => {
+  switch (degree) {
+    case 1:
+      return "中专"
+    case 2:
+      return "大专"
+    case 3:
+      return "本科"
+    case 4:
+      return "硕士"
+    case 5:
+      return "博士"
+    default:
+      return "未知"
+  }
+}
+
 /** 详情对话框是否可视 */
 const dialogFormVisible = ref(false)
 
@@ -85,9 +103,10 @@ const beforeImgUpload: UploadProps["beforeUpload"] = (rawFile) => {
 const beforeFileUpload: UploadProps["beforeUpload"] = (rawFile) => {
   if (
     rawFile.type !== "application/msword" &&
-    rawFile.type !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    rawFile.type !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document" &&
+    rawFile.type !== "application/pdf"
   ) {
-    ElMessage.error("只能上传 DOCX 格式的文件!")
+    ElMessage.error("只能上传 doc,docx 或 pdf 格式的文件!")
     return false
   } else if (rawFile.size / 1024 / 1024 > 2) {
     ElMessage.error("文件大小必须小于2MB!")
@@ -176,7 +195,7 @@ const submit = (id: number) => {
                 <el-text tag="p"> 请核对个人信息并上传相关资历文件 </el-text>
                 <el-text size="large"> PDF或world: </el-text>
                 <el-text type="warning" tag="p"> 最多5个文件,多余的将被覆盖 </el-text>
-                <el-text type="warning" tag="p"> 文件大小必须小于 2mb </el-text>
+                <el-text type="warning" tag="p"> 文件大小必须小于 2MB </el-text>
                 <el-text type="danger" tag="p"> 请勿上传虚假信息 </el-text>
               </template>
               <!-- action="https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/resume" -->
@@ -198,7 +217,7 @@ const submit = (id: number) => {
               >
                 <el-button type="primary">选择文件</el-button>
                 <template #tip>
-                  <div class="el-upload__tip">文件大小必须小于 500kb</div>
+                  <div class="el-upload__tip">文件大小必须小于 2MB</div>
                 </template>
               </el-upload>
             </el-card>
@@ -218,7 +237,7 @@ const submit = (id: number) => {
       <div>
         <el-text>所属部门:{{ position.department }}</el-text>
         <br />
-        <el-text>学历要求:{{ position.degree }}</el-text>
+        <el-text>学历要求:{{ getDegreeLabel(position.degree) }}</el-text>
         <br />
         <el-text>详细信息:{{ position.info }}</el-text>
       </div>
