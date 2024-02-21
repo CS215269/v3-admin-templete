@@ -27,6 +27,7 @@ html.dark-blue {
   /** fill-color */
   --el-fill-color: #01efb710;
   --el-fill-color-light: #01efb710;
+  --el-fill-color-lighter: #076f550f;
   --el-fill-color-blank: #031e47;
   /** bg-color */
   --el-bg-color: #021633;
