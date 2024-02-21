@@ -32,7 +32,7 @@ export function updateTableDataApi(data: Table.UpdateTableRequestData) {
 /** 查 */
 export function getTableDataApi(data: Table.GetTableRequestData) {
   return request<Table.GetTableResponseData>({
-    url: "tablePositionPro",
+    url: "tablePositions",
     method: "post",
     data
   })
