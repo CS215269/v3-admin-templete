@@ -125,7 +125,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <el-form ref="searchFormRef" :inline="true" :model="searchData">
         <el-form-item prop="name" label="名称">
           <el-input v-model="searchData.name" placeholder="请输入关键字" />
-          <el-text>{{ searchData.name }}</el-text>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>

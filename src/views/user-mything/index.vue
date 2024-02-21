@@ -62,7 +62,7 @@ onMounted(getTableData)
         <!-- Toolbar buttons code here -->
       </div>
       <div class="table-wrapper">
-        <el-collapse v-model="activeNames">
+        <el-collapse v-if="positions.length > 0" v-model="activeNames">
           <el-collapse-item
             v-for="(position, index) in positions"
             :key="position.recruitId"
@@ -87,6 +87,7 @@ onMounted(getTableData)
         <!-- <el-collapse v-model="activeCollapse">
           <Batches v-for="batch in batches" :key="batch.id" :batch="batch" />
         </el-collapse> -->
+        <div v-else><el-text tag="p">这里什么也没有~</el-text></div>
       </div>
       <div class="pager-wrapper">
         <!-- Pagination code here -->

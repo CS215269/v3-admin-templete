@@ -19,9 +19,12 @@ const loading = ref(false)
 const codeUrl = ref("")
 /** 登录表单数据 */
 const loginFormData: LoginRequestData = reactive({
-  username: "admin",
-  password: "12345678",
-  code: "it1knq"
+  // username: "admin",
+  // password: "12345678",
+  // code: "it1knq"
+  username: "",
+  password: "",
+  code: ""
 })
 /** 登录表单校验规则 */
 const loginFormRules: FormRules = {
@@ -106,7 +109,7 @@ createCode()
               type="text"
               tabindex="3"
               :prefix-icon="Key"
-              maxlength="7"
+              maxlength="6"
               size="large"
             >
               <template #append>

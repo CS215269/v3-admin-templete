@@ -41,18 +41,24 @@ const formRules: FormRules = reactive({
   ]
 })
 const sendRealName = () => {
-  realNameLoading.value = true
-  setRealNameInfoApi(formData)
-    .then(() => {
-      ElMessage.success("实名成功")
-      infoIntegrity.value = true
-      getUserData()
-    })
-    .catch(() => {})
-    .finally(() => {
-      showRealNameMessageBox.value = false
-      realNameLoading.value = false
-    })
+  formRef.value?.validate((valid: boolean) => {
+    if (valid) {
+      realNameLoading.value = true
+      setRealNameInfoApi(formData)
+        .then(() => {
+          ElMessage.success("实名成功")
+          infoIntegrity.value = true
+          getUserData()
+        })
+        .catch(() => {})
+        .finally(() => {
+          showRealNameMessageBox.value = false
+          realNameLoading.value = false
+        })
+    } else {
+      ElMessage.error("表单效验不通过")
+    }
+  })
 }
 
 // 计算用户学历属性
@@ -302,8 +308,12 @@ const validateInput = () => {
           </el-descriptions-item>
           <el-descriptions-item label="手机号" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.tel }}</template>
-            <template v-else> <el-input v-model="editedUserinfo.tel" /> </template
-          ></el-descriptions-item>
+            <template v-else>
+              <el-tooltip class="box-item" content="手机号暂不支持修改" placement="top">
+                {{ editedUserinfo.tel }}
+              </el-tooltip>
+            </template></el-descriptions-item
+          >
           <el-descriptions-item label="现居地址" :span="2" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.address }}</template>
             <template v-else> <el-input v-model="editedUserinfo.address" /> </template
@@ -317,10 +327,10 @@ const validateInput = () => {
     <el-dialog v-model="showRealNameMessageBox" title="开始投递前,请先进行实名认证" width="30%">
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
         <el-form-item prop="name" label="姓名">
-          <el-input v-model="formData.name" placeholder="请输入姓名" clearable />
+          <el-input v-model.trim="formData.name" placeholder="请输入姓名" clearable />
         </el-form-item>
         <el-form-item prop="idnum" label="身份证号码">
-          <el-input v-model="formData.idnum" placeholder="请输入身份证号" clearable />
+          <el-input v-model.trim="formData.idnum" placeholder="请输入身份证号" clearable />
         </el-form-item>
       </el-form>
       <template #footer>

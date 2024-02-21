@@ -16,10 +16,14 @@ const registerFormRef = ref<FormInstance | null>(null)
 const loading = ref(false)
 /** 注册表单数据 */
 const registerFormData: RegisterRequestData = reactive({
-  password: "12345678",
-  confirmPassword: "1234567",
-  phone: "17756800661",
-  code: "it1knq"
+  // password: "12345678",
+  // confirmPassword: "1234567",
+  // phone: "17756800661",
+  // code: "it1knq"
+  password: "",
+  confirmPassword: "",
+  phone: "",
+  code: ""
 })
 /** 确认密码校验规则 */
 const validatePassword2 = (rule: any, value: string, callback: Function) => {
@@ -78,23 +82,32 @@ const createCode = () => {
   // 先清空验证码的输入
   registerFormData.code = ""
   registerCode.value = true
-  getRegisterCodeApi({ phone: registerFormData.phone })
-    .then((res) => {
-      ElMessage.success(res.message)
+
+  registerFormRef.value
+    ?.validateField("phone")
+    .then(() => {
+      getRegisterCodeApi({ phone: registerFormData.phone })
+        .then((res) => {
+          ElMessage.success(res.message)
+        })
+        .catch(() => {
+          ElMessage.error("系统异常,请联系管理员")
+        })
+
+      registerCodeCD.value = 60
+      registerCode.value = true
+      const interval = setInterval(() => {
+        registerCodeCD.value--
+        if (registerCodeCD.value <= 0) {
+          clearInterval(interval)
+          registerCode.value = false
+        }
+      }, 1000)
     })
     .catch(() => {
-      ElMessage.error("系统异常,请联系管理员")
-    })
-
-  registerCodeCD.value = 60
-  registerCode.value = true
-  const interval = setInterval(() => {
-    registerCodeCD.value--
-    if (registerCodeCD.value <= 0) {
-      clearInterval(interval)
+      ElMessage.error("手机号格式不正确")
       registerCode.value = false
-    }
-  }, 1000)
+    })
 }
 </script>
 

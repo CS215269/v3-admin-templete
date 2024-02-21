@@ -46,17 +46,23 @@ const formRules: FormRules = reactive({
 })
 
 const sendRealName = () => {
-  realNameLoading.value = true
-  setRealNameInfoApi(formData)
-    .then(() => {
-      ElMessage.success("实名成功")
-      infoIntegrity.value = true
-    })
-    .catch(() => {})
-    .finally(() => {
-      realNameLoading.value = false
-      showRealNameMessageBox.value = false
-    })
+  formRef.value?.validate((valid: boolean) => {
+    if (valid) {
+      realNameLoading.value = true
+      setRealNameInfoApi(formData)
+        .then(() => {
+          ElMessage.success("实名成功")
+          infoIntegrity.value = true
+        })
+        .catch(() => {})
+        .finally(() => {
+          realNameLoading.value = false
+          showRealNameMessageBox.value = false
+        })
+    } else {
+      ElMessage.error("表单效验不通过")
+    }
+  })
 }
 
 const fetchData = async (index: number) => {
@@ -78,39 +84,6 @@ const handleChange = (index: number) => {
     isExpanded[index] = true
   }
 }
-
-// const toRealNameMessageBox = () => {
-//   ElMessageBox({
-//     title: "提示",
-//     message: "开始投递前,请先进行实名认证",
-//     showCancelButton: true,
-//     confirmButtonText: "确定",
-//     cancelButtonText: "取消",
-//     beforeClose: (action, instance, done) => {
-//       if (action === "confirm") {
-//         instance.confirmButtonLoading = true
-//         instance.confirmButtonText = "Loading..."
-//         setTimeout(() => {
-//           done()
-//           setTimeout(() => {
-//             instance.confirmButtonLoading = false
-//           }, 300)
-//         }, 3000)
-//       } else {
-//         done()
-//       }
-//     }
-//   })
-//     .then((action) => {
-//       ElMessage({
-//         type: "info",
-//         message: `action: ${action}`
-//       })
-//     })
-//     .catch(() => {
-//       ElMessage.error("系统异常,跳转到实名认证失败")
-//     })
-// }
 
 const getBatchData = () => {
   loading.value = true
