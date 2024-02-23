@@ -2,6 +2,7 @@ export interface GetTableRequestData {
   department: string
   departmentId: number
   recruitId: number
+  thingId: number
   positionId: number
   jobTitle: string
   batchId: number

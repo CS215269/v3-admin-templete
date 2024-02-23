@@ -25,14 +25,14 @@ export function submitThingApi(params: Table.SubmitThingRequestData) {
   })
 }
 
-// /** 改 */
-// export function updateTableDataApi(data: Table.UpdateTableRequestData) {
-//   return request({
-//     url: "userThing",
-//     method: "put",
-//     data
-//   })
-// }
+/** 放弃求职 */
+export function userAbandonApi(params: { id: number }) {
+  return request<Table.setUserInfoResponseData>({
+    url: "abandon",
+    method: "get",
+    params
+  })
+}
 
 /** 下载 */
 export function userDownload(batchId: number) {

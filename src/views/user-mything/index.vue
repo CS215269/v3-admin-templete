@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import { GetTableRequestData } from "@/api/user-thing/types/user-thing"
-import { getUserThingDataApi, userDownload } from "@/api/user-thing"
+import { getUserThingDataApi, userAbandonApi, userDownload } from "@/api/user-thing"
 import { ElMessage } from "element-plus"
 
 defineOptions({
@@ -49,6 +49,21 @@ const download = (batchId: number) => {
     })
 }
 
+const abandon = (id: number) => {
+  loading.value = true
+  userAbandonApi({ id })
+    .then((res) => {
+      if (res.code == 0) ElMessage.success(res.message)
+    })
+    .catch((e) => {
+      ElMessage.error("操作失败")
+      console.log(e)
+    })
+    .finally(() => {
+      loading.value = false
+      getTableData()
+    })
+}
 onMounted(getTableData)
 </script>
 
@@ -63,12 +78,13 @@ onMounted(getTableData)
       </div>
       <div class="table-wrapper">
         <el-collapse v-if="positions.length > 0" v-model="activeNames">
-          <el-collapse-item
-            v-for="(position, index) in positions"
-            :key="position.recruitId"
-            :name="index.toString()"
-            :title="position.batchname + ' ' + position.jobTitle"
-          >
+          <el-collapse-item v-for="(position, index) in positions" :key="position.recruitId" :name="index.toString()">
+            <template #title>
+              <el-text tag="b"> {{ position.batchname }} </el-text>
+              &nbsp;
+              <el-text> {{ position.jobTitle }} </el-text>
+              <el-text v-if="position.status === -1" type="danger"> 已拒绝 </el-text>
+            </template>
             <div>
               <el-text>进度信息</el-text>
             </div>
@@ -81,6 +97,7 @@ onMounted(getTableData)
                 <el-step title="面试通过" />
               </el-steps>
               <el-button v-if="position.status == 2" @click="download(position.batchId)">下载准考证</el-button>
+              <el-button @click="abandon(position.thingId)">放弃</el-button>
             </div>
           </el-collapse-item>
         </el-collapse>
