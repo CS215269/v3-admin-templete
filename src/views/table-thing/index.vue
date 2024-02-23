@@ -8,7 +8,8 @@ import {
   getThingInfoApi,
   prePrintfCertificatesApi,
   prePrintfCertificatesDataApi,
-  printfCertificatesApi
+  printfCertificatesApi,
+  refuseThingDataApi
 } from "@/api/table-thing"
 import { ThingInfoData, type GetTableThingData } from "@/api/table-thing/types/table-thing"
 import { ElMessage, ElTable, type FormInstance } from "element-plus"
@@ -233,6 +234,7 @@ const agree = (row: GetTableThingData) => {
     .finally(() => {
       getTableData()
       loading.value = false
+      getTableData()
     })
 }
 
@@ -246,6 +248,7 @@ const agree2 = (row: GetTableThingData) => {
     .finally(() => {
       getTableData()
       loading.value = false
+      getTableData()
     })
 }
 
@@ -259,6 +262,21 @@ const agree3 = (row: GetTableThingData) => {
     .finally(() => {
       getTableData()
       loading.value = false
+      getTableData()
+    })
+}
+
+const refuse = (row: GetTableThingData) => {
+  loading.value = true
+  refuseThingDataApi({ thingId: row.thingId })
+    .then(() => {
+      ElMessage.warning("拒绝" + row.username + "的" + row.jobTitle + "成功")
+    })
+    .catch()
+    .finally(() => {
+      getTableData()
+      loading.value = false
+      getTableData()
     })
 }
 
@@ -320,6 +338,7 @@ const printCertificates = () => {
     })
     .finally(() => {
       loading.value = false
+      getTableData()
     })
 }
 
@@ -413,7 +432,10 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
                   <div>审核流程:</div>
                   <div>用户投递>管理员初审>笔试>面试</div>
                 </template>
-                <template v-if="scope.row.status === 0" #reference>
+                <template v-if="scope.row.status === -1" #reference>
+                  <el-tag type="danger">已经拒绝</el-tag>
+                </template>
+                <template v-else-if="scope.row.status === 0" #reference>
                   <el-tag type="danger">初审未通过</el-tag>
                 </template>
                 <template v-else-if="scope.row.status === 1" #reference>
@@ -434,7 +456,10 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-table-column fixed="right" label="操作" min-width="200px" align="left">
             <template #default="scope">
               <el-button type="info" bg size="small" @click="showinfo(scope.row)">详细信息</el-button>
-              <template v-if="scope.row.status === 0">
+              <template v-if="scope.row.status === -1">
+                <el-button type="primary" size="small" @click="agree(scope.row)">已拒绝</el-button>
+              </template>
+              <template v-else-if="scope.row.status === 0">
                 <el-button type="primary" size="small" @click="agree(scope.row)">初审通过</el-button>
               </template>
               <template v-else-if="scope.row.status === 1">
@@ -451,7 +476,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               <template v-else-if="scope.row.status === 4">
                 <el-button type="primary" size="small">准备就职</el-button>
               </template>
-              <el-button type="danger" size="small" @click="agree(scope.row)">拒绝</el-button>
+              <el-button v-if="scope.row.status === 0" type="danger" size="small" @click="refuse(scope.row)"
+                >拒绝</el-button
+              >
             </template>
           </el-table-column>
         </el-table>

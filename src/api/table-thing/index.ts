@@ -29,11 +29,11 @@ export function accept3ThingApi(data: { thingId: number }) {
 }
 
 /** 拒绝 */
-export function refuseThingDataApi(data: number) {
+export function refuseThingDataApi(params: { thingId: number }) {
   return request({
-    url: "tableThing",
-    method: "post",
-    data
+    url: "refuse",
+    method: "get",
+    params
   })
 }
 
