@@ -33,6 +33,7 @@ export interface GetPositionData {
   degree: number
   focus: number
   info: string
+  require: string
 }
 
 export interface GetBatchData {
