@@ -70,6 +70,7 @@ export const constantRoutes: RouteRecordRaw[] = [
         meta: {
           title: "首页",
           svgIcon: "dashboard",
+          roles: ["admin", "viewOnly"], // 可以在根路由中设置角色
           affix: true
         }
       }
@@ -135,7 +136,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     meta: {
       title: "管理员后台",
       svgIcon: "unocss",
-      roles: ["admin"]
+      roles: ["admin", "viewOnly"]
     },
     children: [
       {
