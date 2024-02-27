@@ -256,6 +256,27 @@ const cancelEditing = () => {
     editedUserinfo.value = obj
   }
 }
+const isAgeInputInvalid = ref<boolean>(false)
+/** 年龄输入校验 */
+const validateInput = () => {
+  console.log("年龄" + Number(editedUserinfo.value.age))
+  const patrn = /^[0-9]{1,20}$/
+  if (editedUserinfo.value.age === "") {
+    isAgeInputInvalid.value = true
+    ElMessage.error("内容不能为空")
+  } else if (!patrn.exec(editedUserinfo.value.age)) {
+    isAgeInputInvalid.value = true
+    ElMessage.error("只能输入数字")
+    editedUserinfo.value.age = ""
+  } else if (Number(editedUserinfo.value.age) < 15 || Number(editedUserinfo.value.age) > 90) {
+    isAgeInputInvalid.value = true
+    console.log("年龄2" + Number(editedUserinfo.value.age))
+    ElMessage.error("年龄应在 15 到 90 之间")
+    editedUserinfo.value.age = ""
+  } else {
+    isAgeInputInvalid.value = false
+  }
+}
 </script>
 
 <template>
