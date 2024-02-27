@@ -112,8 +112,9 @@ const getUserData = () => {
   loading.value = true
   getUserInfoApi()
     .then((res) => {
-      userinfo.value = res.data
-      uid.value = res.data.id
+      userinfo.value = res.data.user
+      uid.value = res.data.user.id
+      canEdit.value = res.data.canEdit
     })
 
     .catch(() => {
@@ -142,7 +143,12 @@ const getUserData = () => {
     })
 }
 
+const canEdit = ref<boolean>(false)
 const startEditing = () => {
+  if (!canEdit.value) {
+    ElMessage.error("有正在投递的岗位,无法修改")
+    return
+  }
   isEditing.value = true
   if (userinfo.value) {
     console.log("备份成编辑模式")

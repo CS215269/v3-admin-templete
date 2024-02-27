@@ -37,5 +37,5 @@ export interface SetRealNameRequestData {
   idnum: string
 }
 
-export type GetUserInfoResponseData = ApiResponseData<UserInfoData>
+export type GetUserInfoResponseData = ApiResponseData<{ user: UserInfoData; canEdit: boolean }>
 export type SetUserInfoResponseData = ApiResponseData<null>

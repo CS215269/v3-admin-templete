@@ -33,6 +33,8 @@ export interface GetPositionData {
   degree: number
   focus: number
   info: string
+  maxSalary: number
+  minSalary: number
   require: string
 }
 

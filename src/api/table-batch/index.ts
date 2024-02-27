@@ -40,9 +40,6 @@ export function getTableDataApi(data: Table.GetTableRequestData) {
 export function getBatchOptionsApi() {
   return request<Table.GetBatchOptionData>({
     url: "tableBatchOption",
-    method: "get",
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    }
+    method: "get"
   })
 }
