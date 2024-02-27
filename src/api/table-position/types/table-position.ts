@@ -2,6 +2,9 @@ export interface CreateTableRequestData {
   jobTitle: string
   departmentId: number
   degree: string
+  require: string
+  maxSalary: number
+  minSalary: number
   info: string
 }
 
@@ -38,7 +41,6 @@ export type GetTableResponseData = ApiResponseData<{
 
 export type GetPositionOptionData = ApiResponseData<{
   list: { id: number; jobTitle: string }[]
-  total: number
 }>
 
 export type DeleteResult = ApiResponseData<{

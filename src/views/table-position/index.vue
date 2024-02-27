@@ -47,30 +47,44 @@ const formData = reactive({
   jobTitle: "",
   departmentId: 0,
   degree: "",
-  info: ""
+  salary: [0, 0],
+  info: "",
+  require: ""
+})
+const formDataSubmit = reactive({
+  jobTitle: "",
+  departmentId: 0,
+  degree: "",
+  minSalary: 0,
+  maxSalary: 0,
+  info: "",
+  require: ""
 })
 const formRules: FormRules = reactive({
-  name: [{ required: true, trigger: "blur", message: "请输入岗位名称" }],
-  account: [
-    { required: true, trigger: "blur", message: "请输入账号" }
-    // {
-    //   pattern: /^[1-9]\d{5}(?:18|19|20)\d{2}(?:0[1-9]|10|11|12)(?:0[1-9]|[1-2]\d|30|31)\d{3}[\dXx]$/,
-    //   trigger: "blur",
-    //   message: "请输入有效的身份证号码"
-    // }
-    // dsa validator: isChineseIdCard,
-  ],
-  pwd: [{ required: true, trigger: "blur", message: "请输入密码" }],
-  phone: [{ required: true, trigger: "blur", message: "请输入电话" }]
+  jobTitle: [{ required: true, trigger: "blur", message: "请输入岗位名称" }],
+  departmentId: [{ required: true, trigger: "blur", message: "请输入所属部门" }],
+  degree: [{ required: true, trigger: "blur", message: "请输入学历要求" }],
+  info: [{ required: true, trigger: "blur", message: "请输入详细介绍" }],
+  require: [{ required: true, trigger: "blur", message: "请输入额外要求" }]
 })
 const handleCreate = () => {
   formRef.value?.validate((valid: boolean, fields) => {
     if (valid) {
       if (currentUpdateId.value === undefined) {
-        createTableDataApi(formData)
+        formDataSubmit.jobTitle = formData.jobTitle
+        formDataSubmit.departmentId = formData.departmentId
+        formDataSubmit.degree = formData.degree
+        formDataSubmit.minSalary = formData.salary[0]
+        formDataSubmit.maxSalary = formData.salary[1]
+        formDataSubmit.info = formData.info
+        formDataSubmit.require = formData.require
+        createTableDataApi(formDataSubmit)
           .then(() => {
             ElMessage.success("新增成功")
             getTableData()
+          })
+          .catch((e) => {
+            console.log(e)
           })
           .finally(() => {
             dialogVisible.value = false
@@ -101,6 +115,8 @@ const resetForm = () => {
   formData.jobTitle = ""
   formData.departmentId = 0
   formData.degree = ""
+  formData.salary = [1000, 9000]
+  formData.require = ""
   formData.info = ""
 }
 //#endregion
@@ -313,7 +329,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-form-item prop="jobTitle" label="岗位名称">
           <el-input v-model="formData.jobTitle" placeholder="请输入" />
         </el-form-item>
-        <el-form-item prop="open" label="所属部门">
+        <el-form-item prop="departmentId" label="所属部门">
           <!--  v-if="currentUpdateId === undefined" 让组件在修改对话框不可见 -->
           <el-select v-model="formData.departmentId" filterable placeholder="岗位">
             <el-option v-for="item in departmentList" :key="item.id" :label="item.name" :value="item.id" />
@@ -329,14 +345,19 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             <el-option label="博士" value="5" />
           </el-select>
         </el-form-item>
+        <el-form-item prop="salary" label="预估薪资">
+          <el-slider v-model="formData.salary" range :max="100000" :step="500" />
+        </el-form-item>
+        <el-form-item prop="require" label="入职要求">
+          <el-input v-model="formData.require" placeholder="请输入" maxlength="20" show-word-limit />
+        </el-form-item>
         <el-form-item prop="info" label="介绍信息">
-          <el-text placeholder="请输入" />
           <el-input
             v-model="formData.info"
             :rows="2"
             type="textarea"
             placeholder="请输入"
-            maxlength="50"
+            maxlength="80"
             show-word-limit
           />
         </el-form-item>

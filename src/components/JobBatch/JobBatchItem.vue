@@ -190,8 +190,8 @@ const getUserData = () => {
   loading.value = true
   getUserInfoApi()
     .then((res) => {
-      userinfo.value = res.data
-      uid.value = res.data.id
+      userinfo.value = res.data.user
+      uid.value = res.data.user.id
     })
 
     .catch(() => {
@@ -271,6 +271,7 @@ const cancelEditing = () => {
         <el-text tag="p">所属部门:{{ position.department }}</el-text>
         <el-text tag="p">学历要求:{{ getDegreeLabel(position.degree) }}</el-text>
         <el-text tag="p">详细信息:{{ position.info }}</el-text>
+        <el-text tag="p">预估薪资:{{ position.minSalary }} - {{ position.maxSalary }}</el-text>
         <el-text tag="p">其他要求:{{ position.require }}</el-text>
       </div> </el-card
     ><el-dialog v-loadin="loading" v-model="dialogFormVisible" width="90%">
