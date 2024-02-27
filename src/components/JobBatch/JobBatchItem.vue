@@ -192,6 +192,7 @@ const getUserData = () => {
     .then((res) => {
       userinfo.value = res.data.user
       uid.value = res.data.user.id
+      canEdit.value = res.data.canEdit
     })
 
     .catch(() => {
@@ -220,7 +221,12 @@ const getUserData = () => {
     })
 }
 
+const canEdit = ref<boolean>(false)
 const startEditing = () => {
+  if (!canEdit.value) {
+    ElMessage.error("有正在投递的岗位,无法修改")
+    return
+  }
   isEditing.value = true
   if (userinfo.value) {
     console.log("备份成编辑模式")
@@ -292,7 +298,10 @@ const validateInput = () => {
         <el-text tag="p">所属部门:{{ position.department }}</el-text>
         <el-text tag="p">学历要求:{{ getDegreeLabel(position.degree) }}</el-text>
         <el-text tag="p">详细信息:{{ position.info }}</el-text>
-        <el-text tag="p">预估薪资:{{ position.minSalary }} - {{ position.maxSalary }}</el-text>
+        <el-text tag="p"
+          >预估薪资:<el-text v-if="position.maxSalary == 0">薪资面议</el-text
+          ><el-text v-else> {{ position.minSalary }} - {{ position.maxSalary }}</el-text></el-text
+        >
         <el-text tag="p">其他要求:{{ position.require }}</el-text>
       </div> </el-card
     ><el-dialog v-loadin="loading" v-model="dialogFormVisible" width="90%">
