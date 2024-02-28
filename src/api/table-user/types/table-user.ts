@@ -24,10 +24,14 @@ export interface GetTableRequestData {
   currentPage: number
   /** 查询条数 */
   size: number
-  /** 查询参数：批次名称 */
+  /** 查询参数：用户姓名 */
   name?: string
-  /** 查询参数：批次是否可用 */
-  degree?: number
+  /** 查询参数：用户电话 */
+  phone?: string
+  /** 查询参数：身份证号码 */
+  idnum?: string
+  /** 查询参数：用户学历 */
+  degree?: string
 }
 
 /** 用户信息 */

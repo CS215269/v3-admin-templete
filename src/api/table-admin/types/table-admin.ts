@@ -3,6 +3,7 @@ export interface CreateTableRequestData {
   account: string
   pwd: string
   phone: string
+  viewOnly: number
 }
 
 export interface UpdateTableRequestData {
@@ -10,6 +11,7 @@ export interface UpdateTableRequestData {
   name: string
   account: string
   phone: string
+  viewOnly: number
 }
 
 export interface GetTableRequestData {
@@ -18,7 +20,7 @@ export interface GetTableRequestData {
   /** 查询条数 */
   size: number
   /** 查询参数：用户名 */
-  username?: string
+  name?: string
   /** 查询参数：手机号 */
   phone?: string
 }
@@ -29,6 +31,7 @@ export interface GetTableAdminData {
   phone: string
   pwd: boolean
   name: string
+  viewOnly: number
 }
 
 export type GetTableResponseData = ApiResponseData<{

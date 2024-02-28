@@ -18,24 +18,24 @@ const { paginationData, handleCurrentChange, handleSizeChange } = usePagination(
 const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
 const formData = reactive({
-  name: "2",
-  account: "2",
-  pwd: "2",
-  phone: "2"
+  name: "",
+  account: "",
+  pwd: "",
+  phone: "",
+  viewOnly: 2
 })
 const formRules: FormRules = reactive({
   name: [{ required: true, trigger: "blur", message: "请输入用户名" }],
-  account: [
-    { required: true, trigger: "blur", message: "请输入账号" }
-    // {
-    //   pattern: /^[1-9]\d{5}(?:18|19|20)\d{2}(?:0[1-9]|10|11|12)(?:0[1-9]|[1-2]\d|30|31)\d{3}[\dXx]$/,
-    //   trigger: "blur",
-    //   message: "请输入有效的身份证号码"
-    // }
-    // dsa validator: isChineseIdCard,
-  ],
+  account: [{ required: true, trigger: "blur", message: "请输入账号" }],
   pwd: [{ required: true, trigger: "blur", message: "请输入密码" }],
-  phone: [{ required: true, trigger: "blur", message: "请输入电话" }]
+  phone: [
+    { required: true, trigger: "blur", message: "请输入电话" },
+    {
+      pattern: /^[1][3,4,5,7,8,9][0-9]{9}$/,
+      trigger: "blur",
+      message: "请输入有效的电话"
+    }
+  ]
 })
 const handleCreate = () => {
   formRef.value?.validate((valid: boolean, fields) => {
@@ -55,7 +55,8 @@ const handleCreate = () => {
           id: currentUpdateId.value,
           name: formData.name,
           account: formData.account,
-          phone: formData.phone
+          phone: formData.phone,
+          viewOnly: formData.viewOnly
         })
           .then(() => {
             ElMessage.success("修改成功")
@@ -76,6 +77,7 @@ const resetForm = () => {
   formData.account = ""
   formData.pwd = ""
   formData.phone = ""
+  formData.viewOnly = 2
 }
 //#endregion
 
@@ -102,6 +104,7 @@ const handleUpdate = (row: GetTableAdminData) => {
   formData.name = row.name
   formData.account = row.account
   formData.phone = row.phone
+  formData.viewOnly = row.viewOnly
   dialogVisible.value = true
 }
 //#endregion
@@ -118,7 +121,7 @@ const getTableData = () => {
   getTableDataApi({
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
-    username: searchData.name || undefined,
+    name: searchData.name || undefined,
     phone: searchData.phone || undefined
   })
     .then((res) => {
@@ -183,6 +186,12 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-table-column prop="name" label="昵称" align="center" />
           <el-table-column prop="phone" label="手机号" align="center" />
           <el-table-column prop="account" label="账号" align="center" />
+          <el-table-column prop="viewOnly" label="权限" align="center">
+            <template #default="scope">
+              <el-text v-if="scope.row.viewOnly == 0">全职管理员</el-text>
+              <el-text v-else>仅查看管理员</el-text>
+            </template>
+          </el-table-column>
           <el-table-column fixed="right" label="操作" width="150" align="center">
             <template #default="scope">
               <el-button type="primary" text bg size="small" @click="handleUpdate(scope.row)">修改</el-button>
@@ -224,6 +233,12 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </el-form-item>
         <el-form-item prop="phone" label="电话">
           <el-input v-model="formData.phone" placeholder="请输入" />
+        </el-form-item>
+        <el-form-item prop="viewOnly" label="权限">
+          <el-select v-model="formData.viewOnly" placeholder="请选择">
+            <el-option key="1" value="1" label="仅查看" />
+            <el-option key="2" value="0" label="全职管理" />
+          </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
