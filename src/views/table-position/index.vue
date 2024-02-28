@@ -24,7 +24,7 @@ defineOptions({
 const getDegreeLabel = (row: { degree: number }) => {
   switch (row.degree) {
     case 1:
-      return "中专"
+      return "高职"
     case 2:
       return "大专"
     case 3:

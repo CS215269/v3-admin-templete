@@ -15,7 +15,7 @@ defineOptions({
 const getDegreeLabel = (row: { degree: number }) => {
   switch (row.degree) {
     case 1:
-      return "中专"
+      return "高职"
     case 2:
       return "大专"
     case 3:
@@ -123,7 +123,9 @@ const tableData = ref<GetTableUserData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
   name: "",
-  degree: 0
+  phone: "",
+  degree: "",
+  idnum: ""
 })
 const getTableData = () => {
   loading.value = true
@@ -131,7 +133,9 @@ const getTableData = () => {
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
     name: searchData.name || undefined,
-    degree: searchData.degree || undefined
+    degree: searchData.degree || undefined,
+    idnum: searchData.idnum || undefined,
+    phone: searchData.phone || undefined
   })
     .then((res) => {
       paginationData.total = res.data.total
@@ -173,8 +177,21 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-form-item prop="username" label="用户名">
           <el-input v-model="searchData.name" placeholder="请输入" />
         </el-form-item>
+        <el-form-item prop="phone" label="电话">
+          <el-input v-model="searchData.phone" placeholder="请输入" />
+        </el-form-item>
+        <el-form-item prop="idnum" label="身份证号码">
+          <el-input v-model="searchData.idnum" placeholder="请输入" />
+        </el-form-item>
         <el-form-item prop="degree" label="学历">
-          <el-input v-model="searchData.degree" placeholder="请输入" />
+          <el-select v-model="searchData.degree" placeholder="请输入">
+            <el-option value="" label="不限" />
+            <el-option value="1" label="高职" />
+            <el-option value="2" label="大专" />
+            <el-option value="3" label="本科" />
+            <el-option value="4" label="硕士" />
+            <el-option value="5" label="博士" />
+          </el-select>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>

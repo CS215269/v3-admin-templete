@@ -16,7 +16,7 @@ defineOptions({
 const getDegreeLabel = (degree: number | undefined) => {
   switch (degree) {
     case 1:
-      return "中专"
+      return "高职"
     case 2:
       return "大专"
     case 3:
@@ -346,7 +346,7 @@ const validateInput = () => {
               <template v-if="!isEditing">{{ getDegreeLabel(userinfo?.degree) }}</template>
               <template v-else>
                 <el-select id="userdegree" v-model="editedUserinfo.degree">
-                  <el-option label="中专" value="1" />
+                  <el-option label="高职" value="1" />
                   <el-option label="大专" value="2" />
                   <el-option label="本科" value="3" />
                   <el-option label="硕士" value="4" />

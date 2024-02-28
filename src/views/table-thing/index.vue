@@ -33,7 +33,7 @@ const { paginationData, handleCurrentChange, handleSizeChange } = usePagination(
 const getDegreeLabel = (row: { degree: number }) => {
   switch (row.degree) {
     case 1:
-      return "中专"
+      return "高职"
     case 2:
       return "大专"
     case 3:
@@ -51,7 +51,7 @@ const getDegreeLabel = (row: { degree: number }) => {
 const getDegreeLabel2 = (degree: number) => {
   switch (degree) {
     case 1:
-      return "中专"
+      return "高职"
     case 2:
       return "大专"
     case 3:
