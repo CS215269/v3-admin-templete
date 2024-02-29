@@ -325,6 +325,7 @@ const validateInput = () => {
             <template v-else> <el-input v-model="editedUserinfo.address" /> </template
           ></el-descriptions-item>
         </el-descriptions>
+        <el-text v-if="isEditing" tag="p" type="warning">编辑完成请及时保存</el-text>
       </div>
       <div class="pager-wrapper">
         <!-- Pagination code here -->

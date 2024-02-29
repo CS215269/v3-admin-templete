@@ -421,6 +421,7 @@ const validateInput = () => {
               <template v-else> <el-input v-model="editedUserinfo.address" /> </template
             ></el-descriptions-item>
           </el-descriptions>
+          <el-text v-if="isEditing" tag="p" type="warning">编辑完成请及时保存</el-text>
         </div>
         <el-divider />
         <el-text tag="p"> 请核对个人信息并上传相关资历文件 </el-text>
