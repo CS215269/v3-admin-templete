@@ -64,11 +64,21 @@ export function printfCertificatesApi(data: { id: number[] }) {
   })
 }
 
-/** 查详细 */
+/** 查用户详细信息和资历文件 */
 export function getThingInfoApi(id: number) {
   return request<Table.GetThingInfoData>({
     url: `tableThing/${id}`,
     method: "get"
+  })
+}
+
+/** 预览用户资历文件 */
+export function preViewUserFileApi(data: { path: string }) {
+  return request<BlobPart>({
+    responseType: "blob",
+    url: "previewUserFile",
+    method: "post",
+    data
   })
 }
 

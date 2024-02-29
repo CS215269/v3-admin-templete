@@ -8,6 +8,7 @@ import {
   getThingInfoApi,
   prePrintfCertificatesApi,
   prePrintfCertificatesDataApi,
+  preViewUserFileApi,
   printfCertificatesApi,
   refuseThingDataApi
 } from "@/api/table-thing"
@@ -205,7 +206,7 @@ const showinfo = (row: GetTableThingData) => {
       console.log(res)
       thingInfo.value = res.data.data
       imgList.value = res.data.img.reverse()
-      fileList.value = res.data.file
+      fileList.value = res.data.file.reverse()
     })
     .catch(() => {
       ElMessage.error("获取投递详情失败,请重试")
@@ -347,6 +348,59 @@ const batchSort = (a: GetTableThingData, b: GetTableThingData) => {
   return a.batchId - b.batchId
 }
 
+const showUserFileLoading = ref<boolean>(false)
+const showUserFile = (path: string) => {
+  showUserFileLoading.value = true
+  preViewUserFileApi({ path })
+    .then((res) => {
+      // Determine the file extension
+      const fileExtension = path.slice(path.lastIndexOf(".") + 1).toLowerCase()
+      const fileName = path.slice(path.lastIndexOf("/") + 1)
+
+      let mimeType = ""
+      switch (fileExtension) {
+        case "pdf": {
+          mimeType = "application/pdf"
+          const blob = new Blob([res], { type: mimeType })
+          // Handle PDF files: open in a new tab
+          const pdfURL = URL.createObjectURL(blob)
+          window.open(pdfURL, "_blank")
+          break
+        }
+        case "docx": {
+          const blob = new Blob([res])
+          // Handle DOCX files: render using a third-party library
+          const container = document.getElementById("previewUserFile")
+          if (container) {
+            renderAsync(blob, container).then(() => console.log("docx: finished"))
+          } else {
+            console.log("Cannot find container element")
+          }
+          break
+        }
+        case "doc": {
+          const blob = new Blob([res])
+          // Handle DOC files: trigger download
+          const docURL = URL.createObjectURL(blob)
+          const link = document.createElement("a")
+          link.href = docURL
+          link.download = fileName // Suggests a filename for the downloaded file
+          link.click()
+          URL.revokeObjectURL(docURL) // Clean up to avoid memory leaks
+          break
+        }
+        default:
+          console.log("Unsupported file type")
+      }
+    })
+    .catch((e) => {
+      ElMessage.error("预览用户资历文件服务异常")
+      console.log(e)
+    })
+    .finally(() => {
+      showUserFileLoading.value = false
+    })
+}
 /** 监听分页参数的变化 */
 watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })
 </script>
@@ -501,10 +555,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <el-row :gutter="20">
         <el-col :span="16">
           <el-descriptions title="投递人" :column="3" border size="small">
-            <el-descriptions-item label="Username" label-align="right" align="center" label-class-name="my-label">
-              {{ thingInfo.name }}
-            </el-descriptions-item>
-
             <el-descriptions-item label="用户名" label-align="center" align="left">
               {{ thingInfo?.name }}</el-descriptions-item
             >
@@ -515,7 +565,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               {{ thingInfo?.sex }}
             </el-descriptions-item>
             <el-descriptions-item label="学历" label-align="center" align="left">
-              {{ getDegreeLabel2(thingInfo?.degree) }}
+              {{ getDegreeLabel2(thingInfo?.userDegree) }}
             </el-descriptions-item>
             <el-descriptions-item label="政治面貌" label-align="center" align="left"
               >{{ thingInfo?.zzmm }}
@@ -548,6 +598,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               >{{ thingInfo?.address }}
             </el-descriptions-item>
           </el-descriptions>
+          <el-text tag="p" size="large">用户资历文件</el-text>
           <template v-for="url in imgList" :key="url">
             <el-image
               style="width: 100px; height: 100px"
@@ -560,19 +611,16 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               fit="cover"
             />
           </template>
-          <!-- <el-image
-            style="width: 100px; height: 100px"
-            :src="imgList.at(0)"
-            :zoom-rate="1.2"
-            :max-scale="4"
-            :min-scale="0.4"
-            :preview-src-list="imgList"
-            :initial-index="0"
-            fit="cover"
-          /> -->
+          <template v-for="url in fileList" :key="url">
+            <el-text tag="p" style="margin-bottom: 20px">
+              {{ url.split("/").slice(-1) }}
+              <el-button @click="showUserFile(url)" :loading="showUserFileLoading">查看</el-button>
+            </el-text>
+          </template>
+          <div id="previewUserFile" />
         </el-col>
         <el-col :span="8">
-          <el-descriptions title="意愿岗位" :column="2" border size="small">
+          <el-descriptions title="意愿岗位" :column="1" border size="small">
             <el-descriptions-item
               label="Username"
               label-align="right"
