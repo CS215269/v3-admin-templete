@@ -146,7 +146,7 @@ const submit = (id: number) => {
       ElMessage.success("投递成功")
     })
     .catch(() => {
-      ElMessage.error("发生异常,请重试")
+      ElMessage.error("投递失败")
     })
     .finally(() => {
       // loading.value = false
