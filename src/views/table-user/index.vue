@@ -3,7 +3,7 @@ import { reactive, ref, watch } from "vue"
 import { createTableDataApi, deleteTableDataApi, updateTableDataApi, getTableDataApi } from "@/api/table-user"
 import { type GetTableUserData } from "@/api/table-user/types/table-user"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox, ElTooltipProps } from "element-plus"
-import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
+import { Search, Refresh, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
 import { usePagination } from "@/hooks/usePagination"
 
 defineOptions({
@@ -202,7 +202,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
     <el-card v-loading="loading" shadow="never">
       <div class="toolbar-wrapper">
         <div>
-          <el-button type="primary" :icon="CirclePlus" @click="dialogVisible = true">新增用户</el-button>
           <el-button type="danger" :icon="Delete">批量删除</el-button>
         </div>
         <div>
