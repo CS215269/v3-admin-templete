@@ -598,7 +598,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               >{{ thingInfo?.address }}
             </el-descriptions-item>
           </el-descriptions>
-          <el-text tag="p" size="large">用户资历文件</el-text>
+          <el-text tag="p" size="large" style="margin-top: 20px"><strong>用户资历文件</strong></el-text>
           <template v-for="url in imgList" :key="url">
             <el-image
               style="width: 100px; height: 100px"
