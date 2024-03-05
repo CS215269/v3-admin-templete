@@ -1,17 +1,36 @@
+<script lang="ts" setup>
+import { getDashboardDataApi } from "@/api/dashboard"
+import { ElMessage } from "element-plus"
+import { onMounted, ref } from "vue"
+const userTotal = ref<number>()
+const openBatchTotal = ref<number>()
+const unsettledThingsNum = ref<number>()
+const num = ref<number>(0)
+const getDashboardData = () => {
+  getDashboardDataApi()
+    .then((res) => {
+      userTotal.value = res.data.unsettledThingsNum
+      openBatchTotal.value = res.data.openBatchTotal
+      unsettledThingsNum.value = res.data.unsettledThingsNum
+      num.value = res.data.num
+    })
+    .catch(() => {
+      ElMessage.error("首页加载异常")
+    })
+    .finally(() => {})
+}
+onMounted(getDashboardData)
+</script>
 <template>
-  <div class="app-container">
+  <div class="app-container" loading>
     <el-row justify="space-around">
       <el-col :span="10">
         <div class="statistic-card">
-          <el-statistic :value="98500">
+          <el-statistic :value="userTotal">
             <template #title>
               <div style="display: inline-flex; align-items: center">
-                <el-text tag="p" size="large"> 新增用户 </el-text>
-                <el-tooltip
-                  effect="dark"
-                  content="Number of users who logged into the product in one day"
-                  placement="top"
-                >
+                <el-text tag="p" size="large"> 用户总数 </el-text>
+                <el-tooltip effect="dark" content="注册用户数量" placement="top">
                   <el-icon style="margin-left: 4px" :size="12">
                     <Warning />
                   </el-icon>
@@ -19,30 +38,15 @@
               </div>
             </template>
           </el-statistic>
-          <div class="statistic-footer">
-            <div class="footer-item">
-              <span>than yesterday</span>
-              <span class="green">
-                24%
-                <el-icon>
-                  <CaretTop />
-                </el-icon>
-              </span>
-            </div>
-          </div>
         </div>
       </el-col>
       <el-col :span="10">
         <div class="statistic-card">
-          <el-statistic :value="693700">
+          <el-statistic :value="openBatchTotal">
             <template #title>
               <div style="display: inline-flex; align-items: center">
-                Monthly Active Users
-                <el-tooltip
-                  effect="dark"
-                  content="Number of users who logged into the product in one month"
-                  placement="top"
-                >
+                <el-text tag="p" size="large"> 开放批次数 </el-text>
+                <el-tooltip effect="dark" content="批次属性为'已开启'的批次数量" placement="top">
                   <el-icon style="margin-left: 4px" :size="12">
                     <Warning />
                   </el-icon>
@@ -52,13 +56,13 @@
           </el-statistic>
           <div class="statistic-footer">
             <div class="footer-item">
-              <span>month on month</span>
+              <!-- <span>month on month</span>
               <span class="red">
                 12%
                 <el-icon>
                   <CaretBottom />
                 </el-icon>
-              </span>
+              </span> -->
             </div>
           </div>
         </div>
@@ -67,52 +71,20 @@
     <el-row justify="space-around">
       <el-col :span="10">
         <div class="statistic-card">
-          <el-statistic :value="72000" title="New transactions today">
+          <el-statistic :value="unsettledThingsNum" title="New transactions today">
             <template #title>
-              <div style="display: inline-flex; align-items: center">New transactions today</div>
+              <div style="display: inline-flex; align-items: center">待处理投递数</div>
             </template>
           </el-statistic>
-          <div class="statistic-footer">
-            <div class="footer-item">
-              <span>than yesterday</span>
-              <span class="green">
-                16%
-                <el-icon>
-                  <CaretTop />
-                </el-icon>
-              </span>
-            </div>
-            <div class="footer-item">
-              <el-icon :size="14">
-                <ArrowRight />
-              </el-icon>
-            </div>
-          </div>
         </div>
       </el-col>
       <el-col :span="10">
         <div class="statistic-card">
-          <el-statistic :value="72000" title="New transactions today">
+          <el-statistic :value="num" title="New transactions today">
             <template #title>
               <div style="display: inline-flex; align-items: center">New transactions today</div>
             </template>
           </el-statistic>
-          <div class="statistic-footer">
-            <div class="footer-item">
-              <span>than yesterday</span>
-              <span class="green">
-                16%
-                <el-icon>
-                  <CaretTop />
-                </el-icon>
-              </span>
-            </div>
-            <div class="footer-item">
-              <el-icon :size="14">
-                <ArrowRight />
-              </el-icon>
-            </div>
-          </div>
         </div>
       </el-col>
     </el-row>
