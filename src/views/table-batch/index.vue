@@ -22,12 +22,35 @@ const formData = reactive({
   name: "x",
   open: 0,
   startime: "",
-  deadline: ""
+  deadline: "",
+  disableAutoUpdate: 0
 })
-const formRules: FormRules = reactive({
+const disableAutoUpdate = ref<boolean>(true)
+const validateDateRange = (rule: any, value: string, callback: Function) => {
+  const today = new Date().toISOString().split("T")[0] // get today's date in yyyy-mm-dd format
+  console.log(today)
+  console.log(value)
+  if (value == null || value == "") {
+    callback(new Error("请输入开始时间"))
+  } else {
+    callback()
+  }
+}
+const validateDateRange2 = (rule: any, value: string, callback: Function) => {
+  if (value === "") {
+    callback(new Error("请输入截止时间"))
+  } else if (value <= formData.startime) {
+    callback(new Error("截止时间必须比开始时间晚"))
+  } else {
+    callback()
+  }
+}
+
+const formRules = reactive<FormRules<typeof formData>>({
   name: [{ required: true, trigger: "blur", message: "请输入批次名" }],
   open: [{ required: true, trigger: "blur", message: "请输入状态" }],
-  startime: [{ required: true, trigger: "blur", message: "请输入开始时间" }]
+  startime: [{ validator: validateDateRange, trigger: "blur" }],
+  deadline: [{ validator: validateDateRange2, trigger: "blur" }]
 })
 const handleCreate = () => {
   formRef.value?.validate((valid: boolean, fields) => {
@@ -35,6 +58,8 @@ const handleCreate = () => {
       if (currentUpdateId.value === undefined) {
         formData.startime = moment(formData.startime).format("YYYY-MM-DD")
         formData.deadline = moment(formData.deadline).format("YYYY-MM-DD")
+        formData.open = 0
+        formData.disableAutoUpdate = disableAutoUpdate.value ? 0 : 1
         createTableDataApi(formData)
           .then(() => {
             ElMessage.success("新增成功")
@@ -49,7 +74,8 @@ const handleCreate = () => {
           name: formData.name,
           open: formData.open,
           startime: moment(formData.startime).format("YYYY-MM-DD"),
-          deadline: moment(formData.deadline).format("YYYY-MM-DD")
+          deadline: moment(formData.deadline).format("YYYY-MM-DD"),
+          disableAutoUpdate: disableAutoUpdate.value ? 0 : 1
         })
           .then(() => {
             ElMessage.success("修改成功")
@@ -96,6 +122,8 @@ const handleUpdate = (row: GetTableBatchData) => {
   formData.open = row.open
   formData.startime = moment(row.startime).format("YYYY-MM-DD")
   formData.deadline = moment(row.deadline).format("YYYY-MM-DD")
+  // disableAutoUpdate.value = row.disableAutoUpdate == 1
+  disableAutoUpdate.value = row.disableAutoUpdate == 1
   dialogVisible.value = true
 }
 //#endregion
@@ -216,12 +244,16 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       width="30%"
     >
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
-        <p>批次名称建议带有序号或年份,如2023年第2批</p>
+        <el-text v-if="currentUpdateId != undefined" tag="p" style="margin-bottom: 20px"
+          >手动修改批次状态时系统会自动更新其开始时间与结束时间</el-text
+        >
+        <el-text tag="p">批次的开始时间与结束时间会使其状态自动更新</el-text>
+        <el-divider />
         <el-form-item prop="name" label="批次名称">
           <el-input v-model="formData.name" placeholder="请输入" />
         </el-form-item>
-        <el-form-item prop="open" label="批次状态" aria-placeholder="请选择">
-          <!--  v-if="currentUpdateId === undefined" 让组件在修改对话框不可见 -->
+        <el-form-item v-if="currentUpdateId != undefined" prop="open" label="批次状态" aria-placeholder="请选择">
+          <!--  让组件在修改对话框不可见 -->
           <el-select v-model="formData.open" placeholder="请输入">
             <el-option label="已启用" value="1" />
             <el-option label="已禁用" value="0" />
@@ -244,6 +276,18 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             format="YYYY/MM/DD"
             value-format="YYYY-MM-DD"
           />
+        </el-form-item>
+        <el-form-item prop="disableAutoUpdate" label="自动开放/关闭">
+          <el-switch
+            v-model="disableAutoUpdate"
+            class="mt-2"
+            style="margin-left: 24px"
+            active-text="系统自动根据时间段自动设置'已启用'/'已禁用'"
+          />
+          <!--
+            inline-prompt
+            :active-icon="Check"
+            :inactive-icon="Close"<el-text tag="p" style="font-size: 0.4em"></el-text> -->
         </el-form-item>
       </el-form>
       <template #footer>

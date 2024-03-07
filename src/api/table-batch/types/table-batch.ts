@@ -3,6 +3,7 @@ export interface CreateTableRequestData {
   open: number
   startime: string
   deadline: string
+  disableAutoUpdate: number
 }
 
 export interface UpdateTableRequestData {
@@ -11,6 +12,7 @@ export interface UpdateTableRequestData {
   open: number
   startime: string
   deadline: string
+  disableAutoUpdate: number
 }
 
 export interface GetTableRequestData {
@@ -31,6 +33,7 @@ export interface GetTableBatchData {
   positionNum: number
   startime: string
   deadline: string
+  disableAutoUpdate: number
 }
 
 export type GetTableResponseData = ApiResponseData<{

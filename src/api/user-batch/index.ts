@@ -1,15 +1,6 @@
 import { request } from "@/utils/service"
 import type * as Table from "./types/user-batch"
 
-/** 增 */
-export function createTableDataApi(data: Table.CreateTableRequestData) {
-  return request({
-    url: "tableBatch",
-    method: "post",
-    data
-  })
-}
-
 export function getPositionDataApi(batchid: number) {
   return request<Table.GetPositionResponseData>({
     url: `positions/${batchid}`,
