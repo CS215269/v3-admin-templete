@@ -95,6 +95,9 @@ const handleCreate = () => {
           jobTitle: formData.jobTitle,
           departmentId: formData.departmentId,
           degree: formData.degree,
+          minSalary: formData.salary[0],
+          maxSalary: formData.salary[1],
+          require: formData.require,
           info: formData.info
         })
           .then(() => {
@@ -143,6 +146,8 @@ const handleUpdate = (row: GetTablePositionData) => {
   formData.jobTitle = row.jobTitle
   formData.departmentId = row.departmentId
   formData.degree = row.degree
+  formData.salary = [row.maxSalary, row.minSalary]
+  formData.require = row.require
   formData.info = row.info
   dialogVisible.value = true
 }
@@ -295,6 +300,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               {{ getDegreeLabel(scope.row) }}
             </template>
           </el-table-column>
+          <el-table-column prop="require" label="要求" align="center" />
+          <el-table-column prop="minSalary" label="最低薪资" align="center" />
+          <el-table-column prop="maxSalary" label="最高薪资" align="center" />
           <el-table-column prop="info" label="介绍信息" align="center" show-overflow-tooltip />
           <el-table-column fixed="right" label="操作" width="150" align="center">
             <template #default="scope">

@@ -13,6 +13,9 @@ export interface UpdateTableRequestData {
   jobTitle: string
   departmentId: number
   degree: string
+  require: string
+  maxSalary: number
+  minSalary: number
   info: string
 }
 
@@ -30,6 +33,9 @@ export interface GetTablePositionData {
   jobTitle: string
   department: string
   degree: string
+  maxSalary: number
+  minSalary: number
+  require: string
   info: string
   departmentId: number
 }
