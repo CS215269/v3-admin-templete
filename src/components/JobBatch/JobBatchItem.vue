@@ -287,7 +287,7 @@ const validateInput = () => {
 
 <template>
   <div>
-    <el-card class="position-card" shadow="hover">
+    <el-card class="position-card" shadow="hover" style="margin-left: 20px">
       <template #header>
         <div class="card-header">
           <span class="head-title">{{ props.position.jobTitle }}</span>
@@ -295,14 +295,14 @@ const validateInput = () => {
         </div>
       </template>
       <div>
-        <el-text tag="p">所属部门:{{ position.department }}</el-text>
-        <el-text tag="p">学历要求:{{ getDegreeLabel(position.degree) }}</el-text>
-        <el-text tag="p">详细信息:{{ position.info }}</el-text>
+        <el-text tag="p">所属部门: {{ position.department }}</el-text>
+        <el-text tag="p">学历要求: {{ getDegreeLabel(position.degree) }}</el-text>
+        <el-text tag="p">详细信息: {{ position.info }}</el-text>
         <el-text tag="p"
-          >预估薪资:<el-text v-if="position.maxSalary == 0">薪资面议</el-text
-          ><el-text v-else> {{ position.minSalary }} - {{ position.maxSalary }}</el-text></el-text
+          >预估薪资: <el-text v-if="position.maxSalary == 0">薪资面议</el-text
+          ><el-text v-else> {{ position.minSalary / 1000 }}K - {{ position.maxSalary / 1000 }}K</el-text></el-text
         >
-        <el-text tag="p">其他要求:{{ position.require }}</el-text>
+        <el-text tag="p">其他要求: {{ position.require }}</el-text>
       </div> </el-card
     ><el-dialog v-loadin="loading" v-model="dialogFormVisible" width="90%">
       <template #header>

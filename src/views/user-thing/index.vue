@@ -105,9 +105,9 @@ onMounted(getBatchData)
 
 <template>
   <div class="app-container">
-    <el-card v-loading="loading" shadow="never">
-      <div class="toolbar-wrapper">
-        <!-- Toolbar buttons code here -->
+    <el-card shadow="never">
+      <div class="toolbar-wrapper" style="margin-bottom: 20px">
+        <el-text class="mx-1" size="large">选择批次浏览批次下的岗位</el-text>
       </div>
       <div class="table-wrapper">
         <el-collapse v-model="activeNames">

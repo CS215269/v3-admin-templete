@@ -69,15 +69,12 @@ onMounted(getTableData)
 
 <template>
   <div class="app-container">
-    <el-card loading="loading" shadow="never" class="search-wrapper">
-      <!-- Search form code here -->
-    </el-card>
     <el-card loading="loading" shadow="never">
-      <div class="toolbar-wrapper">
-        <!-- Toolbar buttons code here -->
+      <div class="toolbar-wrapper" style="margin-bottom: 20px">
+        <el-text class="mx-1" size="large">我的投递信息</el-text>
       </div>
       <div class="table-wrapper">
-        <el-collapse v-if="positions.length > 0" v-model="activeNames">
+        <el-collapse v-if="positions.length > 0" v-model="activeNames" style="margin: 0">
           <el-collapse-item v-for="(position, index) in positions" :key="position.recruitId" :name="index.toString()">
             <template #title>
               <el-text tag="b"> {{ position.batchname }} </el-text>
@@ -101,6 +98,7 @@ onMounted(getTableData)
             </div>
           </el-collapse-item>
         </el-collapse>
+
         <!-- <el-collapse v-model="activeCollapse">
           <Batches v-for="batch in batches" :key="batch.id" :batch="batch" />
         </el-collapse> -->
