@@ -13,8 +13,8 @@ defineOptions({
 })
 
 // 学历计算属性
-const getDegreeLabel = (degree: number | undefined) => {
-  switch (degree) {
+const getEducationLabel = (education: number | undefined) => {
+  switch (education) {
     case 1:
       return "高职"
     case 2:
@@ -168,7 +168,7 @@ const editedUserinfo = ref<UserInfoData>({
   /** 年龄 */
   age: "",
   /** 学历 */
-  degree: 0,
+  education: 0,
   /** 政治面貌 */
   zzmm: "",
   /** 毕业学校 */
@@ -204,7 +204,7 @@ const getUserData = () => {
         tel: "",
         sex: "",
         age: "",
-        degree: 0,
+        education: 0,
         zzmm: "",
         school: "",
         nation: "",
@@ -239,7 +239,7 @@ const startEditing = () => {
 }
 const saveChanges = () => {
   // 处理数据并发送put请求到服务器
-  editedUserinfo.value.degree = Number(editedUserinfo.value.degree)
+  editedUserinfo.value.education = Number(editedUserinfo.value.education)
   setUserInfoApi(editedUserinfo.value)
     .then((res) => {
       ElMessage.info(res.message)
@@ -296,7 +296,7 @@ const validateInput = () => {
       </template>
       <div>
         <el-text tag="p">所属部门: {{ position.department }}</el-text>
-        <el-text tag="p">学历要求: {{ getDegreeLabel(position.degree) }}</el-text>
+        <el-text tag="p">学历要求: {{ getEducationLabel(position.education) }}</el-text>
         <el-text tag="p">详细信息: {{ position.info }}</el-text>
         <el-text tag="p"
           >预估薪资: <el-text v-if="position.maxSalary == 0">薪资面议</el-text
@@ -343,9 +343,9 @@ const validateInput = () => {
                 </el-select> </template
             ></el-descriptions-item>
             <el-descriptions-item label="学历" label-align="center" align="left">
-              <template v-if="!isEditing">{{ getDegreeLabel(userinfo?.degree) }}</template>
+              <template v-if="!isEditing">{{ getEducationLabel(userinfo?.education) }}</template>
               <template v-else>
-                <el-select id="userdegree" v-model="editedUserinfo.degree">
+                <el-select id="usereducation" v-model="editedUserinfo.education">
                   <el-option label="高职" value="1" />
                   <el-option label="大专" value="2" />
                   <el-option label="本科" value="3" />

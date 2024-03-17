@@ -1,6 +1,12 @@
 <script lang="ts" setup>
 import { reactive, ref, watch } from "vue"
-import { createTableDataApi, deleteTableDataApi, updateTableDataApi, getTableDataApi } from "@/api/table-batch"
+import {
+  createTableDataApi,
+  deleteTableDataApi,
+  updateTableDataApi,
+  getTableDataApi,
+  switchOpenApi
+} from "@/api/table-batch"
 import { type GetTableBatchData } from "@/api/table-batch/types/table-batch"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
@@ -163,6 +169,19 @@ const resetSearch = () => {
 }
 //#endregion
 
+const switchOpen = (id: number) => {
+  loading.value = true
+  switchOpenApi({ id })
+    .then(() => {
+      ElMessage.success("切换成功")
+    })
+    .catch(() => {})
+    .finally(() => {
+      getTableData()
+      loading.value = false
+    })
+}
+
 /** 监听分页参数的变化 */
 watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })
 </script>
@@ -208,8 +227,8 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-table-column prop="name" label="批次名称" align="center" />
           <el-table-column prop="open" label="批次状态" align="center">
             <template #default="scope">
-              <el-tag v-if="scope.row.open" type="success" effect="plain">启用</el-tag>
-              <el-tag v-else type="warning" effect="plain">禁用</el-tag>
+              <el-button v-if="scope.row.open" type="success" effect="plain">已启用</el-button>
+              <el-button v-else type="warning" @click="switchOpen(scope.row.id)">已禁用</el-button>
             </template>
           </el-table-column>
           <el-table-column prop="positionNum" label="岗位数量" align="center" />
@@ -252,8 +271,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-form-item prop="name" label="批次名称">
           <el-input v-model="formData.name" placeholder="请输入" />
         </el-form-item>
+        <!--
         <el-form-item v-if="currentUpdateId != undefined" prop="open" label="批次状态" aria-placeholder="请选择">
-          <!--  让组件在修改对话框不可见 -->
+
           <el-select v-model="formData.open" placeholder="请输入">
             <el-option label="已启用" value="1" />
             <el-option label="已禁用" value="0" />
@@ -284,11 +304,10 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             style="margin-left: 24px"
             active-text="系统自动根据时间段自动设置'已启用'/'已禁用'"
           />
-          <!--
             inline-prompt
             :active-icon="Check"
-            :inactive-icon="Close"<el-text tag="p" style="font-size: 0.4em"></el-text> -->
-        </el-form-item>
+            :inactive-icon="Close"<el-text tag="p" style="font-size: 0.4em"></el-text>
+        </el-form-item> -->
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>

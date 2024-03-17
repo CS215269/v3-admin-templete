@@ -21,8 +21,10 @@ defineOptions({
 })
 
 // 计算属性
-const getDegreeLabel = (row: { degree: number }) => {
-  switch (row.degree) {
+const getEducationLabel = (education: number) => {
+  // INSERT INTO `ahbvcprot1`.`positions` (`jobTitle`, `code`, `type`, `specialty`, `departmentId`, `education`, `degree`, `maxAge`, `sex`, `zzmm`, `info`, `toll`, `minSalary`, `maxSalary`, `require`)
+  // VALUES ('11', '11', '1', '1', 1, 1, 1, 1, 1, '1', '1', 1, 1, 1, '1')
+  switch (education) {
     case 1:
       return "高职"
     case 2:
@@ -37,6 +39,19 @@ const getDegreeLabel = (row: { degree: number }) => {
       return "未知"
   }
 }
+// 计算属性
+const getDegreeLabel = (degree: number) => {
+  switch (degree) {
+    case 1:
+      return "学士"
+    case 2:
+      return "硕士"
+    case 3:
+      return "博士"
+    default:
+      return "未知"
+  }
+}
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
 
@@ -46,6 +61,7 @@ const formRef = ref<FormInstance | null>(null)
 const formData = reactive({
   jobTitle: "",
   departmentId: 0,
+  education: "",
   degree: "",
   salary: [0, 0],
   info: "",
@@ -54,7 +70,8 @@ const formData = reactive({
 const formDataSubmit = reactive({
   jobTitle: "",
   departmentId: 0,
-  degree: "",
+  education: 0,
+  degree: 0,
   minSalary: 0,
   maxSalary: 0,
   info: "",
@@ -62,8 +79,8 @@ const formDataSubmit = reactive({
 })
 const formRules: FormRules = reactive({
   jobTitle: [{ required: true, trigger: "blur", message: "请输入岗位名称" }],
-  departmentId: [{ required: true, trigger: "blur", message: "请输入所属部门" }],
-  degree: [{ required: true, trigger: "blur", message: "请输入学历要求" }],
+  education: [{ required: true, trigger: "blur", message: "请选择学历要求" }],
+  degree: [{ required: true, trigger: "blur", message: "请选择学位要求" }],
   info: [{ required: true, trigger: "blur", message: "请输入详细介绍" }],
   require: [{ required: true, trigger: "blur", message: "请输入额外要求" }]
 })
@@ -73,7 +90,7 @@ const handleCreate = () => {
       if (currentUpdateId.value === undefined) {
         formDataSubmit.jobTitle = formData.jobTitle
         formDataSubmit.departmentId = formData.departmentId
-        formDataSubmit.degree = formData.degree
+        formDataSubmit.education = Number(formData.education)
         formDataSubmit.minSalary = formData.salary[0]
         formDataSubmit.maxSalary = formData.salary[1]
         formDataSubmit.info = formData.info
@@ -94,7 +111,8 @@ const handleCreate = () => {
           id: currentUpdateId.value,
           jobTitle: formData.jobTitle,
           departmentId: formData.departmentId,
-          degree: formData.degree,
+          education: Number(formData.education),
+          degree: Number(formData.degree),
           minSalary: formData.salary[0],
           maxSalary: formData.salary[1],
           require: formData.require,
@@ -117,7 +135,7 @@ const resetForm = () => {
   currentUpdateId.value = undefined
   formData.jobTitle = ""
   formData.departmentId = 0
-  formData.degree = ""
+  formData.education = ""
   formData.salary = [1000, 9000]
   formData.require = ""
   formData.info = ""
@@ -145,7 +163,8 @@ const handleUpdate = (row: GetTablePositionData) => {
   currentUpdateId.value = row.id
   formData.jobTitle = row.jobTitle
   formData.departmentId = row.departmentId
-  formData.degree = row.degree
+  formData.education = String(row.education)
+  formData.degree = String(row.degree)
   formData.salary = [row.maxSalary, row.minSalary]
   formData.require = row.require
   formData.info = row.info
@@ -295,9 +314,14 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="jobTitle" label="岗位名称" align="center" />
           <el-table-column prop="department" label="所属部门" align="center" />
-          <el-table-column prop="degree" label="所需学历" align="center">
+          <el-table-column prop="education" label="所需学历" align="center">
             <template #default="scope">
-              {{ getDegreeLabel(scope.row) }}
+              {{ getEducationLabel(scope.row.education) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="degree" label="所需学位" align="center">
+            <template #default="scope">
+              {{ getDegreeLabel(scope.row.degree) }}
             </template>
           </el-table-column>
           <el-table-column prop="require" label="要求" align="center" />
@@ -343,8 +367,8 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             <el-option v-for="item in departmentList" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
         </el-form-item>
-        <el-form-item prop="degree" label="学历要求">
-          <el-select v-model="formData.degree" placeholder="请选择">
+        <el-form-item prop="education" label="学历要求">
+          <el-select v-model="formData.education" placeholder="请选择">
             <!-- <el-option v-for="item in positionList" :key="item.id" :label="item.jobTitle" :value="item.id" /> -->
             <el-option label="高职" value="1" />
             <el-option label="大专" value="2" />
@@ -353,8 +377,14 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             <el-option label="博士" value="5" />
           </el-select>
         </el-form-item>
-        <el-form-item prop="salary" label="预估薪资">
-          <el-slider v-model="formData.salary" range :max="100000" :step="500" />
+        <el-form-item prop="degree" label="学位要求">
+          <el-select v-model="formData.degree" placeholder="请选择">
+            <!-- <el-option v-for="item in positionList" :key="item.id" :label="item.jobTitle" :value="item.id" /> -->
+            <el-option label="无" value="0" />
+            <el-option label="学士" value="1" />
+            <el-option label="硕士" value="2" />
+            <el-option label="博士" value="3" />
+          </el-select>
         </el-form-item>
         <el-form-item prop="require" label="入职要求">
           <el-input v-model="formData.require" placeholder="请输入" maxlength="20" show-word-limit />

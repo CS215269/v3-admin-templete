@@ -31,8 +31,8 @@ const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
 
 // 计算属性
-const getDegreeLabel = (row: { degree: number }) => {
-  switch (row.degree) {
+const getEducationLabel = (row: { education: number }) => {
+  switch (row.education) {
     case 1:
       return "高职"
     case 2:
@@ -49,8 +49,8 @@ const getDegreeLabel = (row: { degree: number }) => {
 }
 
 // 计算属性
-const getDegreeLabel2 = (degree: number) => {
-  switch (degree) {
+const getEducationLabel2 = (education: number) => {
+  switch (education) {
     case 1:
       return "高职"
     case 2:
@@ -167,6 +167,8 @@ const thingInfo = ref<ThingInfoData>({
   /** 年龄 */
   age: "",
   /** 学历 */
+  userEducation: 0,
+  /** 学位 */
   userDegree: 0,
   /** 政治面貌 */
   zzmm: "",
@@ -193,6 +195,7 @@ const thingInfo = ref<ThingInfoData>({
   jobTitle: "",
   /** 部门 */
   department: "",
+  education: 0,
   degree: 0,
   info: "",
   departmentId: 0
@@ -474,9 +477,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-table-column prop="department" sortable label="所属部门" align="center" />
           <el-table-column prop="username" sortable label="用户姓名" align="center" />
           <el-table-column prop="school" sortable label="毕业院校" align="center" />
-          <el-table-column prop="degree" sortable label="学历" align="center">
-            <template #default="degreeScope">
-              {{ getDegreeLabel(degreeScope.row) }}
+          <el-table-column prop="education" sortable label="用户学历" align="center">
+            <template #default="educationScope">
+              {{ getEducationLabel(educationScope.row) }}
             </template>
           </el-table-column>
           <el-table-column prop="status" label="审核进度" align="center" :formatter="progressFormatter">
@@ -565,7 +568,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               {{ thingInfo?.sex }}
             </el-descriptions-item>
             <el-descriptions-item label="学历" label-align="center" align="left">
-              {{ getDegreeLabel2(thingInfo?.userDegree) }}
+              {{ getEducationLabel2(thingInfo?.userEducation) }}
             </el-descriptions-item>
             <el-descriptions-item label="政治面貌" label-align="center" align="left"
               >{{ thingInfo?.zzmm }}

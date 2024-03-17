@@ -2,7 +2,7 @@ export interface CreateTableRequestData {
   name: string
   sex: string
   age: string
-  degree: number
+  education: number
   zzmm: string
   school: string
   native_place: string
@@ -13,6 +13,7 @@ export interface UpdateTableRequestData {
   name: string
   sex: string
   age: string
+  education: number
   degree: number
   zzmm: string
   school: string
@@ -31,7 +32,7 @@ export interface GetTableRequestData {
   /** 查询参数：身份证号码 */
   idnum?: string
   /** 查询参数：用户学历 */
-  degree?: string
+  education?: string
 }
 
 /** 用户信息 */
@@ -49,6 +50,8 @@ export interface GetTableUserData {
   /** 年龄 */
   age: string
   /** 学历 */
+  education: number
+  /** 学位 */
   degree: number
   /** 政治面貌 */
   zzmm: string

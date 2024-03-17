@@ -12,8 +12,8 @@ defineOptions({
 })
 
 // 计算属性
-const getDegreeLabel = (row: { degree: number }) => {
-  switch (row.degree) {
+const getEducationLabel = (education: number) => {
+  switch (education) {
     case 1:
       return "高职"
     case 2:
@@ -28,16 +28,31 @@ const getDegreeLabel = (row: { degree: number }) => {
       return "未知"
   }
 }
+// 计算属性
+const getDegreeLabel = (degree: number) => {
+  switch (degree) {
+    case 1:
+      return "学士"
+    case 2:
+      return "硕士"
+    case 3:
+      return "博士"
+    default:
+      return "未知"
+  }
+}
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
 
 //#region 增
+// 学生添加暂停维护
 const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
 const formData = reactive({
   name: "",
   sex: "",
   age: "",
+  education: 0,
   degree: 0,
   zzmm: "",
   school: "",
@@ -62,6 +77,7 @@ const handleCreate = () => {
           name: formData.name,
           sex: formData.sex,
           age: formData.age,
+          education: formData.education,
           degree: formData.degree,
           zzmm: formData.zzmm,
           school: formData.school,
@@ -85,6 +101,8 @@ const resetForm = () => {
   formData.name = ""
   formData.sex = ""
   formData.age = ""
+  formData.education = 0
+  formData.degree = 0
   formData.zzmm = ""
   formData.school = ""
   formData.native_place = ""
@@ -112,6 +130,7 @@ const handleUpdate = (row: GetTableUserData) => {
   currentUpdateId.value = row.id
   formData.name = row.name
   formData.sex = row.sex
+  formData.education = row.education
   formData.degree = row.degree
   formData.age = row.age
   dialogVisible.value = true
@@ -124,7 +143,7 @@ const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
   name: "",
   phone: "",
-  degree: "",
+  education: "",
   idnum: ""
 })
 const getTableData = () => {
@@ -133,7 +152,7 @@ const getTableData = () => {
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
     name: searchData.name || undefined,
-    degree: searchData.degree || undefined,
+    education: searchData.education || undefined,
     idnum: searchData.idnum || undefined,
     phone: searchData.phone || undefined
   })
@@ -183,8 +202,8 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-form-item prop="idnum" label="身份证号码">
           <el-input v-model="searchData.idnum" placeholder="请输入" />
         </el-form-item>
-        <el-form-item prop="degree" label="学历">
-          <el-select v-model="searchData.degree" placeholder="请输入">
+        <el-form-item prop="education" label="学历">
+          <el-select v-model="searchData.education" placeholder="请输入">
             <el-option value="" label="不限" />
             <el-option value="1" label="高职" />
             <el-option value="2" label="大专" />
@@ -221,7 +240,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           tel: number
           sex: string
           age: string
-          degree: number
+          education: number
           zzmm: string
           school: string
           nation: string
@@ -234,9 +253,14 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-table-column prop="name" label="姓名" align="center" />
           <el-table-column prop="sex" label="性别" align="center" />
           <el-table-column prop="idnum" label="身份证" align="center" />
-          <el-table-column prop="degree" label="学历" align="center">
+          <el-table-column prop="education" label="学历" align="center">
             <template #default="scope">
-              {{ getDegreeLabel(scope.row) }}
+              {{ getEducationLabel(scope.row.education) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="degree" label="学位" align="center">
+            <template #default="scope">
+              {{ getDegreeLabel(scope.row.degree) }}
             </template>
           </el-table-column>
           <el-table-column prop="address" label="地址" align="center" show-overflow-tooltip />
@@ -272,7 +296,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       width="30%"
     >
       <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
-        <p>关于用户的一些建议</p>
+        <p>用户数据建议由用户自行修改</p>
         <el-form-item prop="name" label="用户姓名">
           <el-input v-model="formData.name" placeholder="请输入" />
         </el-form-item>

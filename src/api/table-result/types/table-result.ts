@@ -27,7 +27,7 @@ export interface GetTableResultData {
   recruitId: number
   jobTitle: string
   department: string
-  degree: string
+  education: string
   departmentId: number
   positionId: number
   batchId: number

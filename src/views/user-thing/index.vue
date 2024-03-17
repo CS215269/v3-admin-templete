@@ -2,7 +2,8 @@
 import { onMounted, reactive, ref } from "vue"
 import { getBatchDataApi, getPositionDataApi } from "@/api/user-batch"
 import { GetBatchData, GetPositionData } from "@/api/user-batch/types/user-batch"
-import JobBatchItem from "@/components/JobBatch/JobBatchItem.vue"
+// import JobBatchItem from "@/components/JobBatch/JobBatchItem.vue"
+import { Search, Refresh } from "@element-plus/icons-vue"
 import { ElMessage, FormInstance, FormRules } from "element-plus"
 import { setRealNameInfoApi } from "@/api/user-info"
 defineOptions({
@@ -10,14 +11,95 @@ defineOptions({
 })
 
 const loading = ref<boolean>(false)
-/** 假设你已经有了一个批次列表 */
-const batches = ref<GetBatchData[]>([])
-/** 用于控制哪些 collapse 是展开的 */
-const activeNames = ref<string[]>([])
-/** 用于控制哪些 collapse 已经加载过数据 */
-const isExpanded = reactive<boolean[]>([])
+/** 当前批次 */
+const currentBatch = ref<GetBatchData>({
+  id: 0,
+  name: "",
+  startime: "",
+  deadline: "",
+  positionNum: 0
+})
+
 /** 用于存储每个 collapse 的数据 */
-const positions = reactive<GetPositionData[][]>([])
+const positions = reactive<GetPositionData[]>([])
+/** 用于存储每个 drawer 的数据 */
+const drawerOpenIndex = reactive<boolean[]>([])
+
+// const handleClose = (done: () => void) => {
+//   drawerOpenIndex.fill(false)
+//   console.log("重置")
+//   console.log(drawerOpenIndex)
+//   done()
+// }
+
+/** 无限加载工具类 */
+const listUtil = reactive({
+  /** 岗位列表是否加载完毕 */
+  over: false,
+  /** 岗位总数 */
+  num: 0,
+  /** 查询起始位置 */
+  offset: 0
+})
+/** 搜索表单 */
+const searchData = reactive({
+  code: ""
+})
+const handleSearch = () => {
+  location.reload()
+}
+const loadData = async () => {
+  try {
+    const {
+      data: { list }
+    } = await getPositionDataApi({
+      batchId: currentBatch.value.id,
+      currentPage: listUtil.offset,
+      size: 3,
+      code: ""
+    })
+
+    if (list.length < 1) {
+      listUtil.over = true
+      console.log("over?" + listUtil.over)
+      return
+    }
+
+    positions.push(...list)
+    console.log(positions)
+    listUtil.offset += list.length
+  } catch (error) {
+    console.error(error)
+    ElMessage.error("加载数据时出错")
+  }
+}
+
+interface FormItem {
+  id: number
+  date?: string
+  name?: string
+  level?: string
+  file?: File | null
+}
+const resumeFormData = ref<FormItem[]>([
+  { id: 1, date: "", name: "", level: "", file: null },
+  { id: 2, date: "", name: "", level: "", file: null }
+])
+const addFormItem = () => {
+  const newId = resumeFormData.value.length + 1
+  resumeFormData.value.push({ id: newId, date: "", name: "", level: "", file: null })
+  // nextTick(() => {
+  // 可选: 自动聚焦到新添加的表单项
+  // })
+}
+
+const delFormItem = (item: FormItem) => {
+  const index = resumeFormData.value.indexOf(item)
+  if (index !== -1) {
+    resumeFormData.value.splice(index, 1)
+  }
+}
+
 /** 用户是否实名认证过 */
 const infoIntegrity = ref<boolean>(false)
 /** 实名认证表单展示 */
@@ -65,38 +147,20 @@ const sendRealName = () => {
   })
 }
 
-const fetchData = async (index: number) => {
-  try {
-    const response = await getPositionDataApi(batches.value[index].id)
-    positions[index] = response.data.list
-  } catch (error) {
-    ElMessage.error("错误")
-    console.error(error)
-  }
-}
-
-/** 用户点击批次按钮后的行为 */
-const handleChange = (index: number) => {
-  if (!infoIntegrity.value) {
-    showRealNameMessageBox.value = true
-  } else if (activeNames.value.includes(index.toString()) && !isExpanded[index]) {
-    fetchData(index)
-    isExpanded[index] = true
-  }
-}
-
 const getBatchData = () => {
   loading.value = true
   getBatchDataApi()
     .then((res) => {
-      batches.value = res.data.list
-      infoIntegrity.value = res.data.infoIntegrity == 0 ? false : true
+      currentBatch.value = res.data.oneBatch
+      listUtil.num = res.data.oneBatch.positionNum
+      loadData()
     })
     .catch(() => {
-      batches.value = []
+      ElMessage.error("系统异常")
     })
     .finally(() => {
       loading.value = false
+      console.log("a?cub" + currentBatch.value.id + "listnum" + listUtil.num)
     })
 }
 
@@ -105,12 +169,143 @@ onMounted(getBatchData)
 
 <template>
   <div class="app-container">
-    <el-card shadow="never">
-      <div class="toolbar-wrapper" style="margin-bottom: 20px">
-        <el-text class="mx-1" size="large">选择批次浏览批次下的岗位</el-text>
+    <div class="toolbar-wrapper" style="margin-bottom: 20px">
+      <el-row justify="space-around">
+        <el-col :span="8">
+          <el-text class="mx-1" size="large">{{ currentBatch.name }}</el-text>
+        </el-col>
+        <el-col :span="4">
+          <el-text class="mx-1" size="large"><el-button>切换批次</el-button> </el-text>
+        </el-col>
+      </el-row>
+      <el-card>
+        <el-form ref="searchFormRef" :inline="true" :model="searchData">
+          <el-form-item prop="code" label="岗位代码">
+            <el-input v-model="searchData.code" placeholder="请输入" />
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
+            <el-button :icon="Refresh" @click="undefined">重置</el-button
+            ><!-- resetSearch -->
+          </el-form-item>
+        </el-form>
+      </el-card>
+    </div>
+    <div class="table-wrapper">
+      <div v-if="infoIntegrity">
+        <el-text>请先实名认证</el-text>
+        <el-button @click="showRealNameMessageBox = true">实名认证</el-button>
       </div>
-      <div class="table-wrapper">
-        <el-collapse v-model="activeNames">
+      <ul v-infinite-scroll="loadData" :infinite-scroll-disabled="true" class="infinite-list" style="overflow: auto">
+        <li v-for="(p, index) in positions" :key="p.id">
+          <el-card style="margin-top: 0.1em">
+            <!-- {{ p }} -->
+            <table border="2px #ccc solid" style="width: 100%; border-collapse: collapse; text-align: center">
+              <!-- 第一行占总高度的6/24 -->
+              <tr style="height: 25%">
+                <!-- 占总宽度的4/24 -->
+                <td style="width: 16.666%">岗位代码</td>
+                <!-- 占总宽度的2/24 -->
+                <td style="width: 8.333%">拟聘人数</td>
+                <!-- 占总宽度的16/24 -->
+                <td style="width: 66.666%">招聘岗位要求</td>
+                <!-- 合并两个格子，占总宽度的2/24 -->
+                <td rowspan="2" class="td-btn" style="width: 8.333%" @click="drawerOpenIndex[index] = true">
+                  点击报名
+                </td>
+              </tr>
+              <!-- 第二行占总高度的18/24 -->
+              <tr style="height: 75%">
+                <!-- 占总宽度的4/24 -->
+                <td style="width: 16.666%">{{ p.code }}</td>
+                <!-- 占总宽度的2/24 -->
+                <td style="width: 8.333%">{{ p.toll }}</td>
+                <!-- 占总宽度的16/24 -->
+                <td style="width: 66.666%; text-align: start">
+                  <el-row :gutter="20">
+                    <el-col :span="12"> 岗位名称：{{ p.jobTitle }} </el-col>
+                    <el-col :span="12"> 岗位类别：{{ p.type }} </el-col>
+                  </el-row>
+                  <el-row :gutter="20">
+                    <el-col :span="12"> 专业：{{ p.specialty }} </el-col>
+                    <el-col :span="12"> 学历：{{ p.education }} </el-col>
+                  </el-row>
+                  <el-row :gutter="20">
+                    <el-col :span="12"> 学位：{{ p.education }} </el-col>
+                    <el-col :span="12"> 年龄：{{ p.maxAge }}周岁以下</el-col>
+                  </el-row>
+                  <el-row :gutter="20">
+                    <el-col :span="12"> 性别：{{ p.sex == 0 ? "不限" : p.sex == 1 ? "男性" : "女性" }} </el-col>
+                    <el-col :span="12"> 政治面貌：{{ p.zzmm }} </el-col>
+                  </el-row>
+                  其他：{{ p.info }}
+                </td>
+              </tr>
+            </table>
+          </el-card>
+          <el-drawer v-model="drawerOpenIndex[index]" direction="rtl" size="70%">
+            <template #header>
+              <h4>{{ p.code }}</h4>
+            </template>
+            <template #default>
+              <el-form>
+                <div>
+                  <el-row>
+                    <el-col :span="6">
+                      <el-text> 获奖日期 </el-text>
+                    </el-col>
+                    <el-col :span="6">
+                      <el-text> 奖项名称 </el-text>
+                    </el-col>
+                    <el-col :span="6">
+                      <el-text> 级别 </el-text>
+                    </el-col>
+                    <el-col :span="6">
+                      <el-text> 证明 </el-text>
+                    </el-col>
+                  </el-row>
+                </div>
+                <div v-for="item in resumeFormData" :key="item.id">
+                  <el-form-item style="display: inline-block">
+                    <el-date-picker
+                      v-model="item.date"
+                      type="date"
+                      placeholder="选择日期"
+                      format="YYYY-MM-DD"
+                      value-format="YYYY-MM-DD "
+                    />
+                  </el-form-item>
+                  <el-form-item style="display: inline-block">
+                    <el-input v-model="item.name" :maxlength="10" show-word-limit />
+                  </el-form-item>
+                  <el-form-item style="display: inline-block">
+                    <el-input v-model="item.level" :maxlength="4" show-word-limit />
+                  </el-form-item>
+                  <el-form-item style="display: inline-block">
+                    <el-upload v-model="item.file">
+                      <el-button type="primary">上传文件</el-button>
+                    </el-upload>
+                  </el-form-item>
+                  <el-form-item style="display: inline-block">
+                    <el-button type="danger" @click="delFormItem(item)">删除</el-button>
+                  </el-form-item>
+                </div>
+              </el-form>
+
+              <el-button @click="addFormItem">添加表单项</el-button>
+            </template>
+            <template #footer>
+              <div style="flex: auto">
+                <el-button @click="drawerOpenIndex[index] = false">取消</el-button>
+                <el-button type="primary" @click="undefined">confirm</el-button>
+                <!--  cancelClickDrawer  confirmClickDrawer -->
+              </div>
+            </template>
+          </el-drawer>
+        </li>
+      </ul>
+
+      <!-- <el-collapse v-model="activeNames">
           <el-collapse-item
             v-for="(batch, index) in batches"
             :key="batch.id"
@@ -127,30 +322,55 @@ onMounted(getBatchData)
               />
             </template>
           </el-collapse-item>
-        </el-collapse>
-        <!-- <el-collapse v-model="activeCollapse">
+        </el-collapse> -->
+      <!-- <el-collapse v-model="activeCollapse">
           <Batches v-for="batch in batches" :key="batch.id" :batch="batch" />
         </el-collapse> -->
-        <el-dialog v-model="showRealNameMessageBox" title="开始投递前,请先进行实名认证" width="30%">
-          <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
-            <el-form-item prop="name" label="姓名">
-              <el-input v-model="formData.name" placeholder="请输入姓名" clearable />
-            </el-form-item>
-            <el-form-item prop="idnum" label="身份证号码">
-              <el-input v-model="formData.idnum" placeholder="请输入身份证号" clearable />
-            </el-form-item>
-          </el-form>
-          <template #footer>
-            <span class="dialog-footer">
-              <el-button @click="showRealNameMessageBox = false">取消</el-button>
-              <el-button type="primary" @click="sendRealName()"> 确定 </el-button>
-            </span>
-          </template>
-        </el-dialog>
-      </div>
-      <div class="pager-wrapper">
-        <!-- Pagination code here -->
-      </div>
-    </el-card>
+      <el-dialog v-model="showRealNameMessageBox" title="开始投递前,请先进行实名认证" width="30%">
+        <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
+          <el-form-item prop="name" label="姓名">
+            <el-input v-model="formData.name" placeholder="请输入姓名" clearable />
+          </el-form-item>
+          <el-form-item prop="idnum" label="身份证号码">
+            <el-input v-model="formData.idnum" placeholder="请输入身份证号" clearable />
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="showRealNameMessageBox = false">取消</el-button>
+            <el-button type="primary" @click="sendRealName()"> 确定 </el-button>
+          </span>
+        </template>
+      </el-dialog>
+    </div>
+    <div class="pager-wrapper">
+      <!-- Pagination code here -->
+    </div>
   </div>
 </template>
+<style>
+.infinite-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+li {
+  margin-bottom: 20px;
+}
+li .el-card__body {
+  padding: 0;
+}
+td {
+  padding: 20px;
+}
+td.td-btn {
+  cursor: pointer;
+  transition: all;
+}
+td.td-btn:hover {
+  cursor: pointer;
+  transition: all;
+  color: blue;
+  text-shadow: 0 0 5 #fc0;
+}
+</style>

@@ -13,7 +13,7 @@ export interface UserInfoData {
   /** 年龄 */
   age: string
   /** 学历 */
-  degree: number
+  education: number
   /** 政治面貌 */
   zzmm: string
   /** 毕业学校 */

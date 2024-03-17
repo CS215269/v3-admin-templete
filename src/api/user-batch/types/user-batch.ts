@@ -13,6 +13,16 @@ export interface UpdateTableRequestData {
   deadline: string
 }
 
+export interface SearchPositionData {
+  /** 偏移量 */
+  currentPage: number
+  /** 查询条数 */
+  size: number
+  /** 查询参数：岗位代码 */
+  code?: string
+  batchId: number
+}
+
 export interface GetTableRequestData {
   /** 当前页码 */
   currentPage: number
@@ -28,14 +38,22 @@ export interface GetPositionData {
   id: number
   recruitId: number
   jobTitle: string
+  code: string
   department: string
   departmentId: number
-  degree: number
+  education: number
   focus: number
   info: string
   maxSalary: number
   minSalary: number
   require: string
+  degree: number
+  maxAge: number
+  sex: 0
+  specialty: string
+  toll: 0
+  type: string
+  zzmm: string
 }
 
 export interface GetBatchData {
@@ -46,6 +64,7 @@ export interface GetBatchData {
   positionNum: number
 }
 
+export type GetCurrentBatchResponseData = ApiResponseData<{ oneBatch: GetBatchData }>
 export type GetBatchResponseData = ApiResponseData<{
   /** 岗位列表 */
   list: GetBatchData[]
@@ -57,8 +76,6 @@ export type GetBatchResponseData = ApiResponseData<{
 export type GetPositionResponseData = ApiResponseData<{
   /** 岗位列表 */
   list: GetPositionData[]
-  /** 列表数量 */
-  total: number
   /** 用户是否实名认证 */
   infoIntegrity: number
 }>

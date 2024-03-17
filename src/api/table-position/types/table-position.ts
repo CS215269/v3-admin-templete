@@ -1,7 +1,8 @@
 export interface CreateTableRequestData {
   jobTitle: string
   departmentId: number
-  degree: string
+  education: number
+  degree: number
   require: string
   maxSalary: number
   minSalary: number
@@ -12,7 +13,8 @@ export interface UpdateTableRequestData {
   id: number
   jobTitle: string
   departmentId: number
-  degree: string
+  education: number
+  degree: number
   require: string
   maxSalary: number
   minSalary: number
@@ -32,7 +34,8 @@ export interface GetTablePositionData {
   id: number
   jobTitle: string
   department: string
-  degree: string
+  education: number
+  degree: number
   maxSalary: number
   minSalary: number
   require: string

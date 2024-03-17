@@ -23,7 +23,7 @@ export interface GetTableThingData {
   departmentId: number
   batchId: number
   batchname: string
-  degree: number
+  education: number
   userId: number
   username: string
   school: string
@@ -44,6 +44,8 @@ export interface ThingInfoData {
   /** 年龄 */
   age: string
   /** 学历 */
+  userEducation: number
+  /** 学位 */
   userDegree: number
   /** 政治面貌 */
   zzmm: string
@@ -70,6 +72,7 @@ export interface ThingInfoData {
   jobTitle: string
   /** 部门 */
   department: string
+  education: number
   degree: number
   info: string
   departmentId: number
