@@ -2,10 +2,11 @@
 import { onMounted, reactive, ref } from "vue"
 import { getBatchDataApi, getPositionDataApi } from "@/api/user-batch"
 import { GetBatchData, GetPositionData } from "@/api/user-batch/types/user-batch"
-// import JobBatchItem from "@/components/JobBatch/JobBatchItem.vue"
+import ReviewForm from "@/components/ReviewForm/ReviewForm.vue"
 import { Search, Refresh } from "@element-plus/icons-vue"
 import { ElMessage, FormInstance, FormRules } from "element-plus"
 import { setRealNameInfoApi } from "@/api/user-info"
+
 defineOptions({
   name: "UserThing"
 })
@@ -22,7 +23,7 @@ const currentBatch = ref<GetBatchData>({
 
 /** 用于存储每个 collapse 的数据 */
 const positions = reactive<GetPositionData[]>([])
-/** 用于存储每个 drawer 的数据 */
+/** 用于存储每个 drawer(抽屉) 的数据 */
 const drawerOpenIndex = reactive<boolean[]>([])
 
 // const handleClose = (done: () => void) => {
@@ -59,11 +60,12 @@ const loadData = async () => {
       code: ""
     })
 
-    if (list.length < 1) {
-      listUtil.over = true
-      console.log("over?" + listUtil.over)
-      return
-    }
+    // 无限加载功能取消
+    // if (list.length < 1) {
+    //   listUtil.over = true
+    //   console.log("over?" + listUtil.over)
+    //   return
+    // }
 
     positions.push(...list)
     console.log(positions)
@@ -71,32 +73,6 @@ const loadData = async () => {
   } catch (error) {
     console.error(error)
     ElMessage.error("加载数据时出错")
-  }
-}
-
-interface FormItem {
-  id: number
-  date?: string
-  name?: string
-  level?: string
-  file?: File | null
-}
-const resumeFormData = ref<FormItem[]>([
-  { id: 1, date: "", name: "", level: "", file: null },
-  { id: 2, date: "", name: "", level: "", file: null }
-])
-const addFormItem = () => {
-  const newId = resumeFormData.value.length + 1
-  resumeFormData.value.push({ id: newId, date: "", name: "", level: "", file: null })
-  // nextTick(() => {
-  // 可选: 自动聚焦到新添加的表单项
-  // })
-}
-
-const delFormItem = (item: FormItem) => {
-  const index = resumeFormData.value.indexOf(item)
-  if (index !== -1) {
-    resumeFormData.value.splice(index, 1)
   }
 }
 
@@ -243,56 +219,12 @@ onMounted(getBatchData)
               </tr>
             </table>
           </el-card>
-          <el-drawer v-model="drawerOpenIndex[index]" direction="rtl" size="70%">
+          <el-drawer v-model="drawerOpenIndex[index]" direction="rtl" size="75%">
             <template #header>
-              <h4>{{ p.code }}</h4>
+              <h4>正在投递: 岗位代码 {{ p.code }}</h4>
             </template>
             <template #default>
-              <el-form>
-                <div>
-                  <el-row>
-                    <el-col :span="6">
-                      <el-text> 获奖日期 </el-text>
-                    </el-col>
-                    <el-col :span="6">
-                      <el-text> 奖项名称 </el-text>
-                    </el-col>
-                    <el-col :span="6">
-                      <el-text> 级别 </el-text>
-                    </el-col>
-                    <el-col :span="6">
-                      <el-text> 证明 </el-text>
-                    </el-col>
-                  </el-row>
-                </div>
-                <div v-for="item in resumeFormData" :key="item.id">
-                  <el-form-item style="display: inline-block">
-                    <el-date-picker
-                      v-model="item.date"
-                      type="date"
-                      placeholder="选择日期"
-                      format="YYYY-MM-DD"
-                      value-format="YYYY-MM-DD "
-                    />
-                  </el-form-item>
-                  <el-form-item style="display: inline-block">
-                    <el-input v-model="item.name" :maxlength="10" show-word-limit />
-                  </el-form-item>
-                  <el-form-item style="display: inline-block">
-                    <el-input v-model="item.level" :maxlength="4" show-word-limit />
-                  </el-form-item>
-                  <el-form-item style="display: inline-block">
-                    <el-upload v-model="item.file">
-                      <el-button type="primary">上传文件</el-button>
-                    </el-upload>
-                  </el-form-item>
-                  <el-form-item style="display: inline-block">
-                    <el-button type="danger" @click="delFormItem(item)">删除</el-button>
-                  </el-form-item>
-                </div>
-              </el-form>
-
-              <el-button @click="addFormItem">添加表单项</el-button>
+              <ReviewForm />
             </template>
             <template #footer>
               <div style="flex: auto">
@@ -306,26 +238,26 @@ onMounted(getBatchData)
       </ul>
 
       <!-- <el-collapse v-model="activeNames">
-          <el-collapse-item
-            v-for="(batch, index) in batches"
-            :key="batch.id"
-            :name="index.toString()"
-            :title="batch.name"
-            @click="handleChange(index)"
-          >
-            <template v-if="isExpanded[index]">
-              <JobBatchItem
-                v-for="position in positions[index]"
-                :key="position.id"
-                :position="position"
-                :batchid="batch.id"
-              />
-            </template>
-          </el-collapse-item>
-        </el-collapse> -->
+            <el-collapse-item
+              v-for="(batch, index) in batches"
+              :key="batch.id"
+              :name="index.toString()"
+              :title="batch.name"
+              @click="handleChange(index)"
+            >
+              <template v-if="isExpanded[index]">
+                <JobBatchItem
+                  v-for="position in positions[index]"
+                  :key="position.id"
+                  :position="position"
+                  :batchid="batch.id"
+                />
+              </template>
+            </el-collapse-item>
+          </el-collapse> -->
       <!-- <el-collapse v-model="activeCollapse">
-          <Batches v-for="batch in batches" :key="batch.id" :batch="batch" />
-        </el-collapse> -->
+            <Batches v-for="batch in batches" :key="batch.id" :batch="batch" />
+          </el-collapse> -->
       <el-dialog v-model="showRealNameMessageBox" title="开始投递前,请先进行实名认证" width="30%">
         <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
           <el-form-item prop="name" label="姓名">
@@ -365,12 +297,14 @@ td {
 }
 td.td-btn {
   cursor: pointer;
-  transition: all;
+  transition: all 0.5s ease-out;
 }
 td.td-btn:hover {
   cursor: pointer;
   transition: all;
   color: blue;
-  text-shadow: 0 0 5 #fc0;
+  box-shadow:
+    inset -2px -2px 5px 2px #888,
+    inset 2px 2px 5px 2px #f4f4f4;
 }
 </style>
