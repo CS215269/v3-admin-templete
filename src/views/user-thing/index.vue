@@ -226,13 +226,6 @@ onMounted(getBatchData)
             <template #default>
               <ReviewForm />
             </template>
-            <template #footer>
-              <div style="flex: auto">
-                <el-button @click="drawerOpenIndex[index] = false">取消</el-button>
-                <el-button type="primary" @click="undefined">confirm</el-button>
-                <!--  cancelClickDrawer  confirmClickDrawer -->
-              </div>
-            </template>
           </el-drawer>
         </li>
       </ul>
@@ -271,6 +264,7 @@ onMounted(getBatchData)
           <span class="dialog-footer">
             <el-button @click="showRealNameMessageBox = false">取消</el-button>
             <el-button type="primary" @click="sendRealName()"> 确定 </el-button>
+            <!-- <el-button type="primary" @click="submit()"> 确定 </el-button> -->
           </span>
         </template>
       </el-dialog>

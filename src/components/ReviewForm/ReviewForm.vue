@@ -1,10 +1,14 @@
 <script lang="ts" setup>
-import { reactive, ref } from "vue"
+import { defineComponent, reactive, ref } from "vue"
 import { Delete } from "@element-plus/icons-vue"
 import { ElMessage, UploadInstance, UploadProps, UploadRawFile, genFileId } from "element-plus"
 import { setDegree, setEducation } from "@/utils/degree"
 import type * as Type from "./data"
 import { submitJobApplicationPartA, submitJobApplicationPartB, submitJobApplicationPartC } from "@/api/user-batch"
+
+defineComponent({
+  name: "ReviewForm"
+})
 
 const formDataUserInfo = reactive<Type.UserInfo>({
   name: "",
@@ -21,8 +25,6 @@ const formDataUserInfo = reactive<Type.UserInfo>({
   address: "",
   specialtiesCertificates: ""
 })
-
-const sex = ref(true)
 
 // 自定义类型FormDataEducation
 type formDataTypeEducation = {
@@ -43,6 +45,34 @@ const formDataEducation = ref<formDataTypeEducation[]>([
     specialty: ""
   }
 ])
+
+const addFormItemEducation = () => {
+  work_time.value.push("")
+  formDataEducation.value.push({
+    id: 0,
+    school: "",
+    graduationTime: "",
+    degree: "",
+    education: "",
+    specialty: ""
+  })
+  // nextTick(() => {
+  // 可选: 自动聚焦到新添加的表单项
+  // })
+}
+const delFormItemEducation = (item: formDataTypeEducation) => {
+  let currentId = item.id
+  const index = formDataEducation.value.indexOf(item)
+  if (index !== -1) {
+    formDataEducation.value.splice(index, 1)
+  }
+  if (formDataEducation.value.at(index) != undefined) {
+    for (let i = index; i < formDataEducation.value.length; i++) {
+      formDataEducation.value[i].id = currentId++
+    }
+  }
+}
+
 const formDataWorkExperience = ref<Type.WorkExperience[]>([
   {
     id: 0,
@@ -52,7 +82,7 @@ const formDataWorkExperience = ref<Type.WorkExperience[]>([
     position: ""
   }
 ])
-const work_time = ref<string[]>(["", ""])
+const work_time = ref<string[]>([""])
 
 const addFormItemWorkExperience = () => {
   work_time.value.push("")
@@ -72,6 +102,7 @@ const delFormItemWorkExperience = (item: Type.WorkExperience) => {
   const index = formDataWorkExperience.value.indexOf(item)
   if (index !== -1) {
     formDataWorkExperience.value.splice(index, 1)
+    work_time.value.splice(index, 1)
   }
   if (formDataWorkExperience.value.at(index) != undefined) {
     for (let i = index; i < formDataWorkExperience.value.length; i++) {
@@ -286,7 +317,7 @@ const submit = () => {
   formDataPartA.workExperience = formDataWorkExperience.value
   submitJobApplicationPartA(formDataPartA)
     .then(() => {
-      ElMessage.success()
+      ElMessage.success("OK01")
     })
     .catch((e) => {
       submitStatus.value = false
@@ -344,6 +375,10 @@ const submitC = () => {
 // }
 const upload = ref<UploadInstance>()
 
+// const setUploadRef = (el, index: number) => {
+//   uploads.value[index] = el
+// }
+
 const beforeFileUpload: UploadProps["beforeUpload"] = (rawFile) => {
   if (rawFile.type !== "application/pdf") {
     ElMessage.error("只能上传 doc,docx 或 pdf 格式的文件!")
@@ -367,6 +402,8 @@ const handleExceed: UploadProps["onExceed"] = (files) => {
 const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
   console.log(file, uploadFiles)
 }
+
+// defineExpose(submit())
 </script>
 
 <template>
@@ -383,14 +420,12 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-select v-model="formDataUserInfo.sex" clearable placeholder="Select" style="width: 240px">
-              <el-option label="男" :value="1" />
-              <el-option label="女" :value="2" />
-            </el-select>
-            <el-radio-group v-model="sex">
-              <el-radio :value="true">男</el-radio>
-              <el-radio :value="false">女</el-radio>
-            </el-radio-group>
+            <el-form-item label="性别">
+              <el-select v-model="formDataUserInfo.sex" clearable placeholder="Select" style="width: 240px">
+                <el-option label="男" :value="1" />
+                <el-option label="女" :value="2" />
+              </el-select>
+            </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="出生日期">
@@ -435,10 +470,10 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
 
           <el-col :span="8">
             <el-form-item label="婚否">
-              <el-radio-group v-model="formDataUserInfo.married">
-                <el-radio value="未婚">未婚</el-radio>
-                <el-radio value="已婚">已婚</el-radio>
-              </el-radio-group>
+              <el-select v-model="formDataUserInfo.married" clearable placeholder="Select" style="width: 240px">
+                <el-option label="未婚" :value="0" />
+                <el-option label="已婚" :value="1" />
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -477,22 +512,21 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
           <el-text tag="p" size="large"><b>教育经历（从专、本科学历填起）</b></el-text>
         </el-row>
         <el-row>
-          <el-col :span="3"><el-text tag="p">学历</el-text></el-col>
-          <el-col :span="3"><el-text tag="p">学位</el-text></el-col>
+          <el-col :span="4"><el-text tag="p">学历</el-text></el-col>
+          <el-col :span="4"><el-text tag="p">学位</el-text></el-col>
           <el-col :span="6"><el-text tag="p">毕业学校</el-text></el-col>
           <el-col :span="5"><el-text tag="p">所学专业</el-text></el-col>
-          <el-col :span="3"><el-text tag="p">毕业时间</el-text></el-col>
-          <el-col :span="3"><el-text tag="p">证明材料上传</el-text></el-col>
+          <el-col :span="4"><el-text tag="p">毕业时间</el-text></el-col>
         </el-row>
         <el-row v-for="item in formDataEducation" :key="item.id">
-          <el-col :span="3">
+          <el-col :span="4">
             <el-select v-model="item.education">
               <el-option label="专科" value="专科" />
               <el-option label="本科" value="本科" />
               <el-option label="研究生" value="研究生" />
             </el-select>
           </el-col>
-          <el-col :span="3">
+          <el-col :span="4">
             <el-select v-model="item.degree">
               <el-option label="无" value="无" />
               <el-option label="学士" value="学士" />
@@ -500,10 +534,10 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               <el-option label="博士" value="博士" />
             </el-select>
           </el-col>
-          <el-col :span="5">
+          <el-col :span="6">
             <el-form-item><el-input v-model="item.school" /> </el-form-item>
           </el-col>
-          <el-col :span="4"><el-input v-model="item.specialty" /></el-col>
+          <el-col :span="5"><el-input v-model="item.specialty" /></el-col>
           <el-col :span="4">
             <el-form-item>
               <el-date-picker
@@ -515,7 +549,14 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               />
             </el-form-item>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="1">
+            <el-form-item>
+              <el-button type="danger" size="small" plain :icon="Delete" @click="delFormItemEducation(item)"
+            /></el-form-item>
+          </el-col>
+        </el-row>
+        <el-row justify="space-evenly">
+          <el-col :span="12" v-if="formDataEducation.length != 0">
             <el-upload
               ref="upload"
               :auto-upload="false"
@@ -525,29 +566,27 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               :before-upload="beforeFileUpload"
               :limit="1"
             >
-              <el-button type="primary" size="small" plain>上传文件</el-button>
+              <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
             </el-upload>
           </el-col>
-          <el-col :span="1">
-            <el-form-item>
-              <el-button type="danger" size="small" plain :icon="Delete" />
-            </el-form-item>
-          </el-col>
+          <el-col :span="12" v-if="formDataEducation.length == 0"><el-text> 暂无记录 </el-text></el-col>
+          <el-col :span="4"><el-button @click="addFormItemEducation()">增加一条记录</el-button> </el-col>
         </el-row>
         <el-row>
+          <el-divider border-style="double" />
           <el-text tag="p" size="large">
             <strong>符合“安徽工商职业学院周转池编制人才标准”（专业技术岗位必填，任填一项）</strong>
           </el-text>
         </el-row>
         <el-row justify="center">
+          <el-divider border-style="dashed" />
           <el-text tag="p" size="large"> 1.工作经历 </el-text>
         </el-row>
         <el-row>
           <el-col :span="6"><el-text tag="p">工作时间（段）</el-text></el-col>
-          <el-col :span="6"><el-text tag="p">所在单位</el-text></el-col>
-          <el-col :span="6"><el-text tag="p">岗位（职务）</el-text></el-col>
-          <el-col :span="6"><el-text tag="p">证明材料上传</el-text></el-col>
+          <el-col :span="9"><el-text tag="p">所在单位</el-text></el-col>
+          <el-col :span="8"><el-text tag="p">岗位（职务）</el-text></el-col>
         </el-row>
         <el-row v-for="(item, index) in formDataWorkExperience" :key="item.id">
           <el-col :span="6">
@@ -564,26 +603,12 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               />
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+          <el-col :span="9">
             <el-form-item> <el-input v-model="item.company" /> </el-form-item
           ></el-col>
-          <el-col :span="6">
+          <el-col :span="8">
             <el-form-item> <el-input v-model="item.position" /> </el-form-item
           ></el-col>
-          <el-col :span="5">
-            <el-upload
-              ref="upload"
-              :auto-upload="false"
-              accept="application/pdf"
-              :on-remove="handleRemove"
-              :on-exceed="handleExceed"
-              :before-upload="beforeFileUpload"
-              :limit="1"
-            >
-              <el-button type="primary" size="small" plain>上传文件</el-button>
-              <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
-            </el-upload>
-          </el-col>
           <el-col :span="1">
             <el-form-item>
               <el-button type="danger" size="small" plain :icon="Delete" @click="delFormItemWorkExperience(item)" />
@@ -591,24 +616,38 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
           </el-col>
         </el-row>
         <el-row justify="space-evenly">
+          <el-col :span="12" v-if="formDataWorkExperience.length != 0">
+            <!-- ref="setUploadRef" -->
+            <el-upload
+              ref="upload02"
+              :auto-upload="false"
+              accept="application/pdf"
+              :on-remove="handleRemove"
+              :on-exceed="handleExceed"
+              :before-upload="beforeFileUpload"
+            >
+              <el-button type="primary" size="small" plain>上传佐证文件</el-button>
+              <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
+            </el-upload>
+          </el-col>
           <el-col :span="12" v-if="formDataWorkExperience.length == 0"><el-text> 暂无记录 </el-text></el-col>
           <el-col :span="4"><el-button @click="addFormItemWorkExperience()">增加一条记录</el-button> </el-col>
         </el-row>
         <el-row justify="center">
+          <el-divider border-style="dashed" />
           <el-text tag="p" size="large"> 2.论文 </el-text>
         </el-row>
         <el-row>
-          <el-col :span="4"><el-text> 期刊 </el-text></el-col>
-          <el-col :span="8"><el-text> 论文名称 </el-text></el-col>
+          <el-col :span="5"><el-text> 期刊 </el-text></el-col>
+          <el-col :span="10"><el-text> 论文名称 </el-text></el-col>
           <el-col :span="4"><el-text> 发刊时间 </el-text></el-col>
           <el-col :span="4"><el-text> 刊号 </el-text></el-col>
-          <el-col :span="4"><el-text> 证明材料上传 </el-text></el-col>
         </el-row>
         <el-row v-for="item in formDataPaper" :key="item.id">
-          <el-col :span="4">
+          <el-col :span="5">
             <el-form-item><el-input v-model="item.journal" /> </el-form-item
           ></el-col>
-          <el-col :span="8">
+          <el-col :span="10">
             <el-form-item><el-input v-model="item.title" /> </el-form-item
           ></el-col>
           <el-col :span="4">
@@ -623,9 +662,17 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
             </el-form-item>
           </el-col>
           <el-col :span="4">
-            <el-form-item><el-input v-model="item.journal_num" /> </el-form-item
-          ></el-col>
-          <el-col :span="3">
+            <el-form-item><el-input v-model="item.journal_num" /> </el-form-item>
+          </el-col>
+
+          <el-col :span="1">
+            <el-form-item>
+              <el-button type="danger" size="small" plain :icon="Delete" @click="delFormItemPaper(item)" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row justify="space-evenly">
+          <el-col :span="12" v-if="formDataPaper.length != 0">
             <el-upload
               ref="upload"
               :auto-upload="false"
@@ -638,33 +685,25 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
                 id: 33
               }"
             >
-              <el-button type="primary" size="small" plain>上传文件</el-button>
+              <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
             </el-upload>
           </el-col>
-
-          <el-col :span="1">
-            <el-form-item>
-              <el-button type="danger" size="small" plain :icon="Delete" @click="delFormItemPaper(item)" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row justify="space-evenly">
           <el-col :span="12" v-if="formDataPaper.length == 0"><el-text> 暂无记录 </el-text></el-col>
           <el-col :span="4"><el-button @click="addFormItemPaper()">增加一条记录</el-button> </el-col>
         </el-row>
         <el-row justify="center">
+          <el-divider border-style="dashed" />
           <el-text tag="p" size="large"> 3.教、科研项目 </el-text>
         </el-row>
         <el-row>
-          <el-col :span="4"><el-text> 立项时间 </el-text></el-col>
-          <el-col :span="8"><el-text> 项目名称 </el-text></el-col>
+          <el-col :span="5"><el-text> 立项时间 </el-text></el-col>
+          <el-col :span="10"><el-text> 项目名称 </el-text></el-col>
           <el-col :span="4"><el-text> 级别 </el-text></el-col>
           <el-col :span="4"><el-text> 排名 </el-text></el-col>
-          <el-col :span="3"><el-text> 证明材料上传 </el-text></el-col>
         </el-row>
         <el-row v-for="item in formDataProject0" :key="item.id">
-          <el-col :span="4">
+          <el-col :span="5">
             <el-form-item>
               <el-date-picker
                 v-model="item.time"
@@ -675,7 +714,7 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               />
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="10">
             <el-form-item>
               <el-input v-model="item.title" />
             </el-form-item>
@@ -690,20 +729,6 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               <el-input v-model="item.rank" />
             </el-form-item>
           </el-col>
-          <el-col :span="3">
-            <el-upload
-              ref="upload"
-              :auto-upload="false"
-              accept="application/pdf"
-              :on-remove="handleRemove"
-              :on-exceed="handleExceed"
-              :before-upload="beforeFileUpload"
-              :limit="1"
-            >
-              <el-button type="primary" size="small" plain>上传文件</el-button>
-              <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
-            </el-upload>
-          </el-col>
 
           <el-col :span="1">
             <el-form-item>
@@ -712,18 +737,31 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
           </el-col>
         </el-row>
         <el-row justify="space-evenly">
+          <el-col :span="12" v-if="formDataProject0.length != 0">
+            <el-upload
+              ref="upload"
+              :auto-upload="false"
+              accept="application/pdf"
+              :on-remove="handleRemove"
+              :on-exceed="handleExceed"
+              :before-upload="beforeFileUpload"
+            >
+              <el-button type="primary" size="small" plain>上传佐证文件</el-button>
+              <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
+            </el-upload>
+          </el-col>
           <el-col :span="12" v-if="formDataProject0.length == 0"><el-text> 暂无记录 </el-text></el-col>
           <el-col :span="4"><el-button @click="addFormItemProject0()">增加一条记录</el-button> </el-col>
         </el-row>
         <el-row justify="center">
+          <el-divider border-style="dashed" />
           <el-text tag="p" size="large"> 4.教学成果奖或教学竞赛奖励 </el-text>
         </el-row>
         <el-row>
           <el-col :span="5"><el-text> 获奖时间 </el-text></el-col>
-          <el-col :span="8"><el-text> 获奖类型 </el-text></el-col>
-          <el-col :span="3"><el-text> 级别 </el-text></el-col>
-          <el-col :span="3"><el-text> 排名 </el-text></el-col>
-          <el-col :span="4"><el-text> 证明材料上传 </el-text></el-col>
+          <el-col :span="10"><el-text> 获奖类型 </el-text></el-col>
+          <el-col :span="4"><el-text> 级别 </el-text></el-col>
+          <el-col :span="4"><el-text> 排名 </el-text></el-col>
         </el-row>
         <el-row v-for="item in formDataProject1" :key="item.id">
           <el-col :span="5">
@@ -737,22 +775,29 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               />
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="10">
             <el-form-item>
               <el-input v-model="item.title" />
             </el-form-item>
           </el-col>
-          <el-col :span="3">
+          <el-col :span="4">
             <el-form-item>
               <el-input v-model="item.level" />
             </el-form-item>
           </el-col>
-          <el-col :span="3">
+          <el-col :span="4">
             <el-form-item>
               <el-input v-model="item.rank" />
             </el-form-item>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="1">
+            <el-form-item>
+              <el-button type="danger" size="small" plain :icon="Delete" @click="delFormItemProject1(item)" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row justify="space-evenly">
+          <el-col :span="12" v-if="formDataProject1.length != 0">
             <el-upload
               ref="upload"
               :auto-upload="false"
@@ -762,30 +807,23 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               :before-upload="beforeFileUpload"
               :limit="1"
             >
-              <el-button type="primary" size="small" plain>上传文件</el-button>
+              <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
             </el-upload>
           </el-col>
 
-          <el-col :span="1">
-            <el-form-item>
-              <el-button type="danger" size="small" plain :icon="Delete" @click="delFormItemProject1(item)" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row justify="space-evenly">
-          <!-- <el-col :span="12" v-if="" ><el-text> 暂无记录 </el-text></el-col> -->
+          <el-col :span="12" v-if="formDataProject1.length == 0"><el-text> 暂无记录 </el-text></el-col>
           <el-col :span="4"><el-button @click="addFormItemProject1()">增加一条记录</el-button> </el-col>
         </el-row>
         <el-row justify="center">
+          <el-divider border-style="dashed" />
           <el-text tag="p" size="large"> 5.指导竞赛 </el-text>
         </el-row>
         <el-row>
           <el-col :span="5"><el-text> 获奖时间 </el-text></el-col>
-          <el-col :span="8"><el-text> 赛项名称 </el-text></el-col>
-          <el-col :span="3"><el-text> 级别 </el-text></el-col>
-          <el-col :span="3"><el-text> 名次 </el-text></el-col>
-          <el-col :span="4"><el-text> 证明材料上传 </el-text></el-col>
+          <el-col :span="10"><el-text> 赛项名称 </el-text></el-col>
+          <el-col :span="4"><el-text> 级别 </el-text></el-col>
+          <el-col :span="4"><el-text> 名次 </el-text></el-col>
         </el-row>
         <el-row v-for="item in formDataProject2" :key="item.id">
           <el-col :span="5">
@@ -799,28 +837,14 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               />
             </el-form-item>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="10">
             <el-form-item> <el-input v-model="item.title" /></el-form-item>
           </el-col>
-          <el-col :span="3">
+          <el-col :span="4">
             <el-form-item> <el-input v-model="item.level" /> </el-form-item
           ></el-col>
-          <el-col :span="3">
-            <el-form-item> <el-input v-model="item.rank" /> </el-form-item
-          ></el-col>
           <el-col :span="4">
-            <el-upload
-              ref="upload"
-              :auto-upload="false"
-              accept="application/pdf"
-              :on-remove="handleRemove"
-              :on-exceed="handleExceed"
-              :before-upload="beforeFileUpload"
-              :limit="1"
-            >
-              <el-button type="primary" size="small" plain>上传文件</el-button>
-              <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
-            </el-upload>
+            <el-form-item> <el-input v-model="item.rank" /> </el-form-item>
           </el-col>
           <el-col :span="1">
             <el-form-item>
@@ -829,29 +853,43 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
           </el-col>
         </el-row>
         <el-row justify="space-evenly">
-          <!-- <el-col :span="12" v-if="" ><el-text> 暂无记录 </el-text></el-col> -->
+          <el-col :span="12" v-if="formDataProject2.length != 0">
+            <el-upload
+              ref="upload"
+              :auto-upload="false"
+              accept="application/pdf"
+              :on-remove="handleRemove"
+              :on-exceed="handleExceed"
+              :before-upload="beforeFileUpload"
+            >
+              <el-button type="primary" size="small" plain>上传佐证文件</el-button>
+              <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
+            </el-upload>
+          </el-col>
+          <el-col :span="12" v-if="formDataProject2.length == 0"><el-text> 暂无记录 </el-text></el-col>
           <el-col :span="4"><el-button @click="addFormItemProject2()">增加一条记录</el-button> </el-col>
         </el-row>
         <el-row justify="center">
+          <el-divider border-style="dashed" />
           <el-text tag="p" size="large"> 6.成果推广 </el-text>
         </el-row>
         <el-row>
-          <el-col :span="1" />
-          <el-col :span="18"><el-text> 成果说明 </el-text></el-col>
-          <el-col :span="4"><el-text> 证明材料上传 </el-text></el-col>
+          <el-col :span="23"><el-text> 成果说明 </el-text></el-col>
         </el-row>
         <el-row v-for="(item, index) in formDataResearch" :key="index">
-          <el-col :span="1"
-            >{{ item.id }}
-            <br />
-            {{ index }}
-          </el-col>
-          <el-col :span="18">
+          <el-col :span="23">
             <el-form-item>
               <el-input v-model:model-value="item.name" />
             </el-form-item>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="1">
+            <el-form-item>
+              <el-button type="danger" size="small" plain :icon="Delete" @click="delFormItemResearch(item)" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row justify="space-evenly">
+          <el-col :span="12" v-if="formDataResearch.length != 0">
             <el-upload
               ref="upload"
               :auto-upload="false"
@@ -861,18 +899,11 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               :before-upload="beforeFileUpload"
               :limit="1"
             >
-              <el-button type="primary" size="small" plain>上传文件</el-button>
+              <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
             </el-upload>
           </el-col>
-          <el-col :span="1">
-            <el-form-item>
-              <el-button type="danger" size="small" plain :icon="Delete" @click="delFormItemResearch(item)" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row justify="space-evenly">
-          <!-- <el-col :span="12" v-if="" ><el-text> 暂无记录 </el-text></el-col> -->
+          <el-col :span="12" v-if="formDataResearch.length == 0"><el-text> 暂无记录 </el-text></el-col>
           <el-col :span="4">
             <el-button @click="addFormItemResearch()">增加一条记录</el-button>
           </el-col>
@@ -884,47 +915,41 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
             </el-form-item>
           </el-col>
         </el-row>
+        <el-divider border-style="dashed" />
         <el-row>
-          <el-col :span="2">
-            <!-- 内容 -->
-          </el-col>
-          <el-col :span="22">
-            <el-row>
-              <el-col :span="4"><el-text> 姓名 </el-text></el-col>
-              <el-col :span="4"><el-text> 关系 </el-text></el-col>
-              <el-col :span="16"><el-text> 工作单位及职务 </el-text></el-col>
-            </el-row>
-            <el-row v-for="item in formDataFamilyConnections" :key="item.name">
-              <el-col :span="4">
-                <el-form-item><el-input v-model="item.name" /> </el-form-item>
-              </el-col>
-              <el-col :span="4">
-                <el-form-item><el-input v-model="item.connection" /> </el-form-item>
-              </el-col>
-              <el-col :span="15">
-                <el-form-item><el-input v-model="item.work" /> </el-form-item>
-              </el-col>
-              <el-col :span="1">
-                <el-form-item>
-                  <el-button
-                    type="danger"
-                    size="small"
-                    plain
-                    :icon="Delete"
-                    @click="delFormItemFamilyConnections(item)"
-                  />
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row justify="space-evenly">
-              <!-- <el-col :span="12" v-if="" ><el-text> 暂无记录 </el-text></el-col> -->
-              <el-col :span="4"><el-button @click="addFormItemFamilyConnections()">增加一条记录</el-button> </el-col>
-            </el-row>
-            <!--
-              内容 -->
+          <el-col :span="24">
+            <el-text tag="p" size="large">直系亲属及主要社会关系 </el-text>
           </el-col>
         </el-row>
-        <el-button @click="submit()">提交</el-button>
+        <el-row>
+          <el-col :span="4"><el-text> 姓名 </el-text></el-col>
+          <el-col :span="4"><el-text> 关系 </el-text></el-col>
+          <el-col :span="16"><el-text> 工作单位及职务 </el-text></el-col>
+        </el-row>
+        <el-row v-for="item in formDataFamilyConnections" :key="item.name">
+          <el-col :span="4">
+            <el-form-item><el-input v-model="item.name" /> </el-form-item>
+          </el-col>
+          <el-col :span="4">
+            <el-form-item><el-input v-model="item.connection" /> </el-form-item>
+          </el-col>
+          <el-col :span="15">
+            <el-form-item><el-input v-model="item.work" /> </el-form-item>
+          </el-col>
+          <el-col :span="1">
+            <el-form-item>
+              <el-button type="danger" size="small" plain :icon="Delete" @click="delFormItemFamilyConnections(item)" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row justify="space-evenly">
+          <el-col :span="12" v-if="formDataFamilyConnections.length == 0"><el-text> 暂无记录 </el-text></el-col>
+          <el-col :span="4"><el-button @click="addFormItemFamilyConnections()">增加一条记录</el-button> </el-col>
+        </el-row>
+        <el-row justify="space-evenly">
+          <el-col :span="20" />
+          <el-col :span="4"> <el-button type="warning" size="large" plain @click="submit()">提交</el-button> </el-col>
+        </el-row>
       </el-form>
     </el-col>
   </el-row>
@@ -933,7 +958,7 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
 .el-col {
   text-align: center;
   padding: 0.5em 0.3em;
-  outline: #ccc 1px solid;
+  outline: transparent 1px solid;
 }
 /* 定制上传组件*/
 .el-upload-listc {
@@ -949,10 +974,3 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
   white-space: nowrap; /* 文本不换行 */
 }
 </style>
-info: formDataUserInfoeducation: []workExperience: []id: formDataEducation.value[i].idschool:
-formDataEducation.value[i].schoolgraduationTime: formDataEducation.value[i].graduationTimedegree:
-setDegree(formDataEducation.value[i].degree)education: setEducation(formDataEducation.value[i].education)specialty:
-formDataEducation.value[i].specialtyinfo: formDataUserInfoeducation: []workExperience: []id:
-formDataEducation.value[i].idschool: formDataEducation.value[i].schoolgraduationTime:
-formDataEducation.value[i].graduationTimedegree: setDegree(formDataEducation.value[i].degree)education:
-setEducation(formDataEducation.value[i].education)specialty: formDataEducation.value[i].specialty
