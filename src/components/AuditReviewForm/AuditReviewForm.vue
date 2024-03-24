@@ -1,8 +1,20 @@
 <script lang="ts" setup>
 import { defineComponent, reactive, ref, onMounted } from "vue"
 import * as Type from "./type/data"
-import { acceptThingApi, getThingInfoApi, preViewUserFileApi, refuseThingApi } from "./api"
+import {
+  acceptThingApi,
+  accept2ThingApi,
+  getThingInfoApi,
+  preViewUserFileApi,
+  refuseThingApi,
+  resetThingApi,
+  refuse2ThingApi
+} from "./api"
 import { ElMessage } from "element-plus"
+import { useUserStore } from "@/store/modules/user"
+
+const userStore = useUserStore()
+const isAdmin = userStore.roles.includes("superadmin")
 
 defineComponent({
   name: "AuditReviewForm"
@@ -10,6 +22,7 @@ defineComponent({
 
 const props = defineProps<{
   thingId: number
+  status: number
   code: string
 }>()
 
@@ -212,8 +225,43 @@ const acceptHandle = () => {
       loading.value = false
     })
 }
+
+const overruleHandle = () => {
+  loading.value = true
+  resetThingApi()
+    .then(() => {
+      closeDrawer()
+    })
+    .catch()
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const approveHandle = () => {
+  loading.value = true
+  if (props.status == 1)
+    accept2ThingApi({ thingId: props.thingId })
+      .then(() => {
+        closeDrawer()
+      })
+      .catch()
+      .finally(() => {
+        loading.value = false
+      })
+  else
+    refuse2ThingApi({ thingId: props.thingId })
+      .then(() => {
+        closeDrawer()
+      })
+      .catch()
+      .finally(() => {
+        loading.value = false
+      })
+}
 onMounted(() => {
   showinfo(props.thingId, props.code)
+  if (isAdmin) refused.value = true
 })
 </script>
 
@@ -715,22 +763,35 @@ onMounted(() => {
               <el-input v-model="qualificationResult" type="textarea" placeholder="拒绝理由" />
             </el-col>
           </el-row>
-          <el-row justify="space-evenly" v-if="!refused">
-            <el-col :span="18" />
-            <el-col :span="3">
-              <el-button type="warning" size="large" plain @click="refuseHandle">拒绝</el-button>
-            </el-col>
-            <el-col :span="3">
-              <el-button type="warning" size="large" plain @click="acceptHandle">同意</el-button>
+          <el-row v-if="!isAdmin">
+            <el-col :span="24">
+              <el-row justify="space-evenly" v-if="!refused">
+                <el-col :span="18" />
+                <el-col :span="3">
+                  <el-button type="warning" size="large" plain @click="refuseHandle">拒绝</el-button>
+                </el-col>
+                <el-col :span="3">
+                  <el-button type="warning" size="large" plain @click="acceptHandle">同意</el-button>
+                </el-col>
+              </el-row>
+              <el-row justify="space-evenly" v-else>
+                <el-col :span="18" />
+                <el-col :span="3">
+                  <el-button type="warning" size="large" plain @click="refused = false">取消</el-button>
+                </el-col>
+                <el-col :span="3">
+                  <el-button type="warning" size="large" plain @click="refuseSubmit">提交</el-button>
+                </el-col>
+              </el-row>
             </el-col>
           </el-row>
-          <el-row justify="space-evenly" v-else>
+          <el-row v-else>
             <el-col :span="18" />
             <el-col :span="3">
-              <el-button type="warning" size="large" plain @click="refused = false">取消</el-button>
+              <el-button type="warning" size="large" plain @click="overruleHandle">驳回</el-button>
             </el-col>
             <el-col :span="3">
-              <el-button type="warning" size="large" plain @click="refuseSubmit">提交</el-button>
+              <el-button type="warning" size="large" plain @click="approveHandle">同意</el-button>
             </el-col>
           </el-row>
         </el-form>

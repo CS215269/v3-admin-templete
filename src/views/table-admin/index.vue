@@ -22,7 +22,7 @@ const formData = reactive({
   account: "",
   pwd: "",
   phone: "",
-  viewOnly: 2
+  promise: 2
 })
 const formRules: FormRules = reactive({
   name: [{ required: true, trigger: "blur", message: "请输入用户名" }],
@@ -56,7 +56,7 @@ const handleCreate = () => {
           name: formData.name,
           account: formData.account,
           phone: formData.phone,
-          viewOnly: formData.viewOnly
+          promise: formData.promise
         })
           .then(() => {
             ElMessage.success("修改成功")
@@ -77,7 +77,7 @@ const resetForm = () => {
   formData.account = ""
   formData.pwd = ""
   formData.phone = ""
-  formData.viewOnly = 2
+  formData.promise = 2
 }
 //#endregion
 
@@ -104,7 +104,7 @@ const handleUpdate = (row: GetTableAdminData) => {
   formData.name = row.name
   formData.account = row.account
   formData.phone = row.phone
-  formData.viewOnly = row.viewOnly
+  formData.promise = row.promise
   dialogVisible.value = true
 }
 //#endregion
@@ -186,9 +186,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-table-column prop="name" label="昵称" align="center" />
           <el-table-column prop="phone" label="手机号" align="center" />
           <el-table-column prop="account" label="账号" align="center" />
-          <el-table-column prop="viewOnly" label="权限" align="center">
+          <el-table-column prop="promise" label="权限" align="center">
             <template #default="scope">
-              <el-text v-if="scope.row.viewOnly == 0">全职管理员</el-text>
+              <el-text v-if="scope.row.promise == 0">全职管理员</el-text>
               <el-text v-else>仅查看管理员</el-text>
             </template>
           </el-table-column>
@@ -234,8 +234,8 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-form-item prop="phone" label="电话">
           <el-input v-model="formData.phone" placeholder="请输入" />
         </el-form-item>
-        <el-form-item prop="viewOnly" label="权限">
-          <el-select v-model="formData.viewOnly" placeholder="请选择">
+        <el-form-item prop="promise" label="权限">
+          <el-select v-model="formData.promise" placeholder="请选择">
             <el-option key="1" value="1" label="仅查看" />
             <el-option key="2" value="0" label="全职管理" />
           </el-select>

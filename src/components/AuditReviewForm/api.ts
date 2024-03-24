@@ -38,6 +38,14 @@ export function accept2ThingApi(data: { thingId: number }) {
   })
 }
 
+/** 同意 */
+export function resetThingApi() {
+  return request({
+    url: "resetState",
+    method: "get"
+  })
+}
+
 /** 拒绝 */
 export function refuseThingApi(params: { thingId: number }) {
   return request({

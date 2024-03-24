@@ -3,7 +3,7 @@ export interface CreateTableRequestData {
   account: string
   pwd: string
   phone: string
-  viewOnly: number
+  promise: number
 }
 
 export interface UpdateTableRequestData {
@@ -11,7 +11,7 @@ export interface UpdateTableRequestData {
   name: string
   account: string
   phone: string
-  viewOnly: number
+  promise: number
 }
 
 export interface GetTableRequestData {
@@ -31,7 +31,7 @@ export interface GetTableAdminData {
   phone: string
   pwd: boolean
   name: string
-  viewOnly: number
+  promise: number
 }
 
 export type GetTableResponseData = ApiResponseData<{

@@ -80,7 +80,8 @@ onMounted(getTableData)
               <el-text tag="b"> {{ position.batchname }} </el-text>
               &nbsp;
               <el-text> {{ position.jobTitle }} </el-text>
-              <el-text v-if="position.status === -1" type="danger"> 已拒绝 </el-text>
+              <el-text v-if="position.status === -2" type="danger"> 已拒绝 </el-text>
+              <el-text v-if="position.status === -2"> {{ position.qualificationResult }} </el-text>
             </template>
             <div>
               <el-text>进度信息</el-text>

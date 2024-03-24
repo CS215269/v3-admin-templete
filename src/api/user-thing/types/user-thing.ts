@@ -8,6 +8,7 @@ export interface GetTableRequestData {
   batchId: number
   batchname: string
   status: number
+  qualificationResult: string
 }
 
 export interface SubmitThingRequestData {
