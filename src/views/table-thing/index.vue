@@ -1,26 +1,20 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref, watch } from "vue"
+import { ElMessage, ElTable, type FormInstance } from "element-plus"
+// import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
+import { Search, Refresh, CirclePlus, Download, RefreshRight } from "@element-plus/icons-vue"
 import {
   accept2ThingApi,
   accept3ThingApi,
   acceptThingApi,
   getTableDataBySearchApi,
-  getThingInfoApi,
-  prePrintfCertificatesApi,
-  prePrintfCertificatesDataApi,
-  preViewUserFileApi,
-  printfCertificatesApi,
   refuseThingDataApi
 } from "@/api/table-thing"
-import { ThingInfoData, type GetTableThingData } from "@/api/table-thing/types/table-thing"
-import { ElMessage, ElTable, type FormInstance } from "element-plus"
-// import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
-import { Search, Refresh, CirclePlus, Download, RefreshRight, Dish } from "@element-plus/icons-vue"
-import { usePagination } from "@/hooks/usePagination"
+import { type GetTableThingData } from "@/api/table-thing/types/table-thing"
 import { getBatchOptionsApi } from "@/api/table-batch"
 import { getPositionOptionApi } from "@/api/table-position"
-import { getDepartmentOptionApi } from "@/api/table-department"
-import { renderAsync } from "docx-preview"
+import AuditReviewForm from "@/components/AuditReviewForm/AuditReviewForm.vue"
+import { usePagination } from "@/hooks/usePagination"
 
 defineOptions({
   // 命名当前组件
@@ -31,35 +25,15 @@ const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
 
 // 计算属性
-const getEducationLabel = (row: { education: number }) => {
-  switch (row.education) {
+const getDegreeLabel = (row: { degree: number }) => {
+  switch (row.degree) {
+    case 0:
+      return "无"
     case 1:
-      return "高职"
+      return "学士"
     case 2:
-      return "大专"
-    case 3:
-      return "本科"
-    case 4:
       return "硕士"
-    case 5:
-      return "博士"
-    default:
-      return "未知"
-  }
-}
-
-// 计算属性
-const getEducationLabel2 = (education: number) => {
-  switch (education) {
-    case 1:
-      return "高职"
-    case 2:
-      return "大专"
     case 3:
-      return "本科"
-    case 4:
-      return "硕士"
-    case 5:
       return "博士"
     default:
       return "未知"
@@ -83,8 +57,7 @@ const tableData = ref<GetTableThingData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
   batches: [],
-  jobTitle: [],
-  department: []
+  jobTitle: []
 })
 const getTableData = () => {
   loading.value = true
@@ -92,8 +65,7 @@ const getTableData = () => {
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
     batches: searchData.batches,
-    jobTitles: searchData.jobTitle,
-    departments: searchData.department
+    jobTitles: searchData.jobTitle
   })
     .then((res) => {
       paginationData.total = res.data.total
@@ -115,7 +87,6 @@ const resetSearch = () => {
 }
 //#endregion
 
-const departmentList = ref<{ id: number; name: string }[]>([])
 const positionList = ref<{ id: number; jobTitle: string }[]>([])
 const batchList = ref<{ id: number; name: string }[]>([])
 
@@ -136,90 +107,19 @@ onMounted(() => {
       positionList.value = []
     })
     .finally(() => {})
-  getDepartmentOptionApi()
-    .then((res) => {
-      departmentList.value = res.data.list
-    })
-    .catch(() => {
-      positionList.value = []
-    })
-    .finally(() => {})
 })
 
 /** 详细信息弹框开关 */
-const dialogVisible = ref<boolean>(false)
-/** 详细信息 */
-const imgList = ref<string[]>([""])
-/** 详细信息 */
-const fileList = ref<string[]>([""])
-/** 详细信息 */
-const thingInfo = ref<ThingInfoData>({
-  /** 用户id */
-  userId: 0,
-  /** 姓名 */
-  name: "",
-  /** 身份证号码 */
-  idnum: 0,
-  /** 电话号码 */
-  tel: 0,
-  /** 性别 */
-  sex: "",
-  /** 年龄 */
-  age: "",
-  /** 学历 */
-  userEducation: 0,
-  /** 学位 */
-  userDegree: 0,
-  /** 政治面貌 */
-  zzmm: "",
-  /** 毕业学校 */
-  school: "",
-  /** 民族 */
-  nation: "",
-  /** 出生日期 */
-  birthday: "",
-  /** 籍贯 */
-  native_place: "",
-  /** 现居地址 */
-  address: "",
-  /** 毕业时间 */
-  graduation_time: "",
-  /** 专业 */
-  specialty: "",
-  /** 资历图片 */
-  imgs: "",
-
-  /** 岗位id */
-  pid: 0,
-  /** 岗位名称 */
-  jobTitle: "",
-  /** 部门 */
-  department: "",
-  education: 0,
-  degree: 0,
-  info: "",
-  departmentId: 0
-})
-const showinfo = (row: GetTableThingData) => {
-  loading.value = true
-  console.log(row)
-  getThingInfoApi(row.thingId)
-    .then((res) => {
-      dialogVisible.value = true
-      console.log(res)
-      thingInfo.value = res.data.data
-      imgList.value = res.data.img.reverse()
-      fileList.value = res.data.file.reverse()
-    })
-    .catch(() => {
-      ElMessage.error("获取投递详情失败,请重试")
-    })
-    .finally(() => {
-      loading.value = false
-      console.log("小图1地址" + imgList.value.at(0))
-    })
+const drawerVisible = ref<boolean>(false)
+/** 详细信息:code */
+const code = ref<string>("")
+/** 详细信息thingId */
+const thingId = ref<number>(0)
+const showinfoHandle = (row: GetTableThingData) => {
+  code.value = row.code
+  thingId.value = row.thingId
+  drawerVisible.value = true
 }
-
 /** 表格引用 */
 const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 /** 选中行 */
@@ -284,126 +184,11 @@ const refuse = (row: GetTableThingData) => {
     })
 }
 
-/** 打印准考证预览 */
-const previewDialog = ref<boolean>(false)
-/** 准考证预览正在加载 */
-const previewLoading = ref<boolean>(false)
-/** 准考证预览准考证号 */
-const previewCode2 = ref<number[]>([])
-/** 准考证预览岗位号 */
-const previewCode = ref<number[]>([])
-/** 打印准考证预览 */
-const prePrintCertificates = () => {
-  previewLoading.value = true
-  previewDialog.value = true
-  const thingIds = multipleSelection.value.map((item) => item.thingId)
-  prePrintfCertificatesDataApi({ id: thingIds })
-    .then((res) => {
-      previewCode.value = res.data.code
-      previewCode2.value = res.data.codeWithUser
-    })
-    .catch((e) => {
-      console.log(e)
-    })
-    .finally(() => {})
-
-  prePrintfCertificatesApi()
-    .then((res) => {
-      console.log(res)
-      const blob = new Blob([res])
-      // 在这里使用docData渲染docx文档
-      const container = document.getElementById("container_docx")
-      if (container) {
-        renderAsync(blob, container).then(() => console.log("docx: finished"))
-      } else {
-        console.log("Can not find container element")
-      }
-    })
-    .catch((e) => {
-      ElMessage.error("预览准考证服务异常")
-      console.log(e)
-    })
-    .finally(() => {
-      previewLoading.value = false
-    })
-}
-
-/** 批量打印准考证 */
-const printCertificates = () => {
-  loading.value = false
-  const thingIds = multipleSelection.value.map((item) => item.thingId)
-  printfCertificatesApi({ id: thingIds })
-    .then((res) => {
-      if (res.data.error != 0) ElMessage.error(`输出结果:成功${res.data.total},失败${res.data.error}`)
-      else ElMessage.success(`输出成功:成功${res.data.total},总数${thingIds.length}`)
-    })
-    .catch(() => {
-      ElMessage.error("生成准考证服务异常")
-    })
-    .finally(() => {
-      loading.value = false
-      getTableData()
-    })
-}
-
 const batchSort = (a: GetTableThingData, b: GetTableThingData) => {
   // 根据batchId属性进行比较并返回排序结果
   return a.batchId - b.batchId
 }
 
-const showUserFileLoading = ref<boolean>(false)
-const showUserFile = (path: string) => {
-  showUserFileLoading.value = true
-  preViewUserFileApi({ path })
-    .then((res) => {
-      // Determine the file extension
-      const fileExtension = path.slice(path.lastIndexOf(".") + 1).toLowerCase()
-      const fileName = path.slice(path.lastIndexOf("/") + 1)
-
-      let mimeType = ""
-      switch (fileExtension) {
-        case "pdf": {
-          mimeType = "application/pdf"
-          const blob = new Blob([res], { type: mimeType })
-          // Handle PDF files: open in a new tab
-          const pdfURL = URL.createObjectURL(blob)
-          window.open(pdfURL, "_blank")
-          break
-        }
-        case "docx": {
-          const blob = new Blob([res])
-          // Handle DOCX files: render using a third-party library
-          const container = document.getElementById("previewUserFile")
-          if (container) {
-            renderAsync(blob, container).then(() => console.log("docx: finished"))
-          } else {
-            console.log("Cannot find container element")
-          }
-          break
-        }
-        case "doc": {
-          const blob = new Blob([res])
-          // Handle DOC files: trigger download
-          const docURL = URL.createObjectURL(blob)
-          const link = document.createElement("a")
-          link.href = docURL
-          link.download = fileName // Suggests a filename for the downloaded file
-          link.click()
-          URL.revokeObjectURL(docURL) // Clean up to avoid memory leaks
-          break
-        }
-        default:
-          console.log("Unsupported file type")
-      }
-    })
-    .catch((e) => {
-      ElMessage.error("预览用户资历文件服务异常")
-      console.log(e)
-    })
-    .finally(() => {
-      showUserFileLoading.value = false
-    })
-}
 /** 监听分页参数的变化 */
 watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })
 </script>
@@ -436,18 +221,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             <el-option v-for="item in positionList" :key="item.id" :label="item.jobTitle" :value="item.id" />
           </el-select>
         </el-form-item>
-        <el-form-item prop="department" label="部门" size="large">
-          <el-select
-            v-model="searchData.department"
-            filterable
-            collapse-tags
-            collapse-tags-tooltip
-            multiple
-            placeholder="请输入"
-          >
-            <el-option v-for="item in departmentList" :key="item.id" :label="item.name" :value="item.id" />
-          </el-select>
-        </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
           <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
@@ -458,7 +231,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       <div class="toolbar-wrapper">
         <div>
           <el-button type="primary" :icon="CirclePlus" @click="null">批量同意</el-button>
-          <el-button type="danger" :icon="Dish" @click="prePrintCertificates()">打印准考证</el-button>
         </div>
         <div>
           <el-tooltip content="下载">
@@ -474,12 +246,11 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="batchname" sortable :sort-method="batchSort" label="批次" align="center" />
           <el-table-column prop="jobTitle" sortable label="岗位名称" align="center" />
-          <el-table-column prop="department" sortable label="所属部门" align="center" />
           <el-table-column prop="username" sortable label="用户姓名" align="center" />
           <el-table-column prop="school" sortable label="毕业院校" align="center" />
-          <el-table-column prop="education" sortable label="用户学历" align="center">
+          <el-table-column prop="degree" sortable label="学位要求" align="center">
             <template #default="educationScope">
-              {{ getEducationLabel(educationScope.row) }}
+              {{ getDegreeLabel(educationScope.row) }}
             </template>
           </el-table-column>
           <el-table-column prop="status" label="审核进度" align="center" :formatter="progressFormatter">
@@ -512,7 +283,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           </el-table-column>
           <el-table-column fixed="right" label="操作" min-width="200px" align="left">
             <template #default="scope">
-              <el-button type="info" bg size="small" @click="showinfo(scope.row)">详细信息</el-button>
+              <el-button type="info" bg size="small" @click="showinfoHandle(scope.row)">详细信息</el-button>
               <template v-if="scope.row.status === -1">
                 <el-button type="primary" size="small" @click="agree(scope.row)">已拒绝</el-button>
               </template>
@@ -553,7 +324,10 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         />
       </div>
     </el-card>
-    <!-- 详细信息 -->
+    <el-drawer>
+      <AuditReviewForm :code="code" :thingId="thingId" />
+    </el-drawer>
+    <!-- 详细信息
     <el-dialog v-model="dialogVisible" title="简历详情" width="80%">
       <el-row :gutter="20">
         <el-col :span="16">
@@ -678,7 +452,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-button type="warning" @click="previewDialog = false">取消</el-button>
         <el-button type="primary" @click="printCertificates()">确定</el-button>
       </template>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 

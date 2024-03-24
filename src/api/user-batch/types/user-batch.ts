@@ -38,6 +38,7 @@ export interface GetBatchData {
   positionNum: number
 }
 
+export type InspectIdnumResponse = ApiResponseData<undefined>
 export type GetCurrentBatchResponseData = ApiResponseData<{ oneBatch: GetBatchData }>
 export type GetBatchResponseData = ApiResponseData<{
   /** 岗位列表 */

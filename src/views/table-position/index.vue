@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, reactive, ref, watch } from "vue"
+import { reactive, ref, watch } from "vue"
 import { createTableDataApi, deleteTableDataApi, updateTableDataApi, getTableDataApi } from "@/api/table-position/index"
 import { type GetTablePositionData } from "@/api/table-position/types/table-position"
 import {
@@ -13,7 +13,6 @@ import {
 } from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
 import { usePagination } from "@/hooks/usePagination"
-import { getDepartmentOptionApi } from "@/api/table-department"
 
 defineOptions({
   // 命名当前组件
@@ -22,8 +21,6 @@ defineOptions({
 
 // 计算属性
 const getEducationLabel = (education: number) => {
-  // INSERT INTO `ahbvcprot1`.`positions` (`jobTitle`, `code`, `type`, `specialty`, `departmentId`, `education`, `degree`, `maxAge`, `sex`, `zzmm`, `info`, `toll`, `minSalary`, `maxSalary`, `require`)
-  // VALUES ('11', '11', '1', '1', 1, 1, 1, 1, 1, '1', '1', 1, 1, 1, '1')
   switch (education) {
     case 1:
       return "高职"
@@ -60,7 +57,6 @@ const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
 const formData = reactive({
   jobTitle: "",
-  departmentId: 0,
   education: "",
   degree: "",
   salary: [0, 0],
@@ -69,11 +65,8 @@ const formData = reactive({
 })
 const formDataSubmit = reactive({
   jobTitle: "",
-  departmentId: 0,
   education: 0,
   degree: 0,
-  minSalary: 0,
-  maxSalary: 0,
   info: "",
   require: ""
 })
@@ -89,10 +82,7 @@ const handleCreate = () => {
     if (valid) {
       if (currentUpdateId.value === undefined) {
         formDataSubmit.jobTitle = formData.jobTitle
-        formDataSubmit.departmentId = formData.departmentId
         formDataSubmit.education = Number(formData.education)
-        formDataSubmit.minSalary = formData.salary[0]
-        formDataSubmit.maxSalary = formData.salary[1]
         formDataSubmit.info = formData.info
         formDataSubmit.require = formData.require
         createTableDataApi(formDataSubmit)
@@ -110,11 +100,8 @@ const handleCreate = () => {
         updateTableDataApi({
           id: currentUpdateId.value,
           jobTitle: formData.jobTitle,
-          departmentId: formData.departmentId,
           education: Number(formData.education),
           degree: Number(formData.degree),
-          minSalary: formData.salary[0],
-          maxSalary: formData.salary[1],
           require: formData.require,
           info: formData.info
         })
@@ -134,7 +121,6 @@ const handleCreate = () => {
 const resetForm = () => {
   currentUpdateId.value = undefined
   formData.jobTitle = ""
-  formData.departmentId = 0
   formData.education = ""
   formData.salary = [1000, 9000]
   formData.require = ""
@@ -162,10 +148,8 @@ const currentUpdateId = ref<undefined | number>(undefined)
 const handleUpdate = (row: GetTablePositionData) => {
   currentUpdateId.value = row.id
   formData.jobTitle = row.jobTitle
-  formData.departmentId = row.departmentId
   formData.education = String(row.education)
   formData.degree = String(row.degree)
-  formData.salary = [row.maxSalary, row.minSalary]
   formData.require = row.require
   formData.info = row.info
   dialogVisible.value = true
@@ -176,15 +160,13 @@ const handleUpdate = (row: GetTablePositionData) => {
 const tableData = ref<GetTablePositionData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
-  jobTitle: "",
-  departmentId: ""
+  jobTitle: ""
 })
 const getTableData = () => {
   loading.value = true
   getTableDataApi({
     currentPage: paginationData.currentPage,
-    size: paginationData.pageSize,
-    departments: searchData.departmentId || undefined
+    size: paginationData.pageSize
   })
     .then((res) => {
       paginationData.total = res.data.total
@@ -211,21 +193,6 @@ const tableTooltipOption: Partial<ElTooltipProps> = {
   placement: "left-start",
   effect: "light"
 }
-
-/** 下拉框数据:部门 */
-const departmentList = ref<{ id: number; name: string }[]>([])
-onMounted(() => {
-  getDepartmentOptionApi()
-    .then((res) => {
-      departmentList.value = res.data.list
-    })
-    .catch(() => {
-      departmentList.value = []
-    })
-    .finally(() => {
-      loading.value = false
-    })
-})
 
 const multipleSelection = ref<GetTablePositionData[]>([])
 const handleSelectionChange = (val: GetTablePositionData[]) => {
@@ -271,18 +238,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-form-item prop="username" label="名称">
           <el-input v-model="searchData.jobTitle" placeholder="请输入" />
         </el-form-item>
-        <el-form-item prop="open" label="所属部门">
-          <el-select
-            v-model="searchData.departmentId"
-            filterable
-            collapse-tags
-            collapse-tags-tooltip
-            multiple
-            placeholder="请选择"
-          >
-            <el-option v-for="item in departmentList" :key="item.id" :label="item.name" :value="item.id" />
-          </el-select>
-        </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
           <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
@@ -313,7 +268,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         >
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="jobTitle" label="岗位名称" align="center" />
-          <el-table-column prop="department" label="所属部门" align="center" />
           <el-table-column prop="education" label="所需学历" align="center">
             <template #default="scope">
               {{ getEducationLabel(scope.row.education) }}
@@ -360,12 +314,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <p>添加岗位,所属批次关闭时次岗位对用户不可见</p>
         <el-form-item prop="jobTitle" label="岗位名称">
           <el-input v-model="formData.jobTitle" placeholder="请输入" />
-        </el-form-item>
-        <el-form-item prop="departmentId" label="所属部门">
-          <!--  v-if="currentUpdateId === undefined" 让组件在修改对话框不可见 -->
-          <el-select v-model="formData.departmentId" filterable placeholder="岗位">
-            <el-option v-for="item in departmentList" :key="item.id" :label="item.name" :value="item.id" />
-          </el-select>
         </el-form-item>
         <el-form-item prop="education" label="学历要求">
           <el-select v-model="formData.education" placeholder="请选择">

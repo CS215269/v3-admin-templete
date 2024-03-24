@@ -18,15 +18,14 @@ export interface GetTableThingData {
   recruitId: number
   /** 岗位表的主键 */
   positionId: number
+  /** 岗位学位的要求 */
+  degree: number
+  code: string
   jobTitle: string
-  department: string
-  departmentId: number
   batchId: number
   batchname: string
-  education: number
   userId: number
   username: string
-  school: string
   status: number
 }
 
@@ -70,12 +69,9 @@ export interface ThingInfoData {
   pid: number
   /** 岗位名称 */
   jobTitle: string
-  /** 部门 */
-  department: string
   education: number
   degree: number
   info: string
-  departmentId: number
 }
 
 export interface ThingIdToPrint {

@@ -151,28 +151,6 @@ export const asyncRoutes: RouteRecordRaw[] = [
     ]
   },
   {
-    path: "/departmentTable",
-    component: Layouts,
-    redirect: "/departmentTable/index",
-    name: "departmentTable",
-    meta: {
-      title: "管理员后台",
-      svgIcon: "unocss",
-      roles: ["admin", "viewOnly"]
-    },
-    children: [
-      {
-        path: "index",
-        component: () => import("@/views/table-department/index.vue"),
-        name: "部门信息",
-        meta: {
-          title: "部门",
-          svgIcon: "unocss"
-        }
-      }
-    ]
-  },
-  {
     path: "/positionTable",
     component: Layouts,
     redirect: "/positionTable/index",

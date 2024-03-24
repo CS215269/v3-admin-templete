@@ -224,7 +224,7 @@ onMounted(getBatchData)
               <h4>正在投递: 岗位代码 {{ p.code }}</h4>
             </template>
             <template #default>
-              <ReviewForm />
+              <ReviewForm :recruitId="p.recruitId" :code="p.code" />
             </template>
           </el-drawer>
         </li>
@@ -280,7 +280,7 @@ onMounted(getBatchData)
   margin: 0;
   list-style: none;
 }
-li {
+.table-wrapper li {
   margin-bottom: 20px;
 }
 li .el-card__body {

@@ -9,7 +9,7 @@ export interface UserInfo {
   birthday: string
   idnum: string
   married: string
-  nativePlace: string
+  native_place: string
   address: string
   specialtiesCertificates: string
 }
@@ -78,3 +78,25 @@ export interface FormDataPartC {
   family: FamilyConnections[]
   note: string
 }
+
+export type GetUserThingResponseData = ApiResponseData<{
+  info: UserInfo
+  code: string
+  recruitId: number
+  education: Education[]
+  workExperience: WorkExperience[]
+  paper: Paper[]
+  project: Project[]
+  research: Research[]
+  awardsAndPunishments: string
+  family: FamilyConnections[]
+  note: string
+  qualificationResult: string
+  file0: string[]
+  file1: string[]
+  file2: string[]
+  file3: string[]
+  file4: string[]
+  file5: string[]
+  file6: string[]
+}>

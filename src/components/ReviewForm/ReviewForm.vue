@@ -1,14 +1,52 @@
 <script lang="ts" setup>
 import { defineComponent, reactive, ref } from "vue"
 import { Delete } from "@element-plus/icons-vue"
-import { ElMessage, UploadInstance, UploadProps, UploadRawFile, genFileId } from "element-plus"
+import { ElMessage, FormRules, UploadInstance, UploadProps, UploadRawFile, genFileId } from "element-plus"
 import { setDegree, setEducation } from "@/utils/degree"
 import type * as Type from "./data"
 import { submitJobApplicationPartA, submitJobApplicationPartB, submitJobApplicationPartC } from "@/api/user-batch"
+import { useUserStore } from "@/store/modules/user"
 
 defineComponent({
   name: "ReviewForm"
 })
+
+const props = defineProps<{
+  recruitId: number
+  code: string
+}>()
+
+const token = useUserStore().token
+const myHeaders = new Headers()
+myHeaders.append("ngrok-skip-browser-warning", "true")
+if (token) {
+  myHeaders.append("Authorization", `Bearer ${token}`)
+}
+const isPhoneNumber = (rule: any, value: string, callback: Function) => {
+  const reg = /^(?:(?:\+|00)86)?1\d{10}$/
+  if (value === "") {
+    callback(new Error("手机号为空"))
+  } else if (reg.test(value)) {
+    callback(new Error("手机号不合法"))
+  } else {
+    callback()
+  }
+}
+
+const inspectIdnum = (rule: any, value: string, callback: Function) => {
+  const reg = /^[1-9]\d{5}(?:18|19|20)\d{2}(?:0[1-9]|10|11|12)(?:0[1-9]|[1-2]\d|30|31)\d{3}[\dXx]$/
+  if (value === "") {
+    callback(new Error("身份证号码为空"))
+  } else if (reg.test(value)) {
+    callback(new Error("身份证号码不合法"))
+  } else {
+    callback()
+  }
+}
+const rules: FormRules = {
+  phone: [{ validator: isPhoneNumber, trigger: "blur" }],
+  idnum: [{ validator: inspectIdnum, trigger: "blur" }]
+}
 
 const formDataUserInfo = reactive<Type.UserInfo>({
   name: "",
@@ -21,7 +59,7 @@ const formDataUserInfo = reactive<Type.UserInfo>({
   birthday: "",
   idnum: "",
   married: "",
-  native_place: "",
+  nativePlace: "",
   address: "",
   specialtiesCertificates: ""
 })
@@ -47,7 +85,6 @@ const formDataEducation = ref<formDataTypeEducation[]>([
 ])
 
 const addFormItemEducation = () => {
-  work_time.value.push("")
   formDataEducation.value.push({
     id: 0,
     school: "",
@@ -86,13 +123,11 @@ const work_time = ref<string[]>([""])
 
 const addFormItemWorkExperience = () => {
   work_time.value.push("")
-  formDataWorkExperience.value.push({
-    id: formDataWorkExperience.value.length,
-    company: "",
-    work_time_start: "",
-    work_time_end: "",
-    position: ""
-  })
+  formDataWorkExperience.value = [
+    ...formDataWorkExperience.value,
+    { id: 0, company: "", work_time_start: "", work_time_end: "", position: "" }
+  ]
+
   // nextTick(() => {
   // 可选: 自动聚焦到新添加的表单项
   // })
@@ -281,7 +316,8 @@ const note = ref<string>("")
 
 const submitStatus = ref<boolean>(true)
 const formDataPartA = reactive<Type.FormDataPartA>({
-  code: "111",
+  recruitId: props.recruitId,
+  code: props.code,
   info: formDataUserInfo,
   education: [],
   workExperience: []
@@ -331,7 +367,9 @@ const submit = () => {
 }
 const submitB = () => {
   submitJobApplicationPartB(formDataPartB)
-    .then(() => {})
+    .then(() => {
+      ElMessage.success("OK02")
+    })
     .catch((e) => {
       submitStatus.value = false
       ElMessage.error(e)
@@ -344,14 +382,16 @@ const submitB = () => {
 }
 const submitC = () => {
   submitJobApplicationPartC(formDataPartC)
-    .then(() => {})
+    .then(() => {
+      ElMessage.success("OK03")
+    })
     .catch((e) => {
       submitStatus.value = false
       ElMessage.error(e)
     })
     .finally(() => {
       if (submitStatus.value) {
-        ElMessage.success("提交成功")
+        submitUpload()
       }
     })
 }
@@ -368,10 +408,85 @@ const submitC = () => {
 //   }
 // ])
 
-// const uploadRef = ref<UploadInstance>()
+const uploadPath = "https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/userResume"
+// const uploadPath = "api/userResume"
 
+const uploadRef0 = ref<UploadInstance>()
+const uploadRef1 = ref<UploadInstance>()
+const uploadRef2 = ref<UploadInstance>()
+const uploadRef3 = ref<UploadInstance>()
+const uploadRef4 = ref<UploadInstance>()
+const uploadRef5 = ref<UploadInstance>()
+const uploadRef6 = ref<UploadInstance>()
+
+const submitUpload = async () => {
+  uploadRef0.value!.submit()
+  await new Promise((resolve) => setTimeout(resolve, 500))
+  uploadRef1.value!.submit()
+  await new Promise((resolve) => setTimeout(resolve, 500))
+  uploadRef2.value!.submit()
+  await new Promise((resolve) => setTimeout(resolve, 500))
+  uploadRef3.value!.submit()
+  await new Promise((resolve) => setTimeout(resolve, 500))
+  uploadRef4.value!.submit()
+  await new Promise((resolve) => setTimeout(resolve, 500))
+  uploadRef5.value!.submit()
+  await new Promise((resolve) => setTimeout(resolve, 500))
+  uploadRef6.value!.submit()
+}
+/** 定义同时允许上传的最大数量 */
+// const MAX_CONCURRENT_UPLOADS = 2
+
+// 定义上传组件实例的类型
+// interface UploadInstance {
+//   value: any;
+//   submit(): void;
+//   on(event: 'success' | 'error', callback: () => void): void;
+// }
+
+/** 将所有上传组件实例的引用收集到一个数组中 */
+// const uploadRefs: UploadInstance[] = [
+//   uploadRef0.value!,
+//   uploadRef1.value!,
+//   uploadRef2.value!,
+//   uploadRef3.value!,
+//   uploadRef4.value!,
+//   uploadRef5.value!,
+//   uploadRef6.value!
+// ]
+
+/** 跟踪当前要上传的文件索引 */
+// let currentIndex = 0
+
+/** 存储正在进行的上传任务引用 */
+// const uploadsInProgress: UploadInstance[] = []
+/** 定义提交上传的函数 */
 // const submitUpload = () => {
-//   uploadRef.value!.submit()
+//   uploadRefs[0]!.submit()
+//   // 启动初始上传任务
+//   for (let i = 0; i < MAX_CONCURRENT_UPLOADS && currentIndex < uploadRefs.length; i++) {
+//     // 获取当前上传组件实例引用
+//     const uploadRef = uploadRefs[currentIndex]
+//     // 调用 submit 方法开始上传
+//     uploadRef.submit()
+//     // 将上传任务添加到正在进行的上传任务列表中
+//     uploadsInProgress.push(uploadRef)
+//     // 移动到下一个文件索引
+//     currentIndex++
+//   }
+// }
+/** 上传完成处理函数 */
+const handleUploadComplete = () => {
+  ElMessage.success("上传完成")
+}
+
+// // 为每个正在进行的上传任务绑定上传完成事件监听器
+// uploadsInProgress.forEach((uploadRef) => {
+//   // 当上传成功时执行处理函数
+//   uploadRef.onSuccess = handleUploadComplete
+//   // 当上传失败时执行处理函数
+//   uploadRef.on("error", handleUploadComplete)
+// })
 // }
 const upload = ref<UploadInstance>()
 
@@ -384,11 +499,9 @@ const beforeFileUpload: UploadProps["beforeUpload"] = (rawFile) => {
     ElMessage.error("只能上传 doc,docx 或 pdf 格式的文件!")
     return false
   } else if (rawFile.size / 1024 / 1024 > 5) {
-    ElMessage.error("文件大小必须小于2MB!")
+    ElMessage.error("文件大小必须小于5MB!")
     return false
   }
-  console.log(rawFile.name + "开始上传")
-  ElMessage.info(rawFile.name + " 开始上传")
   return true
 }
 
@@ -412,10 +525,10 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
       <el-row justify="center">
         <el-text tag="p" size="large"><b>基础信息</b></el-text>
       </el-row>
-      <el-form>
+      <el-form ref="ruleFormRef" :rules="rules" status-icon>
         <el-row>
           <el-col :span="8">
-            <el-form-item label="姓名">
+            <el-form-item label="姓名" prop="name">
               <el-input v-model="formDataUserInfo.name" />
             </el-form-item>
           </el-col>
@@ -458,7 +571,7 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
         </el-row>
         <el-row>
           <el-col :span="8">
-            <el-form-item label="电话">
+            <el-form-item label="电话" prop="phone">
               <el-input v-model="formDataUserInfo.phone" />
             </el-form-item>
           </el-col>
@@ -479,7 +592,7 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
         </el-row>
         <el-row>
           <el-col :span="24">
-            <el-form-item label="身份证号码">
+            <el-form-item label="身份证号码" prop="idnum">
               <el-input v-model="formDataUserInfo.idnum" />
             </el-form-item>
           </el-col>
@@ -488,7 +601,7 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
           <el-col :span="24">
             <el-form-item label="户口所在地（应届毕业生填入学前的）">
               <el-input
-                v-model="formDataUserInfo.native_place"
+                v-model="formDataUserInfo.nativePlace"
                 placeholder="** 省（市、自治区）** 市（州）** 县（市、区）"
               />
             </el-form-item>
@@ -558,13 +671,19 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
         <el-row justify="space-evenly">
           <el-col :span="12" v-if="formDataEducation.length != 0">
             <el-upload
-              ref="upload"
+              :action="uploadPath"
+              ref="uploadRef0"
               :auto-upload="false"
               accept="application/pdf"
               :on-remove="handleRemove"
               :on-exceed="handleExceed"
+              :on-success="handleUploadComplete"
               :before-upload="beforeFileUpload"
-              :limit="1"
+              :headers="myHeaders"
+              :data="{
+                code: props.code,
+                part: 0
+              }"
             >
               <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
@@ -576,6 +695,9 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
         <el-row>
           <el-divider border-style="double" />
           <el-text tag="p" size="large">
+            {{ work_time.length }}{{ formDataWorkExperience.length }}
+            <!-- console.log(`1l${work_time.value.length}2l${formDataWorkExperience.value.length},i${i}`) -->
+
             <strong>符合“安徽工商职业学院周转池编制人才标准”（专业技术岗位必填，任填一项）</strong>
           </el-text>
         </el-row>
@@ -619,12 +741,19 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
           <el-col :span="12" v-if="formDataWorkExperience.length != 0">
             <!-- ref="setUploadRef" -->
             <el-upload
-              ref="upload02"
+              ref="uploadRef1"
+              :action="uploadPath"
               :auto-upload="false"
               accept="application/pdf"
               :on-remove="handleRemove"
               :on-exceed="handleExceed"
+              :on-success="handleUploadComplete"
               :before-upload="beforeFileUpload"
+              :headers="myHeaders"
+              :data="{
+                code: props.code,
+                part: 1
+              }"
             >
               <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
@@ -674,15 +803,18 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
         <el-row justify="space-evenly">
           <el-col :span="12" v-if="formDataPaper.length != 0">
             <el-upload
-              ref="upload"
+              :action="uploadPath"
+              ref="uploadRef2"
               :auto-upload="false"
               accept="application/pdf"
               :on-remove="handleRemove"
               :on-exceed="handleExceed"
+              :on-success="handleUploadComplete"
               :before-upload="beforeFileUpload"
-              :limit="1"
+              :headers="myHeaders"
               :data="{
-                id: 33
+                code: props.code,
+                part: 2
               }"
             >
               <el-button type="primary" size="small" plain>上传佐证文件</el-button>
@@ -739,12 +871,19 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
         <el-row justify="space-evenly">
           <el-col :span="12" v-if="formDataProject0.length != 0">
             <el-upload
-              ref="upload"
+              :action="uploadPath"
+              ref="uploadRef3"
               :auto-upload="false"
               accept="application/pdf"
               :on-remove="handleRemove"
               :on-exceed="handleExceed"
+              :on-success="handleUploadComplete"
               :before-upload="beforeFileUpload"
+              :headers="myHeaders"
+              :data="{
+                code: props.code,
+                part: 3
+              }"
             >
               <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
@@ -799,13 +938,19 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
         <el-row justify="space-evenly">
           <el-col :span="12" v-if="formDataProject1.length != 0">
             <el-upload
-              ref="upload"
+              :action="uploadPath"
+              ref="uploadRef4"
               :auto-upload="false"
               accept="application/pdf"
               :on-remove="handleRemove"
               :on-exceed="handleExceed"
+              :on-success="handleUploadComplete"
               :before-upload="beforeFileUpload"
-              :limit="1"
+              :headers="myHeaders"
+              :data="{
+                code: props.code,
+                part: 4
+              }"
             >
               <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
@@ -855,12 +1000,19 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
         <el-row justify="space-evenly">
           <el-col :span="12" v-if="formDataProject2.length != 0">
             <el-upload
-              ref="upload"
+              :action="uploadPath"
+              ref="uploadRef5"
               :auto-upload="false"
               accept="application/pdf"
               :on-remove="handleRemove"
               :on-exceed="handleExceed"
+              :on-success="handleUploadComplete"
               :before-upload="beforeFileUpload"
+              :headers="myHeaders"
+              :data="{
+                code: props.code,
+                part: 5
+              }"
             >
               <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
@@ -891,13 +1043,19 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
         <el-row justify="space-evenly">
           <el-col :span="12" v-if="formDataResearch.length != 0">
             <el-upload
-              ref="upload"
+              :action="uploadPath"
+              ref="uploadRef6"
               :auto-upload="false"
               accept="application/pdf"
               :on-remove="handleRemove"
               :on-exceed="handleExceed"
+              :on-success="handleUploadComplete"
               :before-upload="beforeFileUpload"
-              :limit="1"
+              :headers="myHeaders"
+              :data="{
+                code: props.code,
+                part: 6
+              }"
             >
               <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
@@ -948,29 +1106,24 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
         </el-row>
         <el-row justify="space-evenly">
           <el-col :span="20" />
-          <el-col :span="4"> <el-button type="warning" size="large" plain @click="submit()">提交</el-button> </el-col>
+          <el-col :span="4">
+            {{ submitStatus }}
+            <el-button type="warning" size="small" plain @click="submitStatus = true">提交</el-button>
+            <el-button type="warning" size="large" plain @click="submit()">提交</el-button>
+          </el-col>
         </el-row>
       </el-form>
     </el-col>
   </el-row>
 </template>
 <style>
-.el-col {
+.el-from .el-col {
   text-align: center;
   padding: 0.5em 0.3em;
   outline: transparent 1px solid;
 }
-/* 定制上传组件*/
-.el-upload-listc {
-  /* 定制上传组件 */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 60%; /* 设置文件项的宽度 */
-}
-.custom-file-itemc {
-  overflow: hidden; /* 避免文件名过长溢出 */
-  text-overflow: ellipsis; /* 文本溢出时显示省略号 */
-  white-space: nowrap; /* 文本不换行 */
+.el-from .el-row {
+  margin-top: 0.3em;
+  outline: #ccc 1px solid;
 }
 </style>

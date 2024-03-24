@@ -17,6 +17,14 @@ export function getBatchDataApi() {
   })
 }
 
+export function inspectIdnumApi(params: { idNum: number }) {
+  return request<Table.InspectIdnumResponse>({
+    url: `inspectIdnum`,
+    method: "get",
+    params
+  })
+}
+
 export function submitJobApplicationPartA(data: Type.FormDataPartA) {
   return request({
     url: `submitA`,
