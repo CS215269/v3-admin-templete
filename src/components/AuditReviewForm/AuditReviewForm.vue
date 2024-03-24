@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { defineComponent, reactive, ref, onMounted } from "vue"
 import * as Type from "./type/data"
-import { getThingInfoApi, preViewUserFileApi } from "./api"
+import { acceptThingApi, getThingInfoApi, preViewUserFileApi, refuseThingApi } from "./api"
 import { ElMessage } from "element-plus"
 
 defineComponent({
@@ -13,6 +13,13 @@ const props = defineProps<{
   code: string
 }>()
 
+// 使用 defineEmits 声明事件
+const emit = defineEmits(["close-drawer"])
+
+const closeDrawer = () => {
+  // 发射事件
+  emit("close-drawer")
+}
 const formDataUserInfo = reactive<Type.UserInfo>({
   name: "",
   sex: 1,
@@ -177,6 +184,34 @@ const showUserFile = (path: string) => {
     })
 }
 
+const refused = ref(false)
+const refuseHandle = () => {
+  refused.value = true
+}
+
+const refuseSubmit = () => {
+  loading.value = true
+  refuseThingApi({ thingId: props.thingId })
+    .then(() => {
+      closeDrawer()
+    })
+    .catch()
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+const acceptHandle = () => {
+  loading.value = true
+  acceptThingApi({ thingId: props.thingId })
+    .then(() => {
+      closeDrawer()
+    })
+    .catch()
+    .finally(() => {
+      loading.value = false
+    })
+}
 onMounted(() => {
   showinfo(props.thingId, props.code)
 })
@@ -675,18 +710,27 @@ onMounted(() => {
               <el-text tag="p">备注:{{ note }}</el-text>
             </el-col>
           </el-row>
-          <el-row>
+          <el-row v-if="refused">
             <el-col :span="24">
-              <el-input v-model="qualificationResult" type="textarea" />
+              <el-input v-model="qualificationResult" type="textarea" placeholder="拒绝理由" />
             </el-col>
           </el-row>
-          <el-row justify="space-evenly">
+          <el-row justify="space-evenly" v-if="!refused">
             <el-col :span="18" />
             <el-col :span="3">
-              <el-button type="warning" size="large" plain @click="undefined">拒绝</el-button>
+              <el-button type="warning" size="large" plain @click="refuseHandle">拒绝</el-button>
             </el-col>
             <el-col :span="3">
-              <el-button type="warning" size="large" plain @click="undefined">同意</el-button>
+              <el-button type="warning" size="large" plain @click="acceptHandle">同意</el-button>
+            </el-col>
+          </el-row>
+          <el-row justify="space-evenly" v-else>
+            <el-col :span="18" />
+            <el-col :span="3">
+              <el-button type="warning" size="large" plain @click="refused = false">取消</el-button>
+            </el-col>
+            <el-col :span="3">
+              <el-button type="warning" size="large" plain @click="refuseSubmit">提交</el-button>
             </el-col>
           </el-row>
         </el-form>

@@ -2,38 +2,11 @@ import { request } from "@/utils/service"
 import type * as Table from "./types/table-thing"
 
 /** 同意 */
-export function acceptThingApi(data: { thingId: number }) {
-  return request({
-    url: "accept",
-    method: "post",
-    data
-  })
-}
-
-/** 同意 */
-export function accept2ThingApi(data: { thingId: number }) {
-  return request({
-    url: "accept2",
-    method: "post",
-    data
-  })
-}
-
-/** 同意 */
 export function accept3ThingApi(data: { thingId: number }) {
   return request({
     url: "accept3",
     method: "post",
     data
-  })
-}
-
-/** 拒绝 */
-export function refuseThingDataApi(params: { thingId: number }) {
-  return request({
-    url: "refuse",
-    method: "get",
-    params
   })
 }
 

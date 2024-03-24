@@ -19,3 +19,38 @@ export function preViewUserFileApi(data: { path: string }) {
     data
   })
 }
+
+/** 同意 */
+export function acceptThingApi(data: { thingId: number }) {
+  return request({
+    url: "accept",
+    method: "post",
+    data
+  })
+}
+
+/** 同意 */
+export function accept2ThingApi(data: { thingId: number }) {
+  return request({
+    url: "accept2",
+    method: "post",
+    data
+  })
+}
+
+/** 拒绝 */
+export function refuseThingApi(params: { thingId: number }) {
+  return request({
+    url: "refuse",
+    method: "get",
+    params
+  })
+}
+/** 拒绝 */
+export function refuse2ThingApi(params: { thingId: number }) {
+  return request({
+    url: "refuse2",
+    method: "get",
+    params
+  })
+}

@@ -1,15 +1,9 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref, watch } from "vue"
-import { ElMessage, ElTable, type FormInstance } from "element-plus"
+import { ElTable, type FormInstance } from "element-plus"
 // import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Download, RefreshRight } from "@element-plus/icons-vue"
-import {
-  accept2ThingApi,
-  accept3ThingApi,
-  acceptThingApi,
-  getTableDataBySearchApi,
-  refuseThingDataApi
-} from "@/api/table-thing"
+import { getTableDataBySearchApi } from "@/api/table-thing"
 import { type GetTableThingData } from "@/api/table-thing/types/table-thing"
 import { getBatchOptionsApi } from "@/api/table-batch"
 import { getPositionOptionApi } from "@/api/table-position"
@@ -128,62 +122,6 @@ const handleSelectionChange = (val: GetTableThingData[]) => {
   multipleSelection.value = val
 }
 
-const agree = (row: GetTableThingData) => {
-  loading.value = true
-  acceptThingApi({ thingId: row.thingId })
-    .then(() => {
-      ElMessage.success(row.username + "的" + row.jobTitle + "成功")
-    })
-    .catch()
-    .finally(() => {
-      getTableData()
-      loading.value = false
-      getTableData()
-    })
-}
-
-const agree2 = (row: GetTableThingData) => {
-  loading.value = true
-  accept2ThingApi({ thingId: row.thingId })
-    .then(() => {
-      ElMessage.success(row.username + "的" + row.jobTitle + "成功")
-    })
-    .catch()
-    .finally(() => {
-      getTableData()
-      loading.value = false
-      getTableData()
-    })
-}
-
-const agree3 = (row: GetTableThingData) => {
-  loading.value = true
-  accept3ThingApi({ thingId: row.thingId })
-    .then(() => {
-      ElMessage.success(row.username + "的" + row.jobTitle + "成功")
-    })
-    .catch()
-    .finally(() => {
-      getTableData()
-      loading.value = false
-      getTableData()
-    })
-}
-
-const refuse = (row: GetTableThingData) => {
-  loading.value = true
-  refuseThingDataApi({ thingId: row.thingId })
-    .then(() => {
-      ElMessage.warning("拒绝" + row.username + "的" + row.jobTitle + "成功")
-    })
-    .catch()
-    .finally(() => {
-      getTableData()
-      loading.value = false
-      getTableData()
-    })
-}
-
 const batchSort = (a: GetTableThingData, b: GetTableThingData) => {
   // 根据batchId属性进行比较并返回排序结果
   return a.batchId - b.batchId
@@ -255,58 +193,26 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           </el-table-column>
           <el-table-column prop="status" label="审核进度" align="center" :formatter="progressFormatter">
             <template #default="scope">
-              <el-popover effect="light" trigger="hover" placement="top" width="auto">
-                <template #default>
-                  <div>审核流程:</div>
-                  <div>用户投递>管理员初审>笔试>面试</div>
-                </template>
-                <template v-if="scope.row.status === -1" #reference>
-                  <el-tag type="danger">已经拒绝</el-tag>
-                </template>
-                <template v-else-if="scope.row.status === 0" #reference>
-                  <el-tag type="danger">初审未通过</el-tag>
-                </template>
-                <template v-else-if="scope.row.status === 1" #reference>
-                  <el-tag type="warning">初审通过</el-tag>
-                </template>
-                <template v-else-if="scope.row.status === 2" #reference>
-                  <el-tag type="success">已打印准考证</el-tag>
-                </template>
-                <template v-else-if="scope.row.status === 3" #reference>
-                  <el-tag type="success">笔试通过</el-tag>
-                </template>
-                <template v-else-if="scope.row.status === 4" #reference>
-                  <el-tag type="success">面试通过</el-tag>
-                </template>
-              </el-popover>
+              <template v-if="scope.row.status === -2">
+                <el-tag type="warning">已拒绝</el-tag>
+              </template>
+              <template v-else-if="scope.row.status === -1">
+                <el-tag type="warning">拒绝待确认</el-tag>
+              </template>
+              <template v-else-if="scope.row.status === 0">
+                <el-tag type="danger">未处理</el-tag>
+              </template>
+              <template v-else-if="scope.row.status === 1">
+                <el-tag type="success">同意待确认</el-tag>
+              </template>
+              <template v-else-if="scope.row.status === 2">
+                <el-tag type="success">已同意</el-tag>
+              </template>
             </template>
           </el-table-column>
           <el-table-column fixed="right" label="操作" min-width="200px" align="left">
             <template #default="scope">
               <el-button type="info" bg size="small" @click="showinfoHandle(scope.row)">详细信息</el-button>
-              <template v-if="scope.row.status === -1">
-                <el-button type="primary" size="small" @click="agree(scope.row)">已拒绝</el-button>
-              </template>
-              <template v-else-if="scope.row.status === 0">
-                <el-button type="primary" size="small" @click="agree(scope.row)">初审通过</el-button>
-              </template>
-              <template v-else-if="scope.row.status === 1">
-                <el-tooltip class="box-item" effect="dark" content="请使用批量操作生成准考证" placement="top">
-                  <el-button type="primary" size="small">打印准考证</el-button>
-                </el-tooltip>
-              </template>
-              <template v-else-if="scope.row.status === 2">
-                <el-button type="primary" size="small" @click="agree2(scope.row)">笔试通过</el-button>
-              </template>
-              <template v-else-if="scope.row.status === 3">
-                <el-button type="primary" size="small" @click="agree3(scope.row)">面试通过</el-button>
-              </template>
-              <template v-else-if="scope.row.status === 4">
-                <el-button type="primary" size="small">准备就职</el-button>
-              </template>
-              <el-button v-if="scope.row.status === 0" type="danger" size="small" @click="refuse(scope.row)"
-                >拒绝</el-button
-              >
             </template>
           </el-table-column>
         </el-table>
@@ -324,8 +230,8 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         />
       </div>
     </el-card>
-    <el-drawer>
-      <AuditReviewForm :code="code" :thingId="thingId" />
+    <el-drawer v-model="drawerVisible">
+      <AuditReviewForm :code="code" :thingId="thingId" @close-drawer="drawerVisible = false" />
     </el-drawer>
     <!-- 详细信息
     <el-dialog v-model="dialogVisible" title="简历详情" width="80%">
