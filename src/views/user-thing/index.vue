@@ -216,6 +216,7 @@ onMounted(getBatchData)
                     <el-col :span="12"> 性别：{{ p.sex == 0 ? "不限" : p.sex == 1 ? "男性" : "女性" }} </el-col>
                     <el-col :span="12"> 政治面貌：{{ p.zzmm }} </el-col>
                   </el-row>
+                  技能测试环节：{{ p.require }}<br />
                   其他：{{ p.info }}
                 </td>
               </tr>
