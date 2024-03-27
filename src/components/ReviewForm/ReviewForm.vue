@@ -399,8 +399,8 @@ const submitC = () => {
       }
     })
 }
-const uploadPath = "https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/userResume"
-// const uploadPath = "api/userResume"
+// const uploadPath = "https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/userResume"
+const uploadPath = "api/userResume"
 const uploadPath2 = uploadPath + "/idnum"
 
 const uploadRef0 = ref<UploadInstance>()
