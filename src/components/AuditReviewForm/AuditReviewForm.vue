@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { defineComponent, reactive, ref, onMounted } from "vue"
+import { defineComponent, ref, onMounted } from "vue"
 import * as Type from "./type/data"
 import {
   acceptThingApi,
@@ -33,7 +33,7 @@ const closeDrawer = () => {
   // 发射事件
   emit("close-drawer")
 }
-const formDataUserInfo = reactive<Type.UserInfo>({
+const formDataUserInfo = ref<Type.UserInfo>({
   name: "",
   sex: 1,
   phone: "",
@@ -44,7 +44,7 @@ const formDataUserInfo = reactive<Type.UserInfo>({
   birthday: "",
   idnum: "",
   married: "",
-  native_place: "",
+  nativePlace: "",
   address: "",
   specialtiesCertificates: ""
 })
@@ -142,11 +142,14 @@ const fileList4 = ref<string[]>([])
 const fileList5 = ref<string[]>([])
 const fileList6 = ref<string[]>([])
 
+const fileListIDPhoto = ref<string[]>([])
+
 const loading = ref<boolean>(false)
 const showinfo = (thingId: number, code: string) => {
   loading.value = true
   getThingInfoApi({ id: thingId, code })
     .then((res) => {
+      formDataUserInfo.value = res.data.userinfo
       formDataEducation.value = res.data.education
       formDataWorkExperience.value = res.data.workExperience
       formDataPaper.value = res.data.paper
@@ -162,6 +165,7 @@ const showinfo = (thingId: number, code: string) => {
       fileList4.value = res.data.file4.reverse()
       fileList5.value = res.data.file5.reverse()
       fileList6.value = res.data.file6.reverse()
+      fileListIDPhoto.value = res.data.IDPhoto
     })
     .catch(() => {
       ElMessage.error("获取投递详情失败,请重试")
@@ -348,7 +352,7 @@ onMounted(() => {
             <el-col :span="24">
               <el-form-item label="户口所在地（应届毕业生填入学前的）">
                 <el-input
-                  v-model="formDataUserInfo.native_place"
+                  v-model="formDataUserInfo.nativePlace"
                   placeholder="** 省（市、自治区）** 市（州）** 县（市、区）"
                 />
               </el-form-item>

@@ -29,10 +29,10 @@ export const getEducation = (arg: number) => {
       return "异常"
   }
 }
-/** 将学位转换成汉字 */
+/** 将学位转换成数字 */
 export const setDegree = (arg: string) => {
   switch (arg) {
-    case "暂无":
+    case "无":
       return 0
     case "学士":
       return 1

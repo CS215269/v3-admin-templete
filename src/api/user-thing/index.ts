@@ -35,10 +35,11 @@ export function userAbandonApi(params: { id: number }) {
 }
 
 /** 下载 */
-export function userDownload(batchId: number) {
+export function exportFormApi(params: { id: number }) {
   return request<BlobPart>({
-    responseType: "blob",
-    url: `userDownload/${batchId}`,
-    method: "get"
+    // responseType: "blob",
+    url: `exportForm`,
+    method: "get",
+    params
   })
 }

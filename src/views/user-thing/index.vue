@@ -102,7 +102,10 @@ const formRules: FormRules = reactive({
     // dsa validator: isChineseIdCard,
   ]
 })
-
+const clickHandle = (index: number) => {
+  if (infoIntegrity.value) drawerOpenIndex[index] = true
+  else showRealNameMessageBox.value = true
+}
 const sendRealName = () => {
   formRef.value?.validate((valid: boolean) => {
     if (valid) {
@@ -129,6 +132,7 @@ const getBatchData = () => {
     .then((res) => {
       currentBatch.value = res.data.oneBatch
       listUtil.num = res.data.oneBatch.positionNum
+      infoIntegrity.value = res.data.infoIntegrity == 0 ? false : true
       loadData()
     })
     .catch(() => {
@@ -168,7 +172,7 @@ onMounted(getBatchData)
       </el-card>
     </div>
     <div class="table-wrapper">
-      <div v-if="infoIntegrity">
+      <div v-if="!infoIntegrity">
         <el-text>请先实名认证</el-text>
         <el-button @click="showRealNameMessageBox = true">实名认证</el-button>
       </div>
@@ -186,9 +190,7 @@ onMounted(getBatchData)
                 <!-- 占总宽度的16/24 -->
                 <td style="width: 66.666%">招聘岗位要求</td>
                 <!-- 合并两个格子，占总宽度的2/24 -->
-                <td rowspan="2" class="td-btn" style="width: 8.333%" @click="drawerOpenIndex[index] = true">
-                  点击报名
-                </td>
+                <td rowspan="2" class="td-btn" style="width: 8.333%" @click="clickHandle(index)">点击报名</td>
               </tr>
               <!-- 第二行占总高度的18/24 -->
               <tr style="height: 75%">

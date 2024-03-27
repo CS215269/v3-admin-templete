@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import { GetTableRequestData } from "@/api/user-thing/types/user-thing"
-import { getUserThingDataApi, userAbandonApi, userDownload } from "@/api/user-thing"
+import { exportFormApi, getUserThingDataApi, userAbandonApi } from "@/api/user-thing"
 import { ElMessage } from "element-plus"
 
 defineOptions({
@@ -28,32 +28,28 @@ const getTableData = () => {
       loading.value = false
     })
 }
-const download = (batchId: number) => {
-  loading.value = true
-  userDownload(batchId)
-    .then((res) => {
-      const blob = new Blob([res])
-      const url = window.URL.createObjectURL(blob)
-
-      const a = document.createElement("a")
-      a.href = url
-      a.download = "准考证.docx"
-      a.click()
-      ElMessage.success("下载准考证成功")
-    })
-    .catch((error) => {
-      console.log("下载准考证失败" + error)
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
 
 const abandon = (id: number) => {
   loading.value = true
   userAbandonApi({ id })
     .then((res) => {
       if (res.code == 0) ElMessage.success(res.message)
+    })
+    .catch((e) => {
+      ElMessage.error("操作失败")
+      console.log(e)
+    })
+    .finally(() => {
+      loading.value = false
+      getTableData()
+    })
+}
+
+const exportForm = (id: number) => {
+  loading.value = true
+  exportFormApi({ id })
+    .then(() => {
+      // if (res.code == 0) ElMessage.success(res.message)
     })
     .catch((e) => {
       ElMessage.error("操作失败")
@@ -94,8 +90,8 @@ onMounted(getTableData)
                 <el-step title="笔试通过" />
                 <el-step title="面试通过" />
               </el-steps>
-              <el-button v-if="position.status == 2" @click="download(position.batchId)">下载准考证</el-button>
               <el-button @click="abandon(position.thingId)">放弃</el-button>
+              <el-button @click="exportForm(position.thingId)">导出报名资格审查表</el-button>
             </div>
           </el-collapse-item>
         </el-collapse>

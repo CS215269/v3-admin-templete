@@ -83,9 +83,9 @@ const editedUserinfo = ref<UserInfoData>({
   id: uid.value,
   name: "",
   idnum: "",
-  tel: "",
+  phone: "",
   /** 性别 */
-  sex: "",
+  sex: 1,
   /** 年龄 */
   age: "",
   /** 学历 */
@@ -99,13 +99,20 @@ const editedUserinfo = ref<UserInfoData>({
   /** 出生日期 */
   birthday: "",
   /** 籍贯 */
-  native_place: "",
+  nativePlace: "",
   /** 现居地址 */
   address: "",
   /** 毕业时间 */
   graduation_time: "",
   /** 专业 */
-  specialty: ""
+  specialty: "",
+  birthPlace: "",
+  /** 电子邮件 */
+  email: "",
+  /** 婚否 */
+  married: "",
+  /** 资格证 */
+  specialtiesCertificates: ""
 })
 
 const getUserData = () => {
@@ -123,18 +130,22 @@ const getUserData = () => {
         id: uid.value,
         name: "",
         idnum: "",
-        tel: "",
-        sex: "",
+        phone: "",
+        sex: 1,
         age: "",
         education: 0,
         zzmm: "",
         school: "",
         nation: "",
         birthday: "",
-        native_place: "",
+        nativePlace: "",
         address: "",
         graduation_time: "",
-        specialty: ""
+        specialty: "",
+        birthPlace: "",
+        email: "",
+        married: "",
+        specialtiesCertificates: ""
       }
       ElMessage.error("获取个人信息失败,请重试")
     })
@@ -264,8 +275,8 @@ const validateInput = () => {
               </el-select> </template
           ></el-descriptions-item>
           <el-descriptions-item label="籍贯" label-align="center" align="left">
-            <template v-if="!isEditing">{{ userinfo?.native_place }}</template>
-            <template v-else> <el-input v-model="editedUserinfo.native_place" /> </template
+            <template v-if="!isEditing">{{ userinfo?.nativePlace }}</template>
+            <template v-else> <el-input v-model="editedUserinfo.nativePlace" /> </template
           ></el-descriptions-item>
           <el-descriptions-item label="出生日期" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.birthday }}</template>
@@ -313,10 +324,10 @@ const validateInput = () => {
             </template>
           </el-descriptions-item>
           <el-descriptions-item label="手机号" label-align="center" align="left">
-            <template v-if="!isEditing">{{ userinfo?.tel }}</template>
+            <template v-if="!isEditing">{{ userinfo?.phone }}</template>
             <template v-else>
               <el-tooltip class="box-item" content="手机号暂不支持修改" placement="top">
-                {{ editedUserinfo.tel }}
+                {{ editedUserinfo.phone }}
               </el-tooltip>
             </template></el-descriptions-item
           >

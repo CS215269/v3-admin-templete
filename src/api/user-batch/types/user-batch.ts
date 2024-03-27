@@ -39,7 +39,11 @@ export interface GetBatchData {
 }
 
 export type InspectIdnumResponse = ApiResponseData<undefined>
-export type GetCurrentBatchResponseData = ApiResponseData<{ oneBatch: GetBatchData }>
+export type GetCurrentBatchResponseData = ApiResponseData<{
+  oneBatch: GetBatchData
+  /** 用户是否实名认证 */
+  infoIntegrity: number
+}>
 export type GetBatchResponseData = ApiResponseData<{
   /** 岗位列表 */
   list: GetBatchData[]

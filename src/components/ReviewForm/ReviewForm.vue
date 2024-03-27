@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { defineComponent, reactive, ref } from "vue"
+import { defineComponent, onMounted, reactive, ref } from "vue"
 import { Delete } from "@element-plus/icons-vue"
 import { ElMessage, FormRules, UploadInstance, UploadProps, UploadRawFile, genFileId } from "element-plus"
 import { setDegree, setEducation } from "@/utils/degree"
 import type * as Type from "./data"
 import { submitJobApplicationPartA, submitJobApplicationPartB, submitJobApplicationPartC } from "@/api/user-batch"
 import { useUserStore } from "@/store/modules/user"
+import { getUserInfoApi } from "@/api/user-info"
 
 defineComponent({
   name: "ReviewForm"
@@ -48,7 +49,7 @@ const rules: FormRules = {
   idnum: [{ validator: inspectIdnum, trigger: "blur" }]
 }
 
-const formDataUserInfo = reactive<Type.UserInfo>({
+const formDataUserInfo = ref<Type.UserInfo>({
   name: "",
   sex: 1,
   phone: "",
@@ -318,7 +319,7 @@ const submitStatus = ref<boolean>(true)
 const formDataPartA = reactive<Type.FormDataPartA>({
   recruitId: props.recruitId,
   code: props.code,
-  info: formDataUserInfo,
+  info: formDataUserInfo.value,
   education: [],
   workExperience: []
 })
@@ -332,7 +333,9 @@ const formDataPartC = reactive<Type.FormDataPartC>({
   family: formDataFamilyConnections.value,
   note: note.value
 })
+const uploading = ref(false)
 const submit = () => {
+  uploading.value = true
   const adapter: Type.Education[] = []
   for (let i = 0; i < formDataEducation.value.length; i++) {
     adapter.push({
@@ -349,6 +352,7 @@ const submit = () => {
     formDataWorkExperience.value[i].work_time_start = element[0]
     formDataWorkExperience.value[i].work_time_end = element[1]
   }
+  formDataPartA.info = formDataUserInfo.value
   formDataPartA.education = adapter
   formDataPartA.workExperience = formDataWorkExperience.value
   submitJobApplicationPartA(formDataPartA)
@@ -395,21 +399,9 @@ const submitC = () => {
       }
     })
 }
-// const fileList = ref<UploadUserFile[]>([
-//   {
-//     id: "1",
-//     name: "element-plus-logo.svg",
-//     url: "https://element-plus.org/images/element-plus-logo.svg"
-//   },
-//   {
-//     id: "2",
-//     name: "element-plus-logo2.svg",
-//     url: "https://element-plus.org/images/element-plus-logo.svg"
-//   }
-// ])
-
 const uploadPath = "https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/userResume"
 // const uploadPath = "api/userResume"
+const uploadPath2 = uploadPath + "/idnum"
 
 const uploadRef0 = ref<UploadInstance>()
 const uploadRef1 = ref<UploadInstance>()
@@ -433,66 +425,16 @@ const submitUpload = async () => {
   uploadRef5.value!.submit()
   await new Promise((resolve) => setTimeout(resolve, 500))
   uploadRef6.value!.submit()
+  await new Promise((resolve) => setTimeout(resolve, 500))
+  upload.value!.submit()
+  uploading.value = false
 }
-/** 定义同时允许上传的最大数量 */
-// const MAX_CONCURRENT_UPLOADS = 2
-
-// 定义上传组件实例的类型
-// interface UploadInstance {
-//   value: any;
-//   submit(): void;
-//   on(event: 'success' | 'error', callback: () => void): void;
-// }
-
-/** 将所有上传组件实例的引用收集到一个数组中 */
-// const uploadRefs: UploadInstance[] = [
-//   uploadRef0.value!,
-//   uploadRef1.value!,
-//   uploadRef2.value!,
-//   uploadRef3.value!,
-//   uploadRef4.value!,
-//   uploadRef5.value!,
-//   uploadRef6.value!
-// ]
-
-/** 跟踪当前要上传的文件索引 */
-// let currentIndex = 0
-
-/** 存储正在进行的上传任务引用 */
-// const uploadsInProgress: UploadInstance[] = []
-/** 定义提交上传的函数 */
-// const submitUpload = () => {
-//   uploadRefs[0]!.submit()
-//   // 启动初始上传任务
-//   for (let i = 0; i < MAX_CONCURRENT_UPLOADS && currentIndex < uploadRefs.length; i++) {
-//     // 获取当前上传组件实例引用
-//     const uploadRef = uploadRefs[currentIndex]
-//     // 调用 submit 方法开始上传
-//     uploadRef.submit()
-//     // 将上传任务添加到正在进行的上传任务列表中
-//     uploadsInProgress.push(uploadRef)
-//     // 移动到下一个文件索引
-//     currentIndex++
-//   }
-// }
 /** 上传完成处理函数 */
 const handleUploadComplete = () => {
   ElMessage.success("上传完成")
 }
 
-// // 为每个正在进行的上传任务绑定上传完成事件监听器
-// uploadsInProgress.forEach((uploadRef) => {
-//   // 当上传成功时执行处理函数
-//   uploadRef.onSuccess = handleUploadComplete
-//   // 当上传失败时执行处理函数
-//   uploadRef.on("error", handleUploadComplete)
-// })
-// }
 const upload = ref<UploadInstance>()
-
-// const setUploadRef = (el, index: number) => {
-//   uploads.value[index] = el
-// }
 
 const beforeFileUpload: UploadProps["beforeUpload"] = (rawFile) => {
   if (rawFile.type !== "application/pdf") {
@@ -512,11 +454,14 @@ const handleExceed: UploadProps["onExceed"] = (files) => {
   upload.value!.handleStart(file)
 }
 
-const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
-  console.log(file, uploadFiles)
-}
-
-// defineExpose(submit())
+onMounted(() => {
+  getUserInfoApi()
+    .then((res) => {
+      formDataUserInfo.value = res.data.user
+    })
+    .catch(() => {})
+    .finally(() => {})
+})
 </script>
 
 <template>
@@ -529,7 +474,7 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
         <el-row>
           <el-col :span="8">
             <el-form-item label="姓名" prop="name">
-              <el-input v-model="formDataUserInfo.name" />
+              <el-text>{{ formDataUserInfo.name }}</el-text>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -572,7 +517,7 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
         <el-row>
           <el-col :span="8">
             <el-form-item label="电话" prop="phone">
-              <el-input v-model="formDataUserInfo.phone" />
+              <el-text> {{ formDataUserInfo.phone }}</el-text>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -591,10 +536,31 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="24">
+          <el-col :span="12">
             <el-form-item label="身份证号码" prop="idnum">
-              <el-input v-model="formDataUserInfo.idnum" />
+              <el-row>
+                <el-col :span="24">
+                  <el-text> {{ formDataUserInfo.idnum }} </el-text>
+                </el-col>
+              </el-row>
             </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-upload
+              ref="upload"
+              :action="uploadPath2"
+              :limit="1"
+              :on-exceed="handleExceed"
+              :auto-upload="false"
+              :headers="myHeaders"
+            >
+              <template #trigger>
+                <el-button type="primary">select file</el-button>
+              </template>
+              <template #tip>
+                <div class="el-upload__tip">上传一个PDF文件,包含身份证正反面照片</div>
+              </template>
+            </el-upload>
           </el-col>
         </el-row>
         <el-row>
@@ -675,7 +641,6 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               ref="uploadRef0"
               :auto-upload="false"
               accept="application/pdf"
-              :on-remove="handleRemove"
               :on-exceed="handleExceed"
               :on-success="handleUploadComplete"
               :before-upload="beforeFileUpload"
@@ -745,7 +710,6 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               :action="uploadPath"
               :auto-upload="false"
               accept="application/pdf"
-              :on-remove="handleRemove"
               :on-exceed="handleExceed"
               :on-success="handleUploadComplete"
               :before-upload="beforeFileUpload"
@@ -807,7 +771,6 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               ref="uploadRef2"
               :auto-upload="false"
               accept="application/pdf"
-              :on-remove="handleRemove"
               :on-exceed="handleExceed"
               :on-success="handleUploadComplete"
               :before-upload="beforeFileUpload"
@@ -875,7 +838,6 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               ref="uploadRef3"
               :auto-upload="false"
               accept="application/pdf"
-              :on-remove="handleRemove"
               :on-exceed="handleExceed"
               :on-success="handleUploadComplete"
               :before-upload="beforeFileUpload"
@@ -942,7 +904,6 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               ref="uploadRef4"
               :auto-upload="false"
               accept="application/pdf"
-              :on-remove="handleRemove"
               :on-exceed="handleExceed"
               :on-success="handleUploadComplete"
               :before-upload="beforeFileUpload"
@@ -1004,7 +965,6 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               ref="uploadRef5"
               :auto-upload="false"
               accept="application/pdf"
-              :on-remove="handleRemove"
               :on-exceed="handleExceed"
               :on-success="handleUploadComplete"
               :before-upload="beforeFileUpload"
@@ -1047,7 +1007,6 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
               ref="uploadRef6"
               :auto-upload="false"
               accept="application/pdf"
-              :on-remove="handleRemove"
               :on-exceed="handleExceed"
               :on-success="handleUploadComplete"
               :before-upload="beforeFileUpload"
@@ -1105,11 +1064,21 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
           <el-col :span="4"><el-button @click="addFormItemFamilyConnections()">增加一条记录</el-button> </el-col>
         </el-row>
         <el-row justify="space-evenly">
+          <el-col>
+            <el-text tag="p"
+              >说明：<br />
+              1.请报考者认真阅读《招聘公告》后如实准确填写。报考者隐瞒有关情况或提供虚假材料的，取消其考试或聘用资格，并按有关规定严肃处理。<br />
+              2.教育经历请从专科及以上开始填写，并按照时间专科、本科、研究生、博士的顺序填写。<br />
+              3.“直系亲属及主要社会关系”包括夫妻关系、直系血亲关系、三代以内旁系血亲和近姻亲关系。
+            </el-text>
+          </el-col>
+        </el-row>
+        <el-row justify="space-evenly">
           <el-col :span="20" />
           <el-col :span="4">
             {{ submitStatus }}
             <el-button type="warning" size="small" plain @click="submitStatus = true">提交</el-button>
-            <el-button type="warning" size="large" plain @click="submit()">提交</el-button>
+            <el-button :loading="uploading" type="warning" size="large" plain @click="submit()">提交</el-button>
           </el-col>
         </el-row>
       </el-form>
@@ -1117,12 +1086,12 @@ const handleRemove: UploadProps["onRemove"] = (file, uploadFiles) => {
   </el-row>
 </template>
 <style>
-.el-from .el-col {
+.el-drawer__body .el-col {
   text-align: center;
-  padding: 0.5em 0.3em;
+  padding: 0.5em 0.8em;
   outline: transparent 1px solid;
 }
-.el-from .el-row {
+.el-drawer__body .el-row {
   margin-top: 0.3em;
   outline: #ccc 1px solid;
 }

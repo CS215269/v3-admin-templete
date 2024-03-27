@@ -7,9 +7,9 @@ export interface UserInfoData {
   /** 身份证号码 */
   idnum: string
   /** 电话号码 */
-  tel: string
+  phone: string
   /** 性别 */
-  sex: string
+  sex: number
   /** 年龄 */
   age: string
   /** 学历 */
@@ -22,14 +22,22 @@ export interface UserInfoData {
   nation: string
   /** 出生日期 */
   birthday: string
-  /** 籍贯 */
-  native_place: string
+  /** 出生地 */
+  nativePlace: string
   /** 现居地址 */
   address: string
   /** 毕业时间 */
   graduation_time: string
   /** 专业 */
   specialty: string
+  /** 出生地 */
+  birthPlace: string
+  /** 电子邮件 */
+  email: string
+  /** 婚否 */
+  married: string
+  /** 资格证 */
+  specialtiesCertificates: string
 }
 
 export interface SetRealNameRequestData {
