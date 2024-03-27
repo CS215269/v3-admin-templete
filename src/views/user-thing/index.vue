@@ -177,6 +177,13 @@ onMounted(getBatchData)
         <el-button @click="showRealNameMessageBox = true">实名认证</el-button>
       </div>
       <ul v-infinite-scroll="loadData" :infinite-scroll-disabled="true" class="infinite-list" style="overflow: auto">
+        <li>
+          <el-text tag="p">
+            特别说明：1.专业技术岗位招聘要求还符合《安徽工商职业学院周转池编制人才标准》对应的要求（详见本次招聘附件2）；
+            <br />
+            2.国家认可的国（境）外大学相关专业毕业生也可报考。
+          </el-text>
+        </li>
         <li v-for="(p, index) in positions" :key="p.id">
           <el-card style="margin-top: 0.1em">
             <!-- {{ p }} -->
