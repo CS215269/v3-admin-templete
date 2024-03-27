@@ -47,18 +47,18 @@ export function resetThingApi() {
 }
 
 /** 拒绝 */
-export function refuseThingApi(params: { thingId: number }) {
+export function refuseThingApi(data: { thingId: number; qualificationResult: string }) {
   return request({
     url: "refuse",
-    method: "get",
-    params
+    method: "post",
+    data
   })
 }
 /** 拒绝 */
-export function refuse2ThingApi(params: { thingId: number }) {
+export function refuse2ThingApi(data: { thingId: number; qualificationResult: string }) {
   return request({
     url: "refuse2",
-    method: "get",
-    params
+    method: "post",
+    data
   })
 }

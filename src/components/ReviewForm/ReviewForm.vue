@@ -206,7 +206,7 @@ const delFormItemProject0 = (item: Type.Project) => {
 
 const formDataProject1 = ref<Type.Project[]>([
   {
-    type: 0,
+    type: 1,
     id: 0,
     time: "",
     title: "",
@@ -235,7 +235,7 @@ const delFormItemProject1 = (item: Type.Project) => {
 
 const formDataProject2 = ref<Type.Project[]>([
   {
-    type: 0,
+    type: 2,
     id: 0,
     time: "",
     title: "",
@@ -549,6 +549,7 @@ onMounted(() => {
             <el-upload
               ref="upload"
               :action="uploadPath2"
+              accept="application/pdf"
               :limit="1"
               :on-exceed="handleExceed"
               :auto-upload="false"

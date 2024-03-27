@@ -158,6 +158,9 @@ const showinfo = (thingId: number, code: string) => {
       formDataProject2.value = res.data.project.filter((item) => item.type === 2)
       formDataResearch.value = res.data.research
       formDataFamilyConnections.value = res.data.family
+      note.value = res.data.note
+      qualificationResult.value = res.data.qualificationResult
+      awardsAndPunishments.value = res.data.awardsAndPunishments
       fileList0.value = res.data.file0.reverse()
       fileList1.value = res.data.file1.reverse()
       fileList2.value = res.data.file2.reverse()
@@ -208,7 +211,7 @@ const refuseHandle = () => {
 
 const refuseSubmit = () => {
   loading.value = true
-  refuseThingApi({ thingId: props.thingId })
+  refuseThingApi({ thingId: props.thingId, qualificationResult: qualificationResult.value })
     .then(() => {
       closeDrawer()
     })
@@ -254,7 +257,7 @@ const approveHandle = () => {
         loading.value = false
       })
   else
-    refuse2ThingApi({ thingId: props.thingId })
+    refuse2ThingApi({ thingId: props.thingId, qualificationResult: qualificationResult.value })
       .then(() => {
         closeDrawer()
       })

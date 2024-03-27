@@ -81,6 +81,11 @@ const resetSearch = () => {
 }
 //#endregion
 
+const handleCloseDrawer = () => {
+  drawerVisible.value = false
+  getTableData()
+}
+
 const positionList = ref<{ id: number; jobTitle: string }[]>([])
 const batchList = ref<{ id: number; name: string }[]>([])
 
@@ -232,8 +237,8 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         />
       </div>
     </el-card>
-    <el-drawer v-model="drawerVisible">
-      <AuditReviewForm :code="code" :thingId="thingId" :status="status" @close-drawer="drawerVisible = false" />
+    <el-drawer v-model="drawerVisible" size="60%">
+      <AuditReviewForm :code="code" :thingId="thingId" :status="status" @close-drawer="handleCloseDrawer()" />
     </el-drawer>
     <!-- 详细信息
     <el-dialog v-model="dialogVisible" title="简历详情" width="80%">
