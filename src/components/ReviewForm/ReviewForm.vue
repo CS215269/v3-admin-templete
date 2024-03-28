@@ -348,11 +348,20 @@ const colors = [
 const showProgress = ref(false)
 const percentage = ref(0)
 const uploading = ref(false)
+
 const submit = () => {
+  if (!submitA()) ElMessage.error("有字段未完成!")
+  if (formDataUserInfo.value.birthday == "") ElMessage.error("有字段未完成!")
+}
+const submitA = () => {
   showProgress.value = true
   uploading.value = true
   const adapter: Type.Education[] = []
   for (let i = 0; i < formDataEducation.value.length; i++) {
+    if (formDataEducation.value[i].graduationTime == undefined || formDataEducation.value[i].graduationTime == "") {
+      submitStatus.value = false
+      return false
+    }
     adapter.push({
       id: formDataEducation.value[i].id,
       school: formDataEducation.value[i].school,
@@ -363,6 +372,10 @@ const submit = () => {
     })
   }
   for (let i = 0; i < work_time.value.length; i++) {
+    if (work_time.value[i] == undefined || work_time.value[i] == "") {
+      submitStatus.value = false
+      return false
+    }
     const element = work_time.value[i]
     formDataWorkExperience.value[i].work_time_start = element[0]
     formDataWorkExperience.value[i].work_time_end = element[1]
