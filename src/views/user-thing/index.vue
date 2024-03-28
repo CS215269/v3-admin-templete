@@ -211,7 +211,7 @@ onMounted(getBatchData)
                 <!-- 占总宽度的16/24 -->
                 <td style="width: 66.666%; text-align: start">
                   <el-row :gutter="20">
-                    <el-col :span="12"> 岗位名称：{{ p.jobTitle }} </el-col>
+                    <el-col :span="12"> 岗位名称：{{ p.code + "-" + p.jobTitle }} </el-col>
                     <el-col :span="12"> 岗位类别：{{ p.type }} </el-col>
                   </el-row>
                   <el-row :gutter="20">
@@ -237,7 +237,7 @@ onMounted(getBatchData)
               <h4>正在投递: 岗位代码 {{ p.code }}</h4>
             </template>
             <template #default>
-              <ReviewForm :recruitId="p.recruitId" :code="p.code" @close-drawer="handleCloseDrawer()" />
+              <ReviewForm :recruitId="p.recruitId" :code="p.code" @close-drawer="drawerOpenIndex[index] = false" />
             </template>
           </el-drawer>
         </li>

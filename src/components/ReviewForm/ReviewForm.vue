@@ -73,6 +73,9 @@ const formDataUserInfo = ref<Type.UserInfo>({
   specialtiesCertificates: ""
 })
 
+const sex = ref("")
+const married = ref("")
+
 // 自定义类型FormDataEducation
 type formDataTypeEducation = {
   id: number
@@ -352,6 +355,7 @@ const submit = () => {
   for (let i = 0; i < formDataEducation.value.length; i++) {
     if (formDataEducation.value[i].graduationTime == undefined || formDataEducation.value[i].graduationTime === "") {
       submitStatus.value = false
+      formDataEducation.value[i].graduationTime = "2000-01-01"
       console.log("触发返回formDataEducation" + i)
 
       console.log("触发返回formDataEducation长度" + formDataEducation.value.length)
@@ -369,6 +373,7 @@ const submit = () => {
   for (let i = 0; i < work_time.value.length; i++) {
     if (work_time.value[i] == undefined || work_time.value[i] === "") {
       submitStatus.value = false
+      work_time.value[i] = "2000-01-01"
       console.log("触发返回work_time" + i + "长度" + work_time.value.length)
       canSubmit.value = false
     }
@@ -381,63 +386,40 @@ const submit = () => {
   formDataPartA.workExperience = formDataWorkExperience.value
   formDataPartC.note = note.value
   formDataPartC.awardsAndPunishments = awardsAndPunishments.value
-  if (!canSubmit.value || formDataUserInfo.value.birthday === "") {
-    console.log("submita " + !submit)
-    console.log("formDataUserInfo.value.birthday " + formDataUserInfo.value.birthday === "")
-    ElMessage.error("有字段未完成!")
-    uploading.value = false
-  } else {
-    submitA()
-  }
-}
-const submitA = () => {
+
   submitJobApplicationPartA(formDataPartA)
     .then(() => {
       percentage.value += 10
       return true
     })
-    .catch((e) => {
+    .catch(() => {
       submitStatus.value = false
-      ElMessage.error(e)
     })
-    .finally(() => {
-      if (submitStatus.value) {
-        submitB()
-      }
-    })
-}
-const submitB = () => {
+    .finally(() => {})
   submitJobApplicationPartB(formDataPartB)
     .then(() => {
       percentage.value += 10
     })
-    .catch((e) => {
+    .catch(() => {
       submitStatus.value = false
-      ElMessage.error(e)
     })
-    .finally(() => {
-      if (submitStatus.value) {
-        submitC()
-      }
-    })
-}
-const submitC = () => {
+    .finally(() => {})
   submitJobApplicationPartC(formDataPartC)
     .then(() => {
       percentage.value += 10
     })
-    .catch((e) => {
+    .catch(() => {
       submitStatus.value = false
-      ElMessage.error(e)
     })
     .finally(() => {
-      if (submitStatus.value) {
-        submitUpload()
-      }
+      if (!submitStatus.value) {
+        ElMessage.error("提交失败")
+        closeDrawer()
+      } else submitUpload()
     })
 }
-const uploadPath = "https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/userResume"
-// const uploadPath = "api/userResume"
+// const uploadPath = "https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/userResume"
+const uploadPath = "api/userResume"
 const uploadPath2 = uploadPath + "/idnum"
 
 const uploadRef0 = ref<UploadInstance>()
@@ -485,17 +467,14 @@ const submitUpload = async () => {
   if (upload.value && uploadRef0.value) {
     upload.value!.submit()
   }
-  uploading.value = false
   fileUploading.value = false
-}
-/** 上传完成处理函数 */
-const handleUploadComplete = () => {
-  percentage.value += 10
-  if (percentage.value >= 30 && !fileUploading.value) {
-    ElMessage.success("投递成功")
+  if (submitStatus.value) {
+    ElMessage.success("提交成功")
     closeDrawer()
   }
 }
+/** 上传完成处理函数 */
+const handleUploadComplete = () => {}
 
 const upload = ref<UploadInstance>()
 
@@ -521,6 +500,8 @@ onMounted(() => {
   getUserInfoApi()
     .then((res) => {
       formDataUserInfo.value = res.data.user
+      sex.value = res.data.user.sex == 1 ? "男" : "女"
+      married.value = Number(res.data.user.married) == 1 ? "已婚" : "未婚"
     })
     .catch(() => {})
     .finally(() => {
@@ -545,7 +526,7 @@ onMounted(() => {
           </el-col>
           <el-col :span="8">
             <el-form-item label="性别">
-              <el-select v-model="formDataUserInfo.sex" clearable placeholder="Select" style="width: 240px">
+              <el-select v-model="sex" clearable placeholder="Select" style="width: 240px">
                 <el-option label="男" :value="1" />
                 <el-option label="女" :value="2" />
               </el-select>
@@ -594,7 +575,7 @@ onMounted(() => {
 
           <el-col :span="8">
             <el-form-item label="婚否">
-              <el-select v-model="formDataUserInfo.married" clearable placeholder="Select" style="width: 240px">
+              <el-select v-model="married" clearable placeholder="Select" style="width: 240px">
                 <el-option label="未婚" :value="0" />
                 <el-option label="已婚" :value="1" />
               </el-select>
@@ -1148,7 +1129,9 @@ onMounted(() => {
           </el-col>
         </el-row>
         <el-row justify="space-evenly">
-          <el-col :span="20" />
+          <el-col :span="20">
+            <el-text v-if="uploading">上传中</el-text>
+          </el-col>
           <el-col :span="4">
             <el-button :loading="uploading" type="warning" size="large" plain @click="submit()">提交</el-button>
           </el-col>
