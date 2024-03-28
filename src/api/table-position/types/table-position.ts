@@ -24,11 +24,22 @@ export interface GetTableRequestData {
 
 export interface GetTablePositionData {
   id: number
+  recruitId: number
   jobTitle: string
+  code: string
+  department: string
+  departmentId: number
   education: number
-  degree: number
-  require: string
+  focus: number
   info: string
+  require: string
+  degree: number
+  maxAge: number
+  sex: 0
+  specialty: string
+  toll: 0
+  type: string
+  zzmm: string
 }
 
 export type GetTableResponseData = ApiResponseData<{

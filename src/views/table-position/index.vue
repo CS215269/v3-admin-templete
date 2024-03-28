@@ -267,7 +267,11 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           tooltip-effect="light"
         >
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column prop="jobTitle" label="岗位名称" align="center" />
+          <el-table-column prop="jobTitle" label="岗位名称" align="center">
+            <template #default="scope">
+              {{ scope.row.code + "-" + scope.row.jobTitle }}
+            </template>
+          </el-table-column>
           <el-table-column prop="education" label="所需学历" align="center">
             <template #default="scope">
               {{ getEducationLabel(scope.row.education) }}

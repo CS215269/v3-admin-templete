@@ -9,8 +9,6 @@ defineOptions({
 })
 
 const loading = ref<boolean>(false)
-/** 用于控制哪些 collapse 是展开的 */
-const activeNames = ref<string[]>([])
 /** 用于存储用户的投递的数据 */
 const positions = ref<GetTableRequestData[]>([])
 
@@ -90,12 +88,15 @@ onMounted(getTableData)
       </div>
       <el-card :loading="loading" shadow="never">
         <div class="table-wrapper">
-          <el-collapse v-if="positions.length > 0" v-model="activeNames" style="margin: 0">
-            <el-collapse-item v-for="(position, index) in positions" :key="position.recruitId" :name="index.toString()">
+          <div v-if="positions.length > 0" style="margin: 0">
+            <el-card v-for="(position, index) in positions" :key="position.recruitId" :name="index.toString()">
               <template #title>
+                <el-text tag="b"> {{ position.code }} </el-text>
+                &nbsp;
                 <el-text tag="b"> {{ position.type }} </el-text>
                 &nbsp;
                 <el-text> {{ position.jobTitle }} </el-text>
+                &nbsp;
                 <el-text v-if="position.status === -2" type="danger"> 已拒绝 </el-text>
               </template>
               <div>
@@ -117,8 +118,8 @@ onMounted(getTableData)
                   >导出报名资格审查表</el-button
                 >
               </div>
-            </el-collapse-item>
-          </el-collapse>
+            </el-card>
+          </div>
 
           <!-- <el-collapse v-model="activeCollapse">
           <Batches v-for="batch in batches" :key="batch.id" :batch="batch" />

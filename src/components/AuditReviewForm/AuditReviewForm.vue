@@ -278,11 +278,8 @@ onMounted(() => {
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="性别">
-                <el-select v-model="formDataUserInfo.sex" clearable placeholder="Select" style="width: 240px">
-                  <el-option label="男" :value="1" />
-                  <el-option label="女" :value="2" />
-                </el-select>
+              <el-form-item label="性别"
+                ><el-text>{{ formDataUserInfo.sex == 1 ? "男" : "女" }}</el-text>
               </el-form-item>
             </el-col>
             <el-col :span="8">
@@ -322,10 +319,7 @@ onMounted(() => {
 
             <el-col :span="8">
               <el-form-item label="婚否">
-                <el-select v-model="formDataUserInfo.married" clearable placeholder="Select" style="width: 240px">
-                  <el-option label="未婚" :value="0" />
-                  <el-option label="已婚" :value="1" />
-                </el-select>
+                <el-text>{{ Number(formDataUserInfo.married) == 1 ? "已婚" : "未婚" }}</el-text>
               </el-form-item>
             </el-col>
           </el-row>
