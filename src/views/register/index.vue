@@ -3,8 +3,9 @@ import { reactive, ref } from "vue"
 import { useRouter } from "vue-router"
 import { useUserStore } from "@/store/modules/user"
 import { ElMessage, type FormInstance, type FormRules } from "element-plus"
-import { Lock, Key, Phone } from "@element-plus/icons-vue"
-import { getRegisterCodeApi } from "@/api/register"
+import { Lock, Phone } from "@element-plus/icons-vue"
+// Key,
+// import { getRegisterCodeApi } from "@/api/register"
 import { type RegisterRequestData } from "@/api/register/types/register"
 import ThemeSwitch from "@/components/ThemeSwitch/index.vue"
 
@@ -47,8 +48,8 @@ const registerFormRules: FormRules = {
   phone: [
     { required: true, message: "请输入手机号", trigger: "blur" },
     { pattern: /^[1][3,4,5,7,8,9][0-9]{9}$/, message: "手机号格式不正确", trigger: "blur" }
-  ],
-  code: [{ required: true, message: "请输入验证码", trigger: "blur" }]
+  ]
+  // code: [{ required: true, message: "请输入验证码", trigger: "blur" }]
 }
 /** 注册逻辑 */
 const handleRegister = () => {
@@ -74,41 +75,41 @@ const handleRegister = () => {
 }
 
 /** 短信验证码冷却 */
-const registerCode = ref<boolean>(false)
+// const registerCode = ref<boolean>(false)
 /** 短信验证码冷却 */
-const registerCodeCD = ref<number>(0)
+// const registerCodeCD = ref<number>(0)
 /** 获取短信验证码 */
-const createCode = () => {
-  // 先清空验证码的输入
-  registerFormData.code = ""
-  registerCode.value = true
+//const createCode = () => {
+// 先清空验证码的输入
+//  registerFormData.code = ""
+//  registerCode.value = true
 
-  registerFormRef.value
-    ?.validateField("phone")
-    .then(() => {
-      getRegisterCodeApi({ phone: registerFormData.phone })
-        .then((res) => {
-          ElMessage.success(res.message)
-        })
-        .catch(() => {
-          ElMessage.error("系统异常,请联系管理员")
-        })
+//   registerFormRef.value
+//     ?.validateField("phone")
+//     .then(() => {
+//       getRegisterCodeApi({ phone: registerFormData.phone })
+//         .then((res) => {
+//           ElMessage.success(res.message)
+//         })
+//         .catch(() => {
+//           ElMessage.error("系统异常,请联系管理员")
+//         })
 
-      registerCodeCD.value = 60
-      registerCode.value = true
-      const interval = setInterval(() => {
-        registerCodeCD.value--
-        if (registerCodeCD.value <= 0) {
-          clearInterval(interval)
-          registerCode.value = false
-        }
-      }, 1000)
-    })
-    .catch(() => {
-      ElMessage.error("手机号格式不正确")
-      registerCode.value = false
-    })
-}
+//       registerCodeCD.value = 60
+//       registerCode.value = true
+//       const interval = setInterval(() => {
+//         registerCodeCD.value--
+//         if (registerCodeCD.value <= 0) {
+//           clearInterval(interval)
+//           registerCode.value = false
+//         }
+//       }, 1000)
+//     })
+//     .catch(() => {
+//       ElMessage.error("手机号格式不正确")
+//       registerCode.value = false
+//     })
+// }
 </script>
 
 <template>
@@ -158,7 +159,7 @@ const createCode = () => {
               show-password
             />
           </el-form-item>
-          <el-form-item prop="code">
+          <!-- <el-form-item prop="code">
             <el-input
               v-model.trim="registerFormData.code"
               placeholder="验证码注册"
@@ -174,7 +175,7 @@ const createCode = () => {
                 </el-button>
               </template>
             </el-input>
-          </el-form-item>
+          </el-form-item> -->
           <el-text>已有账号? <el-link href="#/login">去登录</el-link></el-text>
           <el-button :loading="loading" type="primary" size="large" @click.prevent="handleRegister">注 册</el-button>
         </el-form>
