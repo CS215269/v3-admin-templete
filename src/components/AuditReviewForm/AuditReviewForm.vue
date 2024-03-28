@@ -7,11 +7,11 @@ import {
   getThingInfoApi,
   preViewUserFileApi,
   refuseThingApi,
-  resetThingApi,
   refuse2ThingApi
 } from "./api"
 import { ElMessage } from "element-plus"
 import { useUserStore } from "@/store/modules/user"
+import { getDegree, getEducation } from "@/utils/degree"
 
 const userStore = useUserStore()
 const isAdmin = userStore.roles.includes("superadmin")
@@ -69,7 +69,6 @@ const formDataWorkExperience = ref<Type.WorkExperience[]>([
     position: ""
   }
 ])
-const work_time = ref<string[]>([""])
 
 const formDataPaper = ref<Type.Paper[]>([
   {
@@ -160,6 +159,7 @@ const showinfo = (thingId: number, code: string) => {
       formDataFamilyConnections.value = res.data.family
       note.value = res.data.note
       qualificationResult.value = res.data.qualificationResult
+      console.log("拒接" + qualificationResult.value)
       awardsAndPunishments.value = res.data.awardsAndPunishments
       fileList0.value = res.data.file0.reverse()
       fileList1.value = res.data.file1.reverse()
@@ -235,7 +235,8 @@ const acceptHandle = () => {
 
 const overruleHandle = () => {
   loading.value = true
-  resetThingApi()
+  const super_qualificationResult = qualificationResult.value
+  refuse2ThingApi({ thingId: props.thingId, qualificationResult: super_qualificationResult })
     .then(() => {
       closeDrawer()
     })
@@ -247,24 +248,14 @@ const overruleHandle = () => {
 
 const approveHandle = () => {
   loading.value = true
-  if (props.status == 1)
-    accept2ThingApi({ thingId: props.thingId })
-      .then(() => {
-        closeDrawer()
-      })
-      .catch()
-      .finally(() => {
-        loading.value = false
-      })
-  else
-    refuse2ThingApi({ thingId: props.thingId, qualificationResult: qualificationResult.value })
-      .then(() => {
-        closeDrawer()
-      })
-      .catch()
-      .finally(() => {
-        loading.value = false
-      })
+  accept2ThingApi({ thingId: props.thingId })
+    .then(() => {
+      closeDrawer()
+    })
+    .catch()
+    .finally(() => {
+      loading.value = false
+    })
 }
 onMounted(() => {
   showinfo(props.thingId, props.code)
@@ -296,13 +287,7 @@ onMounted(() => {
             </el-col>
             <el-col :span="8">
               <el-form-item label="出生日期">
-                <el-date-picker
-                  v-model="formDataUserInfo.birthday"
-                  type="date"
-                  placeholder="选择日期"
-                  format="YYYY/MM/DD"
-                  value-format="YYYY-MM-DD"
-                />
+                <el-text>{{ formDataUserInfo.birthday }}</el-text>
               </el-form-item>
             </el-col>
           </el-row>
@@ -387,19 +372,10 @@ onMounted(() => {
           </el-row>
           <el-row v-for="item in formDataEducation" :key="item.id">
             <el-col :span="4">
-              <el-select v-model="item.education">
-                <el-option label="专科" value="专科" />
-                <el-option label="本科" value="本科" />
-                <el-option label="研究生" value="研究生" />
-              </el-select>
+              <el-text>{{ getEducation(item.education) }}</el-text>
             </el-col>
             <el-col :span="4">
-              <el-select v-model="item.degree">
-                <el-option label="无" value="无" />
-                <el-option label="学士" value="学士" />
-                <el-option label="硕士" value="硕士" />
-                <el-option label="博士" value="博士" />
-              </el-select>
+              <el-text>{{ getDegree(item.degree) }}</el-text>
             </el-col>
             <el-col :span="6">
               <el-form-item
@@ -411,13 +387,7 @@ onMounted(() => {
             >
             <el-col :span="4">
               <el-form-item>
-                <el-date-picker
-                  v-model="item.graduationTime"
-                  type="date"
-                  placeholder="选择日期"
-                  format="YYYY-MM-DD"
-                  value-format="YYYY-MM-DD "
-                />
+                <el-text>{{ item.graduationTime }}</el-text>
               </el-form-item>
             </el-col>
           </el-row>
@@ -449,19 +419,10 @@ onMounted(() => {
             <el-col :span="9"><el-text tag="p">所在单位</el-text></el-col>
             <el-col :span="8"><el-text tag="p">岗位（职务）</el-text></el-col>
           </el-row>
-          <el-row v-for="(item, index) in formDataWorkExperience" :key="item.id">
+          <el-row v-for="item in formDataWorkExperience" :key="item.id">
             <el-col :span="6">
               <el-form-item>
-                <el-date-picker
-                  v-model="work_time[index]"
-                  type="monthrange"
-                  unlink-panels
-                  range-separator="到"
-                  start-placeholder="起始月"
-                  end-placeholder="结束月"
-                  format="YYYY/MM"
-                  value-format="YYYY-MM"
-                />
+                <el-text>{{ item.work_time_start + "到" + item.work_time_end }}</el-text>
               </el-form-item>
             </el-col>
             <el-col :span="9">
@@ -512,13 +473,7 @@ onMounted(() => {
             >
             <el-col :span="4">
               <el-form-item>
-                <el-date-picker
-                  v-model="item.time"
-                  type="date"
-                  placeholder="选择日期"
-                  format="YYYY-MM-DD"
-                  value-format="YYYY-MM-DD "
-                />
+                <el-text>{{ item.time }}</el-text>
               </el-form-item>
             </el-col>
             <el-col :span="4">
@@ -553,13 +508,7 @@ onMounted(() => {
           <el-row v-for="item in formDataProject0" :key="item.id">
             <el-col :span="5">
               <el-form-item>
-                <el-date-picker
-                  v-model="item.time"
-                  type="date"
-                  placeholder="选择日期"
-                  format="YYYY-MM-DD"
-                  value-format="YYYY-MM-DD "
-                />
+                <el-text>{{ item.time }}</el-text>
               </el-form-item>
             </el-col>
             <el-col :span="10">
@@ -604,13 +553,7 @@ onMounted(() => {
           <el-row v-for="item in formDataProject1" :key="item.id">
             <el-col :span="5">
               <el-form-item>
-                <el-date-picker
-                  v-model="item.time"
-                  type="date"
-                  placeholder="选择日期"
-                  format="YYYY-MM-DD"
-                  value-format="YYYY-MM-DD "
-                />
+                <el-text>{{ item.time }}</el-text>
               </el-form-item>
             </el-col>
             <el-col :span="10">
@@ -656,13 +599,7 @@ onMounted(() => {
           <el-row v-for="item in formDataProject2" :key="item.id">
             <el-col :span="5">
               <el-form-item>
-                <el-date-picker
-                  v-model="item.time"
-                  type="date"
-                  placeholder="选择日期"
-                  format="YYYY-MM-DD"
-                  value-format="YYYY-MM-DD "
-                />
+                <el-text>{{ item.time }}</el-text>
               </el-form-item>
             </el-col>
             <el-col :span="10">
@@ -793,12 +730,12 @@ onMounted(() => {
             </el-col>
           </el-row>
           <el-row v-else>
-            <el-col :span="18" />
-            <el-col :span="3">
-              <el-button type="warning" size="large" plain @click="overruleHandle">驳回</el-button>
+            <el-col :span="12" />
+            <el-col :span="6">
+              <el-button type="warning" size="large" plain @click="overruleHandle">资格审查不通过</el-button>
             </el-col>
-            <el-col :span="3">
-              <el-button type="warning" size="large" plain @click="approveHandle">同意</el-button>
+            <el-col :span="6">
+              <el-button type="warning" size="large" plain @click="approveHandle">资格审查通过</el-button>
             </el-col>
           </el-row>
         </el-form>

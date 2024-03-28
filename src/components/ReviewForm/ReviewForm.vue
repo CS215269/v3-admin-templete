@@ -12,6 +12,14 @@ defineComponent({
   name: "ReviewForm"
 })
 
+// 使用 defineEmits 声明事件
+const emit = defineEmits(["close-drawer"])
+
+const closeDrawer = () => {
+  // 发射事件
+  emit("close-drawer")
+}
+
 const props = defineProps<{
   recruitId: number
   code: string
@@ -333,37 +341,21 @@ const formDataPartC = reactive<Type.FormDataPartC>({
   family: formDataFamilyConnections.value,
   note: note.value
 })
-const colors = [
-  { color: "#ff0000", percentage: 10 }, // 红色
-  { color: "#ff6633", percentage: 20 }, // 橙红色
-  { color: "#ff9966", percentage: 30 }, // 橙色
-  { color: "#ffcc99", percentage: 40 }, // 淡橙色
-  { color: "#ffccff", percentage: 50 }, // 粉红色
-  { color: "#ccccff", percentage: 60 }, // 淡紫色
-  { color: "#9999ff", percentage: 70 }, // 蓝色
-  { color: "#6699ff", percentage: 80 }, // 天蓝色
-  { color: "#33ccff", percentage: 90 }, // 淡蓝色
-  { color: "#00ff00", percentage: 100 } // 绿色
-]
-const showProgress = ref(false)
 const percentage = ref(0)
 const uploading = ref(false)
+const fileUploading = ref(false)
+const canSubmit = ref(true)
 
 const submit = () => {
-  if (!submitA() || formDataUserInfo.value.birthday == "") {
-    ElMessage.error("有字段未完成!")
-    showProgress.value = false
-    uploading.value = false
-  }
-}
-const submitA = () => {
-  showProgress.value = true
   uploading.value = true
   const adapter: Type.Education[] = []
   for (let i = 0; i < formDataEducation.value.length; i++) {
-    if (formDataEducation.value[i].graduationTime == undefined || formDataEducation.value[i].graduationTime == "") {
+    if (formDataEducation.value[i].graduationTime == undefined || formDataEducation.value[i].graduationTime === "") {
       submitStatus.value = false
-      return false
+      console.log("触发返回formDataEducation" + i)
+
+      console.log("触发返回formDataEducation长度" + formDataEducation.value.length)
+      canSubmit.value = false
     }
     adapter.push({
       id: formDataEducation.value[i].id,
@@ -375,9 +367,10 @@ const submitA = () => {
     })
   }
   for (let i = 0; i < work_time.value.length; i++) {
-    if (work_time.value[i] == undefined || work_time.value[i] == "") {
+    if (work_time.value[i] == undefined || work_time.value[i] === "") {
       submitStatus.value = false
-      return false
+      console.log("触发返回work_time" + i + "长度" + work_time.value.length)
+      canSubmit.value = false
     }
     const element = work_time.value[i]
     formDataWorkExperience.value[i].work_time_start = element[0]
@@ -386,9 +379,22 @@ const submitA = () => {
   formDataPartA.info = formDataUserInfo.value
   formDataPartA.education = adapter
   formDataPartA.workExperience = formDataWorkExperience.value
+  formDataPartC.note = note.value
+  formDataPartC.awardsAndPunishments = awardsAndPunishments.value
+  if (!canSubmit.value || formDataUserInfo.value.birthday === "") {
+    console.log("submita " + !submit)
+    console.log("formDataUserInfo.value.birthday " + formDataUserInfo.value.birthday === "")
+    ElMessage.error("有字段未完成!")
+    uploading.value = false
+  } else {
+    submitA()
+  }
+}
+const submitA = () => {
   submitJobApplicationPartA(formDataPartA)
     .then(() => {
       percentage.value += 10
+      return true
     })
     .catch((e) => {
       submitStatus.value = false
@@ -430,8 +436,8 @@ const submitC = () => {
       }
     })
 }
-// const uploadPath = "https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/userResume"
-const uploadPath = "api/userResume"
+const uploadPath = "https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/userResume"
+// const uploadPath = "api/userResume"
 const uploadPath2 = uploadPath + "/idnum"
 
 const uploadRef0 = ref<UploadInstance>()
@@ -443,29 +449,51 @@ const uploadRef5 = ref<UploadInstance>()
 const uploadRef6 = ref<UploadInstance>()
 
 const submitUpload = async () => {
-  uploadRef0.value!.submit()
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  uploadRef1.value!.submit()
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  uploadRef2.value!.submit()
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  uploadRef3.value!.submit()
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  uploadRef4.value!.submit()
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  uploadRef5.value!.submit()
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  uploadRef6.value!.submit()
-  await new Promise((resolve) => setTimeout(resolve, 500))
-  upload.value!.submit()
+  fileUploading.value = true
+  if (uploadRef0.value && uploadRef0.value) {
+    uploadRef0.value.submit()
+    await new Promise((resolve) => setTimeout(resolve, 500))
+  }
+  if (uploadRef0.value && uploadRef0.value) {
+    uploadRef0.value!.submit()
+    await new Promise((resolve) => setTimeout(resolve, 500))
+  }
+  if (uploadRef1.value && uploadRef0.value) {
+    uploadRef1.value!.submit()
+    await new Promise((resolve) => setTimeout(resolve, 500))
+  }
+  if (uploadRef2.value && uploadRef0.value) {
+    uploadRef2.value!.submit()
+    await new Promise((resolve) => setTimeout(resolve, 500))
+  }
+  if (uploadRef3.value && uploadRef0.value) {
+    uploadRef3.value!.submit()
+    await new Promise((resolve) => setTimeout(resolve, 500))
+  }
+  if (uploadRef4.value && uploadRef0.value) {
+    uploadRef4.value!.submit()
+    await new Promise((resolve) => setTimeout(resolve, 500))
+  }
+  if (uploadRef5.value && uploadRef0.value) {
+    uploadRef5.value!.submit()
+    await new Promise((resolve) => setTimeout(resolve, 500))
+  }
+  if (uploadRef6.value && uploadRef0.value) {
+    uploadRef6.value!.submit()
+    await new Promise((resolve) => setTimeout(resolve, 500))
+  }
+  if (upload.value && uploadRef0.value) {
+    upload.value!.submit()
+  }
   uploading.value = false
+  fileUploading.value = false
 }
 /** 上传完成处理函数 */
 const handleUploadComplete = () => {
   percentage.value += 10
-  if (percentage.value == 100) {
+  if (percentage.value >= 30 && !fileUploading.value) {
     ElMessage.success("投递成功")
-    showProgress.value = false
+    closeDrawer()
   }
 }
 
@@ -498,7 +526,6 @@ onMounted(() => {
     .finally(() => {
       uploading.value = false
       percentage.value = 0
-      showProgress.value = false
     })
 })
 </script>
@@ -1103,6 +1130,13 @@ onMounted(() => {
           <el-col :span="12" v-if="formDataFamilyConnections.length == 0"><el-text> 暂无记录 </el-text></el-col>
           <el-col :span="4"><el-button @click="addFormItemFamilyConnections()">增加一条记录</el-button> </el-col>
         </el-row>
+        <el-row>
+          <el-col :span="24"
+            ><el-form-item label="备注">
+              <el-input v-model="note" type="textarea" />
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-row justify="space-evenly">
           <el-col>
             <el-text tag="p"
@@ -1114,9 +1148,7 @@ onMounted(() => {
           </el-col>
         </el-row>
         <el-row justify="space-evenly">
-          <el-col :span="20">
-            <el-progress v-if="showProgress" type="dashboard" :percentage="percentage" :color="colors" />
-          </el-col>
+          <el-col :span="20" />
           <el-col :span="4">
             <el-button :loading="uploading" type="warning" size="large" plain @click="submit()">提交</el-button>
           </el-col>

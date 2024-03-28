@@ -37,7 +37,7 @@ export function userAbandonApi(params: { id: number }) {
 /** 下载 */
 export function exportFormApi(params: { id: number }) {
   return request<BlobPart>({
-    // responseType: "blob",
+    responseType: "blob",
     url: `exportForm`,
     method: "get",
     params

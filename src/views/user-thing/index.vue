@@ -237,7 +237,7 @@ onMounted(getBatchData)
               <h4>正在投递: 岗位代码 {{ p.code }}</h4>
             </template>
             <template #default>
-              <ReviewForm :recruitId="p.recruitId" :code="p.code" />
+              <ReviewForm :recruitId="p.recruitId" :code="p.code" @close-drawer="handleCloseDrawer()" />
             </template>
           </el-drawer>
         </li>

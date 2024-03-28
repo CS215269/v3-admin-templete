@@ -237,7 +237,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         />
       </div>
     </el-card>
-    <el-drawer v-model="drawerVisible" size="60%">
+    <el-drawer v-model="drawerVisible" size="80%">
       <AuditReviewForm :code="code" :thingId="thingId" :status="status" @close-drawer="handleCloseDrawer()" />
     </el-drawer>
     <!-- 详细信息
