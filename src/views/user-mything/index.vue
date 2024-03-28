@@ -93,7 +93,7 @@ onMounted(getTableData)
                   <el-step title="面试通过" />
                 </el-steps>
                 <el-button @click="abandon(position.thingId)">放弃</el-button>
-                <el-button v-if="false" @click="exportForm(position.thingId)">导出报名资格审查表</el-button>
+                <el-button @click="exportForm(position.thingId)">导出报名资格审查表</el-button>
               </div>
             </el-collapse-item>
           </el-collapse>

@@ -350,8 +350,11 @@ const percentage = ref(0)
 const uploading = ref(false)
 
 const submit = () => {
-  if (!submitA()) ElMessage.error("有字段未完成!")
-  if (formDataUserInfo.value.birthday == "") ElMessage.error("有字段未完成!")
+  if (!submitA() || formDataUserInfo.value.birthday == "") {
+    ElMessage.error("有字段未完成!")
+    showProgress.value = false
+    uploading.value = false
+  }
 }
 const submitA = () => {
   showProgress.value = true
@@ -492,7 +495,11 @@ onMounted(() => {
       formDataUserInfo.value = res.data.user
     })
     .catch(() => {})
-    .finally(() => {})
+    .finally(() => {
+      uploading.value = false
+      percentage.value = 0
+      showProgress.value = false
+    })
 })
 </script>
 
