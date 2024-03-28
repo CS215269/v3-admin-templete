@@ -6,6 +6,7 @@ import ReviewForm from "@/components/ReviewForm/ReviewForm.vue"
 import { Search, Refresh } from "@element-plus/icons-vue"
 import { ElMessage, FormInstance, FormRules } from "element-plus"
 import { setRealNameInfoApi } from "@/api/user-info"
+import { getDegree, getEducation } from "@/utils/degree"
 
 defineOptions({
   name: "UserThing"
@@ -182,6 +183,8 @@ onMounted(getBatchData)
             特别说明：1.专业技术岗位招聘要求还符合《安徽工商职业学院周转池编制人才标准》对应的要求（详见本次招聘附件2）；
             <br />
             2.国家认可的国（境）外大学相关专业毕业生也可报考。
+            <br />
+            2.每人只可投递一个岗位。
           </el-text>
         </li>
         <li v-for="(p, index) in positions" :key="p.id">
@@ -213,10 +216,10 @@ onMounted(getBatchData)
                   </el-row>
                   <el-row :gutter="20">
                     <el-col :span="12"> 专业：{{ p.specialty }} </el-col>
-                    <el-col :span="12"> 学历：{{ p.education }} </el-col>
+                    <el-col :span="12"> 学历：{{ getEducation(p.education) }} </el-col>
                   </el-row>
                   <el-row :gutter="20">
-                    <el-col :span="12"> 学位：{{ p.education }} </el-col>
+                    <el-col :span="12"> 学位：{{ getDegree(p.degree) }} </el-col>
                     <el-col :span="12"> 年龄：{{ p.maxAge }}周岁以下</el-col>
                   </el-row>
                   <el-row :gutter="20">

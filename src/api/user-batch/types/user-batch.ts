@@ -18,8 +18,6 @@ export interface GetPositionData {
   education: number
   focus: number
   info: string
-  maxSalary: number
-  minSalary: number
   require: string
   degree: number
   maxAge: number

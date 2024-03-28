@@ -1,6 +1,4 @@
 export interface GetTableRequestData {
-  department: string
-  departmentId: number
   recruitId: number
   thingId: number
   positionId: number
@@ -9,6 +7,19 @@ export interface GetTableRequestData {
   batchname: string
   status: number
   qualificationResult: string
+
+  code: string
+  education: number
+  focus: number
+  info: string
+  require: string
+  degree: number
+  maxAge: number
+  sex: 0
+  specialty: string
+  toll: 0
+  type: string
+  zzmm: string
 }
 
 export interface SubmitThingRequestData {

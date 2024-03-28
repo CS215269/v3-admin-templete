@@ -318,11 +318,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-form-item prop="education" label="学历要求">
           <el-select v-model="formData.education" placeholder="请选择">
             <!-- <el-option v-for="item in positionList" :key="item.id" :label="item.jobTitle" :value="item.id" /> -->
-            <el-option label="高职" value="1" />
-            <el-option label="大专" value="2" />
-            <el-option label="本科" value="3" />
-            <el-option label="硕士" value="4" />
-            <el-option label="博士" value="5" />
+            <el-option label="大专" value="0" />
+            <el-option label="本科" value="1" />
+            <el-option label="研究生" value="2" />
           </el-select>
         </el-form-item>
         <el-form-item prop="degree" label="学位要求">

@@ -61,23 +61,6 @@ const sendRealName = () => {
   })
 }
 
-// 计算用户学历属性
-const getEducationLabel = (education: number | undefined) => {
-  switch (education) {
-    case 1:
-      return "高职"
-    case 2:
-      return "大专"
-    case 3:
-      return "本科"
-    case 4:
-      return "硕士"
-    case 5:
-      return "博士"
-    default:
-      return "未知"
-  }
-}
 const userinfo = ref<UserInfoData>()
 const editedUserinfo = ref<UserInfoData>({
   id: uid.value,
@@ -86,14 +69,8 @@ const editedUserinfo = ref<UserInfoData>({
   phone: "",
   /** 性别 */
   sex: 1,
-  /** 年龄 */
-  age: "",
-  /** 学历 */
-  education: 0,
   /** 政治面貌 */
   zzmm: "",
-  /** 毕业学校 */
-  school: "",
   /** 民族 */
   nation: "",
   /** 出生日期 */
@@ -102,10 +79,6 @@ const editedUserinfo = ref<UserInfoData>({
   nativePlace: "",
   /** 现居地址 */
   address: "",
-  /** 毕业时间 */
-  graduation_time: "",
-  /** 专业 */
-  specialty: "",
   birthPlace: "",
   /** 电子邮件 */
   email: "",
@@ -132,16 +105,11 @@ const getUserData = () => {
         idnum: "",
         phone: "",
         sex: 1,
-        age: "",
-        education: 0,
         zzmm: "",
-        school: "",
         nation: "",
         birthday: "",
         nativePlace: "",
         address: "",
-        graduation_time: "",
-        specialty: "",
         birthPlace: "",
         email: "",
         married: "",
@@ -172,7 +140,6 @@ const startEditing = () => {
 }
 const saveChanges = () => {
   // 处理数据并发送put请求到服务器
-  editedUserinfo.value.education = Number(editedUserinfo.value.education)
   setUserInfoApi(editedUserinfo.value)
     .then((res) => {
       ElMessage.info(res.message)
@@ -196,27 +163,6 @@ const cancelEditing = () => {
   }
 }
 onMounted(getUserData)
-const isAgeInputInvalid = ref<boolean>(false)
-/** 年龄输入校验 */
-const validateInput = () => {
-  console.log("年龄" + Number(editedUserinfo.value.age))
-  const patrn = /^[0-9]{1,20}$/
-  if (editedUserinfo.value.age === "") {
-    isAgeInputInvalid.value = true
-    ElMessage.error("内容不能为空")
-  } else if (!patrn.exec(editedUserinfo.value.age)) {
-    isAgeInputInvalid.value = true
-    ElMessage.error("只能输入数字")
-    editedUserinfo.value.age = ""
-  } else if (Number(editedUserinfo.value.age) < 15 || Number(editedUserinfo.value.age) > 90) {
-    isAgeInputInvalid.value = true
-    console.log("年龄2" + Number(editedUserinfo.value.age))
-    ElMessage.error("年龄应在 15 到 90 之间")
-    editedUserinfo.value.age = ""
-  } else {
-    isAgeInputInvalid.value = false
-  }
-}
 </script>
 
 <template>
@@ -242,10 +188,6 @@ const validateInput = () => {
             <template v-if="!isEditing">{{ userinfo?.name }}</template>
             <template v-else> <el-input v-model="editedUserinfo.name" /> </template
           ></el-descriptions-item>
-          <el-descriptions-item label="年龄" label-align="center" align="left">
-            <template v-if="!isEditing">{{ userinfo?.age }}</template>
-            <template v-else> <el-input id="userage" v-model="editedUserinfo.age" @blur="validateInput" /> </template
-          ></el-descriptions-item>
           <el-descriptions-item label="性别" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.sex }}</template>
             <template v-else>
@@ -254,16 +196,24 @@ const validateInput = () => {
                 <el-option label="女" value="女" />
               </el-select> </template
           ></el-descriptions-item>
-          <el-descriptions-item label="学历" label-align="center" align="left">
-            <template v-if="!isEditing">{{ getEducationLabel(userinfo?.education) }}</template>
+          <el-descriptions-item label="婚否" label-align="center" align="left">
+            <template v-if="!isEditing">{{ userinfo?.married }}</template>
             <template v-else>
-              <el-select id="usereducation" v-model="editedUserinfo.education">
+              <el-select id="married" v-model="editedUserinfo.married">
+                <el-option label="未婚" :value="0" />
+                <el-option label="已婚" :value="1" />
+              </el-select> </template
+          ></el-descriptions-item>
+          <el-descriptions-item label="出生地" label-align="center" align="left">
+            <template v-if="!isEditing">{{ userinfo?.birthPlace }}</template>
+            <template v-else>
+              <el-input id="birthPlace" v-model="editedUserinfo.birthPlace">
                 <el-option label="高职" value="1" />
                 <el-option label="大专" value="2" />
                 <el-option label="本科" value="3" />
                 <el-option label="硕士" value="4" />
                 <el-option label="博士" value="5" />
-              </el-select> </template
+              </el-input> </template
           ></el-descriptions-item>
           <el-descriptions-item label="政治面貌" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.zzmm }}</template>
@@ -274,7 +224,7 @@ const validateInput = () => {
                 <el-option label="党员" value="党员" />
               </el-select> </template
           ></el-descriptions-item>
-          <el-descriptions-item label="籍贯" label-align="center" align="left">
+          <el-descriptions-item label="户口所在地" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.nativePlace }}</template>
             <template v-else> <el-input v-model="editedUserinfo.nativePlace" /> </template
           ></el-descriptions-item>
@@ -293,24 +243,13 @@ const validateInput = () => {
             <template v-if="!isEditing">{{ userinfo?.nation }}</template>
             <template v-else> <el-input v-model="editedUserinfo.nation" /> </template
           ></el-descriptions-item>
-          <el-descriptions-item label="毕业院校" label-align="center" align="left">
-            <template v-if="!isEditing">{{ userinfo?.school }}</template>
-            <template v-else> <el-input v-model="editedUserinfo.school" /> </template
+          <el-descriptions-item label="电子邮件" label-align="center" align="left">
+            <template v-if="!isEditing">{{ userinfo?.email }}</template>
+            <template v-else> <el-input v-model="editedUserinfo.email" /> </template
           ></el-descriptions-item>
-          <el-descriptions-item label="毕业时间" label-align="center" align="left">
-            <template v-if="!isEditing">{{ userinfo?.graduation_time }}</template>
-            <template v-else>
-              <el-date-picker
-                v-model="editedUserinfo.graduation_time"
-                type="date"
-                placeholder="选择日期"
-                format="YYYY/MM/DD"
-                value-format="YYYY-MM-DD"
-              /> </template
-          ></el-descriptions-item>
-          <el-descriptions-item label="专业" label-align="center" align="left">
-            <template v-if="!isEditing">{{ userinfo?.specialty }}</template>
-            <template v-else> <el-input v-model="editedUserinfo.specialty" /> </template
+          <el-descriptions-item label="曾获何种专业证书，有何特长" label-align="center" align="left">
+            <template v-if="!isEditing">{{ userinfo?.specialtiesCertificates }}</template>
+            <template v-else> <el-input type="textarea" v-model="editedUserinfo.specialtiesCertificates" /> </template
           ></el-descriptions-item>
           <el-descriptions-item label="身份证号码" label-align="center" align="left">
             <template v-if="!isEditing && userinfo?.idnum">{{ userinfo.idnum }}</template>
@@ -331,7 +270,7 @@ const validateInput = () => {
               </el-tooltip>
             </template></el-descriptions-item
           >
-          <el-descriptions-item label="现居地址" :span="2" label-align="center" align="left">
+          <el-descriptions-item label="家庭详细地址" :span="2" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.address }}</template>
             <template v-else> <el-input v-model="editedUserinfo.address" /> </template
           ></el-descriptions-item>

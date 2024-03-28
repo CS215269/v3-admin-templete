@@ -333,8 +333,23 @@ const formDataPartC = reactive<Type.FormDataPartC>({
   family: formDataFamilyConnections.value,
   note: note.value
 })
+const colors = [
+  { color: "#ff0000", percentage: 10 }, // 红色
+  { color: "#ff6633", percentage: 20 }, // 橙红色
+  { color: "#ff9966", percentage: 30 }, // 橙色
+  { color: "#ffcc99", percentage: 40 }, // 淡橙色
+  { color: "#ffccff", percentage: 50 }, // 粉红色
+  { color: "#ccccff", percentage: 60 }, // 淡紫色
+  { color: "#9999ff", percentage: 70 }, // 蓝色
+  { color: "#6699ff", percentage: 80 }, // 天蓝色
+  { color: "#33ccff", percentage: 90 }, // 淡蓝色
+  { color: "#00ff00", percentage: 100 } // 绿色
+]
+const showProgress = ref(false)
+const percentage = ref(0)
 const uploading = ref(false)
 const submit = () => {
+  showProgress.value = true
   uploading.value = true
   const adapter: Type.Education[] = []
   for (let i = 0; i < formDataEducation.value.length; i++) {
@@ -357,7 +372,7 @@ const submit = () => {
   formDataPartA.workExperience = formDataWorkExperience.value
   submitJobApplicationPartA(formDataPartA)
     .then(() => {
-      ElMessage.success("OK01")
+      percentage.value += 10
     })
     .catch((e) => {
       submitStatus.value = false
@@ -372,7 +387,7 @@ const submit = () => {
 const submitB = () => {
   submitJobApplicationPartB(formDataPartB)
     .then(() => {
-      ElMessage.success("OK02")
+      percentage.value += 10
     })
     .catch((e) => {
       submitStatus.value = false
@@ -387,7 +402,7 @@ const submitB = () => {
 const submitC = () => {
   submitJobApplicationPartC(formDataPartC)
     .then(() => {
-      ElMessage.success("OK03")
+      percentage.value += 10
     })
     .catch((e) => {
       submitStatus.value = false
@@ -431,7 +446,11 @@ const submitUpload = async () => {
 }
 /** 上传完成处理函数 */
 const handleUploadComplete = () => {
-  ElMessage.success("上传完成")
+  percentage.value += 10
+  if (percentage.value == 100) {
+    ElMessage.success("投递成功")
+    showProgress.value = false
+  }
 }
 
 const upload = ref<UploadInstance>()
@@ -1075,10 +1094,10 @@ onMounted(() => {
           </el-col>
         </el-row>
         <el-row justify="space-evenly">
-          <el-col :span="20" />
+          <el-col :span="20">
+            <el-progress v-if="showProgress" type="dashboard" :percentage="percentage" :color="colors" />
+          </el-col>
           <el-col :span="4">
-            {{ submitStatus }}
-            <el-button type="warning" size="small" plain @click="submitStatus = true">提交</el-button>
             <el-button :loading="uploading" type="warning" size="large" plain @click="submit()">提交</el-button>
           </el-col>
         </el-row>
