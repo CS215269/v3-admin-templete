@@ -32,6 +32,7 @@ export interface GetTableResultData {
   positionId: number
   batchId: number
   batchname: string
+  code: string
 }
 
 export type GetTableResponseData = ApiResponseData<{

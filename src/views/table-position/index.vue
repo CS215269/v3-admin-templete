@@ -13,42 +13,13 @@ import {
 } from "element-plus"
 import { Search, Refresh, CirclePlus, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
 import { usePagination } from "@/hooks/usePagination"
+import { getDegree, getEducation } from "@/utils/degree"
 
 defineOptions({
   // 命名当前组件
   name: "TablePosition"
 })
 
-// 计算属性
-const getEducationLabel = (education: number) => {
-  switch (education) {
-    case 1:
-      return "高职"
-    case 2:
-      return "大专"
-    case 3:
-      return "本科"
-    case 4:
-      return "硕士"
-    case 5:
-      return "博士"
-    default:
-      return "未知"
-  }
-}
-// 计算属性
-const getDegreeLabel = (degree: number) => {
-  switch (degree) {
-    case 1:
-      return "学士"
-    case 2:
-      return "硕士"
-    case 3:
-      return "博士"
-    default:
-      return "未知"
-  }
-}
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
 
@@ -274,12 +245,12 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           </el-table-column>
           <el-table-column prop="education" label="所需学历" align="center">
             <template #default="scope">
-              {{ getEducationLabel(scope.row.education) }}
+              {{ getEducation(scope.row.education) }}
             </template>
           </el-table-column>
           <el-table-column prop="degree" label="所需学位" align="center">
             <template #default="scope">
-              {{ getDegreeLabel(scope.row.degree) }}
+              {{ getDegree(scope.row.degree) }}
             </template>
           </el-table-column>
           <el-table-column prop="require" label="要求" align="center" />

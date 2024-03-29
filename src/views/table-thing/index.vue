@@ -82,7 +82,7 @@ const resetSearch = () => {
 //#endregion
 
 const handleCloseDrawer = () => {
-  drawerVisible.value = false
+  drawerVisible.value.fill(false)
   getTableData()
 }
 
@@ -109,17 +109,17 @@ onMounted(() => {
 })
 
 /** 详细信息弹框开关 */
-const drawerVisible = ref<boolean>(false)
+const drawerVisible = ref<boolean[]>([false])
 /** 详细信息:code */
 const code = ref<string>("")
 /** 详细信息thingId */
 const thingId = ref<number>(0)
 const status = ref<number>(0)
-const showinfoHandle = (row: GetTableThingData) => {
+const showinfoHandle = (row: GetTableThingData, index: number) => {
   code.value = row.code
   thingId.value = row.thingId
   status.value = row.status
-  drawerVisible.value = true
+  drawerVisible.value[index] = true
 }
 /** 表格引用 */
 const multipleTableRef = ref<InstanceType<typeof ElTable>>()
@@ -190,7 +190,11 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-table ref="multipleTableRef" :data="tableData" stripe @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="batchname" sortable :sort-method="batchSort" label="批次" align="center" />
-          <el-table-column prop="jobTitle" sortable label="岗位名称" align="center" />
+          <el-table-column prop="jobTitle" sortable label="岗位名称" align="center">
+            <template #default="spoce">
+              {{ spoce.row.code + "-" + spoce.row.jobTitle }}
+            </template>
+          </el-table-column>
           <el-table-column prop="username" sortable label="用户姓名" align="center" />
           <el-table-column prop="school" sortable label="毕业院校" align="center" />
           <el-table-column prop="degree" sortable label="学位要求" align="center">
@@ -219,7 +223,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           </el-table-column>
           <el-table-column fixed="right" label="操作" min-width="200px" align="left">
             <template #default="scope">
-              <el-button type="info" bg size="small" @click="showinfoHandle(scope.row)">详细信息</el-button>
+              <el-button type="info" bg size="small" @click="showinfoHandle(scope.row, scope.$index)"
+                >详细信息</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
@@ -237,8 +243,8 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         />
       </div>
     </el-card>
-    <el-drawer v-model="drawerVisible" size="80%">
-      <AuditReviewForm :code="code" :thingId="thingId" :status="status" @close-drawer="handleCloseDrawer()" />
+    <el-drawer v-for="(t, index) in tableData" :key="t.thingId" v-model="drawerVisible[index]" size="80%">
+      <AuditReviewForm :code="t.code" :thingId="t.thingId" :status="t.status" @close-drawer="handleCloseDrawer()" />
     </el-drawer>
     <!-- 详细信息
     <el-dialog v-model="dialogVisible" title="简历详情" width="80%">

@@ -334,10 +334,7 @@ const formDataPartA = reactive<Type.FormDataPartA>({
   education: [],
   workExperience: []
 })
-const formDataPartB = reactive<Type.FormDataPartB>({
-  paper: formDataPaper.value,
-  project: formDataProject0.value.concat(formDataProject1.value, formDataProject2.value)
-})
+const formDataPartB = ref<Type.FormDataPartB>()
 const formDataPartC = reactive<Type.FormDataPartC>({
   research: formDataResearch.value,
   awardsAndPunishments: awardsAndPunishments.value,
@@ -373,7 +370,8 @@ const submit = () => {
   for (let i = 0; i < work_time.value.length; i++) {
     if (work_time.value[i] == undefined || work_time.value[i] === "") {
       submitStatus.value = false
-      work_time.value[i] = "2000-01-01"
+      // work_time.value[i][0] = "2000-01"
+      // work_time.value[i][1] = "2000-01"
       console.log("触发返回work_time" + i + "长度" + work_time.value.length)
       canSubmit.value = false
     }
@@ -388,20 +386,26 @@ const submit = () => {
   formDataPartC.awardsAndPunishments = awardsAndPunishments.value
 
   submitJobApplicationPartA(formDataPartA)
-    .then(() => {
-      percentage.value += 10
-      return true
+    .then((res) => {
+      if (res.code == 0) {
+        percentage.value += 10
+        return true
+      }
     })
     .catch(() => {
-      submitStatus.value = false
+      // submitStatus.value = false
     })
     .finally(() => {})
-  submitJobApplicationPartB(formDataPartB)
+  formDataPartB.value = {
+    paper: formDataPaper.value,
+    project: formDataProject0.value.concat(formDataProject1.value, formDataProject2.value)
+  }
+  submitJobApplicationPartB(formDataPartB.value)
     .then(() => {
       percentage.value += 10
     })
     .catch(() => {
-      submitStatus.value = false
+      // submitStatus.value = false
     })
     .finally(() => {})
   submitJobApplicationPartC(formDataPartC)
@@ -409,7 +413,7 @@ const submit = () => {
       percentage.value += 10
     })
     .catch(() => {
-      submitStatus.value = false
+      // submitStatus.value = false
     })
     .finally(() => {
       if (!submitStatus.value) {
@@ -708,9 +712,6 @@ onMounted(() => {
         <el-row>
           <el-divider border-style="double" />
           <el-text tag="p" size="large">
-            {{ work_time.length }}{{ formDataWorkExperience.length }}
-            <!-- console.log(`1l${work_time.value.length}2l${formDataWorkExperience.value.length},i${i}`) -->
-
             <strong>符合“安徽工商职业学院周转池编制人才标准”（专业技术岗位必填，任填一项）</strong>
           </el-text>
         </el-row>

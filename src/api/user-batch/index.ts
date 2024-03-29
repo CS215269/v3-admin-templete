@@ -26,7 +26,7 @@ export function inspectIdnumApi(params: { idNum: number }) {
 }
 
 export function submitJobApplicationPartA(data: Type.FormDataPartA) {
-  return request({
+  return request<Type.SubmitDataRequest>({
     url: `submitA`,
     method: "post",
     data

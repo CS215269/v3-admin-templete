@@ -141,13 +141,17 @@ const fileList4 = ref<string[]>([])
 const fileList5 = ref<string[]>([])
 const fileList6 = ref<string[]>([])
 
-const fileListIDPhoto = ref<string[]>([])
+const fileListIDPhoto = ref<string>("")
 
 const loading = ref<boolean>(false)
 const showinfo = (thingId: number, code: string) => {
   loading.value = true
   getThingInfoApi({ id: thingId, code })
     .then((res) => {
+      if (res.code != 0) {
+        ElMessage.error("获取投递详情失败,请重试")
+        return
+      }
       formDataUserInfo.value = res.data.userinfo
       formDataEducation.value = res.data.education
       formDataWorkExperience.value = res.data.workExperience
@@ -170,9 +174,7 @@ const showinfo = (thingId: number, code: string) => {
       fileList6.value = res.data.file6.reverse()
       fileListIDPhoto.value = res.data.IDPhoto
     })
-    .catch(() => {
-      ElMessage.error("获取投递详情失败,请重试")
-    })
+    .catch(() => {})
     .finally(() => {
       loading.value = false
     })
@@ -332,6 +334,14 @@ onMounted(() => {
           </el-row>
           <el-row>
             <el-col :span="24">
+              <el-text tag="p" style="margin-bottom: 20px">
+                {{ fileListIDPhoto.split("/").slice(-1) }}
+              </el-text>
+              <el-button @click="showUserFile(fileListIDPhoto)" :loading="showUserFileLoading">查看</el-button>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="24">
               <el-form-item label="户口所在地（应届毕业生填入学前的）">
                 <el-input
                   v-model="formDataUserInfo.nativePlace"
@@ -372,9 +382,11 @@ onMounted(() => {
               <el-text>{{ getDegree(item.degree) }}</el-text>
             </el-col>
             <el-col :span="6">
-              <el-form-item
-                ><el-text>{{ item.school }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item
+                  ><el-text>{{ item.school }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
             <el-col :span="5"
               ><el-text>{{ item.specialty }}</el-text></el-col
@@ -420,14 +432,18 @@ onMounted(() => {
               </el-form-item>
             </el-col>
             <el-col :span="9">
-              <el-form-item>
-                <el-text>{{ item.company }}</el-text>
-              </el-form-item></el-col
+              <el-space>
+                <el-form-item>
+                  <el-text>{{ item.company }}</el-text>
+                </el-form-item>
+              </el-space></el-col
             >
             <el-col :span="8">
-              <el-form-item>
-                <el-text>{{ item.position }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item>
+                  <el-text>{{ item.position }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
           </el-row>
           <el-row justify="space-evenly">
@@ -456,24 +472,32 @@ onMounted(() => {
           </el-row>
           <el-row v-for="item in formDataPaper" :key="item.id">
             <el-col :span="5">
-              <el-form-item
-                ><el-text>{{ item.journal }}</el-text>
-              </el-form-item></el-col
+              <el-space>
+                <el-form-item
+                  ><el-text>{{ item.journal }}</el-text>
+                </el-form-item>
+              </el-space></el-col
             >
             <el-col :span="10">
-              <el-form-item
-                ><el-text>{{ item.title }}</el-text>
-              </el-form-item></el-col
+              <el-space>
+                <el-form-item
+                  ><el-text>{{ item.title }}</el-text>
+                </el-form-item>
+              </el-space></el-col
             >
             <el-col :span="4">
-              <el-form-item>
-                <el-text>{{ item.time }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item>
+                  <el-text>{{ item.time }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
             <el-col :span="4">
-              <el-form-item
-                ><el-text>{{ item.journal_num }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item
+                  ><el-text>{{ item.journal_num }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
           </el-row>
           <el-row justify="space-evenly">
@@ -501,24 +525,32 @@ onMounted(() => {
           </el-row>
           <el-row v-for="item in formDataProject0" :key="item.id">
             <el-col :span="5">
-              <el-form-item>
-                <el-text>{{ item.time }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item>
+                  <el-text>{{ item.time }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
             <el-col :span="10">
-              <el-form-item>
-                <el-text>{{ item.title }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item>
+                  <el-text>{{ item.title }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
             <el-col :span="4">
-              <el-form-item>
-                <el-text>{{ item.level }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item>
+                  <el-text>{{ item.level }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
             <el-col :span="4">
-              <el-form-item>
-                <el-text>{{ item.rank }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item>
+                  <el-text>{{ item.rank }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
           </el-row>
           <el-row justify="space-evenly">
@@ -539,31 +571,47 @@ onMounted(() => {
             <el-text tag="p" size="large"> 4.教学成果奖或教学竞赛奖励 </el-text>
           </el-row>
           <el-row>
-            <el-col :span="5"><el-text> 获奖时间 </el-text></el-col>
-            <el-col :span="10"><el-text> 获奖类型 </el-text></el-col>
-            <el-col :span="4"><el-text> 级别 </el-text></el-col>
-            <el-col :span="4"><el-text> 排名 </el-text></el-col>
+            <el-col :span="5">
+              <el-space><el-text> 获奖时间 </el-text> </el-space></el-col
+            >
+            <el-col :span="10">
+              <el-space><el-text> 获奖类型 </el-text> </el-space></el-col
+            >
+            <el-col :span="4">
+              <el-space><el-text> 级别 </el-text> </el-space></el-col
+            >
+            <el-col :span="4">
+              <el-space><el-text> 排名 </el-text> </el-space></el-col
+            >
           </el-row>
           <el-row v-for="item in formDataProject1" :key="item.id">
             <el-col :span="5">
-              <el-form-item>
-                <el-text>{{ item.time }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item>
+                  <el-text>{{ item.time }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
             <el-col :span="10">
-              <el-form-item>
-                <el-text>{{ item.title }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item>
+                  <el-text>{{ item.title }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
             <el-col :span="4">
-              <el-form-item>
-                <el-text>{{ item.level }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item>
+                  <el-text>{{ item.level }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
             <el-col :span="4">
-              <el-form-item>
-                <el-text>{{ item.rank }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item>
+                  <el-text>{{ item.rank }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
           </el-row>
           <el-row justify="space-evenly">
@@ -592,24 +640,32 @@ onMounted(() => {
           </el-row>
           <el-row v-for="item in formDataProject2" :key="item.id">
             <el-col :span="5">
-              <el-form-item>
-                <el-text>{{ item.time }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item>
+                  <el-text>{{ item.time }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
             <el-col :span="10">
-              <el-form-item>
-                <el-text>{{ item.title }}</el-text></el-form-item
-              >
+              <el-space>
+                <el-form-item>
+                  <el-text>{{ item.title }}</el-text></el-form-item
+                >
+              </el-space>
             </el-col>
             <el-col :span="4">
-              <el-form-item>
-                <el-text>{{ item.level }}</el-text>
-              </el-form-item></el-col
+              <el-space>
+                <el-form-item>
+                  <el-text>{{ item.level }}</el-text>
+                </el-form-item>
+              </el-space></el-col
             >
             <el-col :span="4">
-              <el-form-item>
-                <el-text>{{ item.rank }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item>
+                  <el-text>{{ item.rank }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
           </el-row>
           <el-row justify="space-evenly">
@@ -672,19 +728,25 @@ onMounted(() => {
           </el-row>
           <el-row v-for="item in formDataFamilyConnections" :key="item.name">
             <el-col :span="4">
-              <el-form-item
-                ><el-text>{{ item.name }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item
+                  ><el-text>{{ item.name }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
             <el-col :span="4">
-              <el-form-item
-                ><el-text>{{ item.connection }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item
+                  ><el-text>{{ item.connection }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
             <el-col :span="15">
-              <el-form-item
-                ><el-text>{{ item.work }}</el-text>
-              </el-form-item>
+              <el-space>
+                <el-form-item
+                  ><el-text>{{ item.work }}</el-text>
+                </el-form-item>
+              </el-space>
             </el-col>
           </el-row>
           <el-row justify="space-evenly">

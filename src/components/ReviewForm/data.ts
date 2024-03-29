@@ -78,3 +78,5 @@ export interface FormDataPartC {
   family: FamilyConnections[]
   note: string
 }
+
+export type SubmitDataRequest = ApiResponseData<null>

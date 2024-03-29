@@ -99,5 +99,5 @@ export type GetUserThingResponseData = ApiResponseData<{
   file4: string[]
   file5: string[]
   file6: string[]
-  IDPhoto: string[]
+  IDPhoto: string
 }>
