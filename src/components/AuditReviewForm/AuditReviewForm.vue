@@ -346,9 +346,6 @@ onMounted(() => {
               <el-text tag="p" style="margin-bottom: 20px">
                 {{ fileListIDPhoto.split("/").slice(-1) }}
               </el-text>
-              <el-text tag="p" style="margin-bottom: 20px">
-                {{ "cnm" + fileListIDPhoto }}
-              </el-text>
               <el-button @click="showUserFile(fileListIDPhoto)" :loading="showUserFileLoading">查看</el-button>
             </el-col>
           </el-row>

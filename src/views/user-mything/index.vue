@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue"
 import { GetTableRequestData } from "@/api/user-thing/types/user-thing"
 import { exportFormApi, getUserThingDataApi, userAbandonApi } from "@/api/user-thing"
 import { ElMessage } from "element-plus"
+import UserReview from "@/components/UserReview/UserReview.vue"
 
 defineOptions({
   name: "UserThing"
@@ -131,12 +132,12 @@ onMounted(getTableData)
                 >导出报名资格审查表</el-button
               >
             </div>
+            <el-dialog>
+              <UserReview :code="position.code" :thingId="position.thingId" />
+            </el-dialog>
           </el-card>
         </div>
 
-        <!-- <el-collapse v-model="activeCollapse">
-          <Batches v-for="batch in batches" :key="batch.id" :batch="batch" />
-        </el-collapse> -->
         <div v-else><el-text tag="p">这里什么也没有~</el-text></div>
       </div>
     </el-card>

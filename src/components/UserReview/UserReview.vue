@@ -11,7 +11,6 @@ defineComponent({
 
 const props = defineProps<{
   thingId: number
-  status: number
   code: string
 }>()
 
@@ -693,11 +692,6 @@ onMounted(() => {
           <el-row>
             <el-col :span="24">
               <el-text tag="p">备注:{{ note }}</el-text>
-            </el-col>
-          </el-row>
-          <el-row v-if="refused">
-            <el-col :span="24">
-              <el-input v-model="qualificationResult" type="textarea" placeholder="拒绝理由" />
             </el-col>
           </el-row>
         </el-form>
