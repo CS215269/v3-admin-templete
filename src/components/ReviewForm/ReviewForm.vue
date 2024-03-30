@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { defineComponent, onMounted, reactive, ref } from "vue"
 import { Delete } from "@element-plus/icons-vue"
-import { ElMessage, FormRules, UploadInstance, UploadProps, UploadRawFile, genFileId } from "element-plus"
+import { ElMessage, FormRules, UploadFile, UploadInstance, UploadProps, UploadRawFile, genFileId } from "element-plus"
 import { setDegree, setEducation } from "@/utils/degree"
 import type * as Type from "./data"
 import { submitJobApplicationPartA, submitJobApplicationPartB, submitJobApplicationPartC } from "@/api/user-batch"
@@ -57,6 +57,9 @@ const rules: FormRules = {
   idnum: [{ validator: inspectIdnum, trigger: "blur" }]
 }
 
+/** 是否已经投递 */
+const delivered = ref(false)
+
 const formDataUserInfo = ref<Type.UserInfo>({
   name: "",
   sex: 1,
@@ -73,7 +76,7 @@ const formDataUserInfo = ref<Type.UserInfo>({
   specialtiesCertificates: ""
 })
 
-const sex = ref("")
+const sex = ref("请选择")
 
 // 自定义类型FormDataEducation
 type formDataTypeEducation = {
@@ -345,12 +348,20 @@ const fileUploading = ref(false)
 const canSubmit = ref(true)
 
 const submit = () => {
+  if (delivered.value) {
+    ElMessage.error("有其他岗位正在投递中")
+    return
+  }
   uploading.value = true
   // 过滤空数据
   if (formDataWorkExperience.value.length == 1 && formDataWorkExperience.value.at(0)?.company === "")
     // 清空 formDataWorkExperience
     formDataWorkExperience.value = []
+  if (formDataEducation.value.length == 1 && formDataEducation.value.at(0)?.school === "")
+    // 清空 formDataEducation
+    formDataEducation.value = []
   const adapter: Type.Education[] = []
+
   for (let i = 0; i < formDataEducation.value.length; i++) {
     if (
       formDataEducation.value[i].graduationTime == null ||
@@ -369,20 +380,14 @@ const submit = () => {
       specialty: formDataEducation.value[i].specialty
     })
   }
-  for (let i = 0; i < work_time.value.length; i++) {
-    if (work_time.value[i] == null || work_time.value[i] == undefined || work_time.value[i] === "") {
-      work_time.value[i] = "2000-01"
-      console.log()
-
-      // work_time.value[i][1] = "2000-01"
-      canSubmit.value = false
-    }
-    const element = work_time.value[i]
-    formDataWorkExperience.value[i].work_time_start = element[0]
-    formDataWorkExperience.value[i].work_time_end = element[1]
-  }
   formDataPartA.info = formDataUserInfo.value
-  formDataPartA.info.sex = sex.value === "男" ? 1 : 2
+  console.log("为男?" + sex.value == "1" ? 1 : 2)
+  console.log("为男?" + sex.value)
+
+  formDataPartA.info.sex = sex.value == "1" ? 1 : 2
+  console.log("报错之后")
+  console.log(formDataPartA.info.sex)
+
   formDataPartA.education = adapter
   formDataPartA.workExperience = formDataWorkExperience.value
   formDataPartC.note = note.value
@@ -420,7 +425,6 @@ const submit = () => {
     })
     .finally(() => {
       uploading.value = false
-      closeDrawer()
       submitUpload()
     })
 }
@@ -483,15 +487,27 @@ const handleUploadComplete = () => {}
 
 const upload = ref<UploadInstance>()
 
-const beforeFileUpload: UploadProps["beforeUpload"] = (rawFile) => {
-  if (rawFile.type !== "application/pdf") {
-    ElMessage.error("只能上传 doc,docx 或 pdf 格式的文件!")
+const handleChange: UploadProps["onChange"] = (uploadFile, uploadFiles) => {
+  if (!uploadFile || !uploadFile.raw) {
     return false
-  } else if (rawFile.size / 1024 / 1024 > 5) {
+  }
+
+  if (uploadFile.raw.type !== "application/pdf") {
+    ElMessage.error("只能上传 doc,docx 或 pdf 格式的文件!")
+    removeFile(uploadFile, uploadFiles) // 移除非法文件
+    return false
+  } else if (uploadFile.raw.size > 5 * 1024 * 1024) {
     ElMessage.error("文件大小必须小于5MB!")
+    removeFile(uploadFile, uploadFiles) // 移除非法文件
     return false
   }
   return true
+}
+const removeFile = (file: UploadFile, fileList: UploadFile[]) => {
+  const index = fileList.indexOf(file)
+  if (index !== -1) {
+    fileList.splice(index, 1)
+  }
 }
 
 const handleExceed: UploadProps["onExceed"] = (files) => {
@@ -504,6 +520,8 @@ const handleExceed: UploadProps["onExceed"] = (files) => {
 onMounted(() => {
   getUserInfoApi()
     .then((res) => {
+      // 不能编辑就代表已经投递
+      delivered.value = !res.data.canEdit
       formDataUserInfo.value = res.data.user
       sex.value = res.data.user.sex == 1 ? "男" : "女"
     })
@@ -579,7 +597,7 @@ onMounted(() => {
 
           <el-col :span="8">
             <el-form-item label="婚否">
-              <el-select v-model="formDataPartA.info.married" clearable placeholder="Select" style="width: 240px">
+              <el-select v-model="formDataUserInfo.married" clearable placeholder="Select" style="width: 240px">
                 <el-option label="未婚" value="未婚" />
                 <el-option label="已婚" value="已婚" />
               </el-select>
@@ -695,7 +713,7 @@ onMounted(() => {
               accept="application/pdf"
               :on-exceed="handleExceed"
               :on-success="handleUploadComplete"
-              :before-upload="beforeFileUpload"
+              :on-change="handleChange"
               :headers="myHeaders"
               :data="{
                 code: props.code,
@@ -724,7 +742,7 @@ onMounted(() => {
           <el-col :span="9"><el-text tag="p">所在单位</el-text></el-col>
           <el-col :span="8"><el-text tag="p">岗位（职务）</el-text></el-col>
         </el-row>
-        <el-row v-for="(item, index) in formDataWorkExperience" :key="item.id">
+        <el-row v-for="(item, index) in formDataWorkExperience" :key="index">
           <el-col :span="6">
             <el-form-item>
               <el-date-picker
@@ -761,7 +779,7 @@ onMounted(() => {
               accept="application/pdf"
               :on-exceed="handleExceed"
               :on-success="handleUploadComplete"
-              :before-upload="beforeFileUpload"
+              :on-change="handleChange"
               :headers="myHeaders"
               :data="{
                 code: props.code,
@@ -822,7 +840,7 @@ onMounted(() => {
               accept="application/pdf"
               :on-exceed="handleExceed"
               :on-success="handleUploadComplete"
-              :before-upload="beforeFileUpload"
+              :on-change="handleChange"
               :headers="myHeaders"
               :data="{
                 code: props.code,
@@ -889,7 +907,7 @@ onMounted(() => {
               accept="application/pdf"
               :on-exceed="handleExceed"
               :on-success="handleUploadComplete"
-              :before-upload="beforeFileUpload"
+              :on-change="handleChange"
               :headers="myHeaders"
               :data="{
                 code: props.code,
@@ -955,7 +973,7 @@ onMounted(() => {
               accept="application/pdf"
               :on-exceed="handleExceed"
               :on-success="handleUploadComplete"
-              :before-upload="beforeFileUpload"
+              :on-change="handleChange"
               :headers="myHeaders"
               :data="{
                 code: props.code,
@@ -1016,7 +1034,7 @@ onMounted(() => {
               accept="application/pdf"
               :on-exceed="handleExceed"
               :on-success="handleUploadComplete"
-              :before-upload="beforeFileUpload"
+              :on-change="handleChange"
               :headers="myHeaders"
               :data="{
                 code: props.code,
@@ -1058,7 +1076,7 @@ onMounted(() => {
               accept="application/pdf"
               :on-exceed="handleExceed"
               :on-success="handleUploadComplete"
-              :before-upload="beforeFileUpload"
+              :on-change="handleChange"
               :headers="myHeaders"
               :data="{
                 code: props.code,
