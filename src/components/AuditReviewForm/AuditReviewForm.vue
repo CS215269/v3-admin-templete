@@ -156,23 +156,32 @@ const showinfo = (thingId: number, code: string) => {
       formDataEducation.value = res.data.education
       formDataWorkExperience.value = res.data.workExperience
       formDataPaper.value = res.data.paper
-      formDataProject0.value = res.data.project.filter((item) => item.type === 0)
-      formDataProject1.value = res.data.project.filter((item) => item.type === 1)
-      formDataProject2.value = res.data.project.filter((item) => item.type === 2)
+      if (res.data && res.data.project && Array.isArray(res.data.project)) {
+        formDataProject0.value = res.data.project.filter((item) => item.type === 0)
+        formDataProject1.value = res.data.project.filter((item) => item.type === 1)
+        formDataProject2.value = res.data.project.filter((item) => item.type === 2)
+      } else {
+        // Handle the case when res.data or res.data.project is null, undefined, or not an array
+        // For example, set default values or show an error message
+      }
+
       formDataResearch.value = res.data.research
       formDataFamilyConnections.value = res.data.family
       note.value = res.data.note
+      console.log("身份证1" + fileListIDPhoto.value)
       qualificationResult.value = res.data.qualificationResult
-      console.log("拒接" + qualificationResult.value)
+      console.log("拒绝理由" + qualificationResult.value)
+      console.log("身份证2" + fileListIDPhoto.value)
       awardsAndPunishments.value = res.data.awardsAndPunishments
-      fileList0.value = res.data.file0.reverse()
-      fileList1.value = res.data.file1.reverse()
-      fileList2.value = res.data.file2.reverse()
-      fileList3.value = res.data.file3.reverse()
-      fileList4.value = res.data.file4.reverse()
-      fileList5.value = res.data.file5.reverse()
-      fileList6.value = res.data.file6.reverse()
-      fileListIDPhoto.value = res.data.IDPhoto
+      if (res.data.file0 != null) fileList0.value = res.data.file0.reverse()
+      if (res.data.file1 != null) fileList1.value = res.data.file1.reverse()
+      if (res.data.file2 != null) fileList2.value = res.data.file2.reverse()
+      if (res.data.file3 != null) fileList3.value = res.data.file3.reverse()
+      if (res.data.file4 != null) fileList4.value = res.data.file4.reverse()
+      if (res.data.file5 != null) fileList5.value = res.data.file5.reverse()
+      if (res.data.file6 != null) fileList6.value = res.data.file6.reverse()
+      if (res.data.IDPhoto != null) fileListIDPhoto.value = res.data.IDPhoto
+      console.log("身份证3" + fileListIDPhoto.value)
     })
     .catch(() => {})
     .finally(() => {
@@ -321,7 +330,7 @@ onMounted(() => {
 
             <el-col :span="8">
               <el-form-item label="婚否">
-                <el-text>{{ Number(formDataUserInfo.married) == 1 ? "已婚" : "未婚" }}</el-text>
+                <el-text>{{ formDataUserInfo.married }}</el-text>
               </el-form-item>
             </el-col>
           </el-row>
@@ -336,6 +345,9 @@ onMounted(() => {
             <el-col :span="24">
               <el-text tag="p" style="margin-bottom: 20px">
                 {{ fileListIDPhoto.split("/").slice(-1) }}
+              </el-text>
+              <el-text tag="p" style="margin-bottom: 20px">
+                {{ "cnm" + fileListIDPhoto }}
               </el-text>
               <el-button @click="showUserFile(fileListIDPhoto)" :loading="showUserFileLoading">查看</el-button>
             </el-col>
@@ -374,7 +386,7 @@ onMounted(() => {
             <el-col :span="5"><el-text tag="p">所学专业</el-text></el-col>
             <el-col :span="4"><el-text tag="p">毕业时间</el-text></el-col>
           </el-row>
-          <el-row v-for="item in formDataEducation" :key="item.id">
+          <el-row v-for="(item, index) in formDataEducation" :key="index">
             <el-col :span="4">
               <el-text>{{ getEducation(item.education) }}</el-text>
             </el-col>
@@ -398,7 +410,7 @@ onMounted(() => {
             </el-col>
           </el-row>
           <el-row justify="space-evenly">
-            <el-col :span="12" v-if="formDataEducation.length != 0">
+            <el-col :span="12">
               <el-row v-for="url in fileList0" :key="url">
                 <el-col :span="24">
                   <el-text tag="p" style="margin-bottom: 20px">
@@ -425,7 +437,7 @@ onMounted(() => {
             <el-col :span="9"><el-text tag="p">所在单位</el-text></el-col>
             <el-col :span="8"><el-text tag="p">岗位（职务）</el-text></el-col>
           </el-row>
-          <el-row v-for="item in formDataWorkExperience" :key="item.id">
+          <el-row v-for="(item, index) in formDataWorkExperience" :key="index">
             <el-col :span="6">
               <el-form-item>
                 <el-text>{{ item.work_time_start + "到" + item.work_time_end }}</el-text>
@@ -447,7 +459,7 @@ onMounted(() => {
             </el-col>
           </el-row>
           <el-row justify="space-evenly">
-            <el-col :span="12" v-if="formDataWorkExperience.length != 0">
+            <el-col :span="12">
               <!-- ref="setUploadRef" -->
               <el-row v-for="url in fileList1" :key="url">
                 <el-col :span="24">
@@ -470,7 +482,7 @@ onMounted(() => {
             <el-col :span="4"><el-text> 发刊时间 </el-text></el-col>
             <el-col :span="4"><el-text> 刊号 </el-text></el-col>
           </el-row>
-          <el-row v-for="item in formDataPaper" :key="item.id">
+          <el-row v-for="(item, index) in formDataPaper" :key="index">
             <el-col :span="5">
               <el-space>
                 <el-form-item
@@ -501,7 +513,7 @@ onMounted(() => {
             </el-col>
           </el-row>
           <el-row justify="space-evenly">
-            <el-col :span="12" v-if="formDataPaper.length != 0">
+            <el-col :span="12">
               <el-row v-for="url in fileList2" :key="url">
                 <el-col :span="24">
                   <el-text tag="p" style="margin-bottom: 20px">
@@ -523,7 +535,7 @@ onMounted(() => {
             <el-col :span="4"><el-text> 级别 </el-text></el-col>
             <el-col :span="4"><el-text> 排名 </el-text></el-col>
           </el-row>
-          <el-row v-for="item in formDataProject0" :key="item.id">
+          <el-row v-for="(item, index) in formDataProject0" :key="index">
             <el-col :span="5">
               <el-space>
                 <el-form-item>
@@ -554,7 +566,7 @@ onMounted(() => {
             </el-col>
           </el-row>
           <el-row justify="space-evenly">
-            <el-col :span="12" v-if="formDataProject0.length != 0">
+            <el-col :span="12">
               <el-row v-for="url in fileList3" :key="url">
                 <el-col :span="24">
                   <el-text tag="p" style="margin-bottom: 20px">
@@ -584,7 +596,7 @@ onMounted(() => {
               <el-space><el-text> 排名 </el-text> </el-space></el-col
             >
           </el-row>
-          <el-row v-for="item in formDataProject1" :key="item.id">
+          <el-row v-for="(item, index) in formDataProject1" :key="index">
             <el-col :span="5">
               <el-space>
                 <el-form-item>
@@ -615,7 +627,7 @@ onMounted(() => {
             </el-col>
           </el-row>
           <el-row justify="space-evenly">
-            <el-col :span="12" v-if="formDataProject1.length != 0">
+            <el-col :span="12">
               <el-row v-for="url in fileList4" :key="url">
                 <el-col :span="24">
                   <el-text tag="p" style="margin-bottom: 20px">
@@ -625,7 +637,6 @@ onMounted(() => {
                 </el-col>
               </el-row>
             </el-col>
-
             <el-col :span="12" v-if="formDataProject1.length == 0"><el-text> 暂无记录 </el-text></el-col>
           </el-row>
           <el-row justify="center">
@@ -638,7 +649,7 @@ onMounted(() => {
             <el-col :span="4"><el-text> 级别 </el-text></el-col>
             <el-col :span="4"><el-text> 名次 </el-text></el-col>
           </el-row>
-          <el-row v-for="item in formDataProject2" :key="item.id">
+          <el-row v-for="(item, index) in formDataProject2" :key="index">
             <el-col :span="5">
               <el-space>
                 <el-form-item>
@@ -669,7 +680,7 @@ onMounted(() => {
             </el-col>
           </el-row>
           <el-row justify="space-evenly">
-            <el-col :span="12" v-if="formDataProject2.length != 0">
+            <el-col :span="12">
               <el-row v-for="url in fileList5" :key="url">
                 <el-col :span="24">
                   <el-text tag="p" style="margin-bottom: 20px">
@@ -686,17 +697,18 @@ onMounted(() => {
             <el-text tag="p" size="large"> 6.成果推广 </el-text>
           </el-row>
           <el-row>
-            <el-col :span="23"><el-text> 成果说明 </el-text></el-col>
+            <el-col :span="24"><el-text> 成果说明 </el-text></el-col>
           </el-row>
-          <el-row v-for="(item, index) in formDataResearch" :key="index">
+          <el-row v-if="formDataResearch.length == 0" justify="space-evenly">
+            <el-text> 暂无数据 </el-text>
+          </el-row>
+          <el-row v-else v-for="(item, index) in formDataResearch" :key="index">
             <el-col :span="23">
               <el-form-item>
-                <el-input v-model:model-value="item.name" />
+                <el-text>{{ item.name }}</el-text>
               </el-form-item>
             </el-col>
-          </el-row>
-          <el-row justify="space-evenly">
-            <el-col :span="12" v-if="formDataResearch.length != 0">
+            <el-col :span="12">
               <el-row v-for="url in fileList6" :key="url">
                 <el-col :span="24">
                   <el-text tag="p" style="margin-bottom: 20px">
@@ -726,7 +738,7 @@ onMounted(() => {
             <el-col :span="4"><el-text> 关系 </el-text></el-col>
             <el-col :span="16"><el-text> 工作单位及职务 </el-text></el-col>
           </el-row>
-          <el-row v-for="item in formDataFamilyConnections" :key="item.name">
+          <el-row v-for="(item, index) in formDataFamilyConnections" :key="index">
             <el-col :span="4">
               <el-space>
                 <el-form-item
@@ -764,7 +776,13 @@ onMounted(() => {
             </el-col>
           </el-row>
           <el-row v-if="!isAdmin">
-            <el-col :span="24">
+            <el-col v-if="props.status == -2" :span="24">
+              <el-text> 资格审查不通过</el-text>
+            </el-col>
+            <el-col v-else-if="props.status == 2" :span="24">
+              <el-text>资格审查通过</el-text>
+            </el-col>
+            <el-col v-else :span="24">
               <el-row justify="space-evenly" v-if="!refused">
                 <el-col :span="18" />
                 <el-col :span="3">

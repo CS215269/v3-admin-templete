@@ -74,7 +74,6 @@ const formDataUserInfo = ref<Type.UserInfo>({
 })
 
 const sex = ref("")
-const married = ref("")
 
 // 自定义类型FormDataEducation
 type formDataTypeEducation = {
@@ -379,6 +378,7 @@ const submit = () => {
     formDataWorkExperience.value[i].work_time_end = element[1]
   }
   formDataPartA.info = formDataUserInfo.value
+  formDataPartA.info.sex = sex.value === "男" ? 1 : 2
   formDataPartA.education = adapter
   formDataPartA.workExperience = formDataWorkExperience.value
   formDataPartC.note = note.value
@@ -502,7 +502,6 @@ onMounted(() => {
     .then((res) => {
       formDataUserInfo.value = res.data.user
       sex.value = res.data.user.sex == 1 ? "男" : "女"
-      married.value = Number(res.data.user.married) == 1 ? "已婚" : "未婚"
     })
     .catch(() => {})
     .finally(() => {
@@ -576,9 +575,9 @@ onMounted(() => {
 
           <el-col :span="8">
             <el-form-item label="婚否">
-              <el-select v-model="married" clearable placeholder="Select" style="width: 240px">
-                <el-option label="未婚" :value="0" />
-                <el-option label="已婚" :value="1" />
+              <el-select v-model="formDataPartA.info.married" clearable placeholder="Select" style="width: 240px">
+                <el-option label="未婚" value="未婚" />
+                <el-option label="已婚" value="已婚" />
               </el-select>
             </el-form-item>
           </el-col>

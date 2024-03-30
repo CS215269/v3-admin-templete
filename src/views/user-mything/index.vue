@@ -82,54 +82,66 @@ onMounted(getTableData)
 
 <template>
   <div class="app-container">
-    <el-card loading="loading" shadow="never">
+    <el-card :loading="loading" shadow="never">
       <div class="toolbar-wrapper" style="margin-bottom: 20px">
         <el-text class="mx-1" size="large">我的投递信息</el-text>
       </div>
-      <el-card :loading="loading" shadow="never">
-        <div class="table-wrapper">
-          <div v-if="positions.length > 0" style="margin: 0">
-            <el-card v-for="(position, index) in positions" :key="position.recruitId" :name="index.toString()">
-              <template #title>
-                <el-text tag="b"> {{ position.code }} </el-text>
-                &nbsp;
-                <el-text tag="b"> {{ position.type }} </el-text>
-                &nbsp;
-                <el-text> {{ position.jobTitle }} </el-text>
-                &nbsp;
-                <el-text v-if="position.status === -2" type="danger"> 已拒绝 </el-text>
-              </template>
-              <div>
-                <el-text>进度信息</el-text>
-              </div>
-              <div>
-                <el-steps class="mb-4" style="max-width: 600px" :space="200" :active="step(position.status)" simple>
-                  <el-step title="用户投递" />
-                  <el-step title="资格审查" />
-                  <el-step title="下载审查表" />
-                </el-steps>
-                <el-text v-if="position.status == 2" tag="b">审查通过</el-text>
-                <el-text v-if="position.status == -2" style="color: red">审查不通过</el-text>
-                <br />
-                <el-text v-if="position.status == -2">原因: {{ position.qualificationResult }}</el-text>
-                <br />
-                <el-button @click="abandon(position.thingId)">放弃</el-button>
-                <el-button v-if="position.status == 2" @click="exportForm(position.thingId)"
-                  >导出报名资格审查表</el-button
-                >
-              </div>
-            </el-card>
-          </div>
+      <div class="table-wrapper">
+        <div v-if="positions.length > 0" style="margin: 0">
+          <el-card
+            v-for="(position, index) in positions"
+            :key="position.recruitId"
+            :name="index.toString()"
+            shadow="never"
+          >
+            <template #title>
+              <el-text tag="b"> {{ position.code }} </el-text>
+              &nbsp;
+              <el-text tag="b"> {{ position.type }} </el-text>
+              &nbsp;
+              <el-text> {{ position.jobTitle }} </el-text>
+              &nbsp;
+              <el-text v-if="position.status === -2" type="danger"> 已拒绝 </el-text>
+            </template>
+            <div>
+              <el-text>进度信息</el-text>
+            </div>
+            <div>
+              <el-steps class="mb-4" style="max-width: 600px" :space="200" :active="step(position.status)" simple>
+                <el-step title="用户投递" />
+                <el-step title="资格审查" />
+                <el-step title="下载审查表" />
+              </el-steps>
+              <el-text v-if="position.status == 2" tag="b">审查通过</el-text>
+              <el-text v-if="position.status == -2" style="color: red">审查不通过</el-text>
+              <br />
+              <el-text v-if="position.status == -2">原因: {{ position.qualificationResult }}</el-text>
+              <br />
+              <el-popconfirm
+                confirm-button-text="Yes"
+                cancel-button-text="No"
+                title="您确定要放弃投递吗?这会删除您的报考信息"
+                @confirm="abandon(position.thingId)"
+              >
+                <template #reference>
+                  <el-button>放弃</el-button>
+                </template>
+              </el-popconfirm>
+              <el-button :loading="loading" v-if="position.status == 2" @click="exportForm(position.thingId)"
+                >导出报名资格审查表</el-button
+              >
+            </div>
+          </el-card>
+        </div>
 
-          <!-- <el-collapse v-model="activeCollapse">
+        <!-- <el-collapse v-model="activeCollapse">
           <Batches v-for="batch in batches" :key="batch.id" :batch="batch" />
         </el-collapse> -->
-          <div v-else><el-text tag="p">这里什么也没有~</el-text></div>
-        </div>
-      </el-card>
-      <div class="pager-wrapper">
-        <!-- Pagination code here -->
+        <div v-else><el-text tag="p">这里什么也没有~</el-text></div>
       </div>
     </el-card>
+    <div class="pager-wrapper">
+      <!-- Pagination code here -->
+    </div>
   </div>
 </template>
