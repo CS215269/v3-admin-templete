@@ -326,7 +326,6 @@ const delFormItemFamilyConnections = (item: Type.FamilyConnections) => {
 
 const note = ref<string>("")
 
-const submitStatus = ref<boolean>(true)
 const formDataPartA = reactive<Type.FormDataPartA>({
   recruitId: props.recruitId,
   code: props.code,
@@ -350,12 +349,12 @@ const submit = () => {
   uploading.value = true
   const adapter: Type.Education[] = []
   for (let i = 0; i < formDataEducation.value.length; i++) {
-    if (formDataEducation.value[i].graduationTime == undefined || formDataEducation.value[i].graduationTime === "") {
-      submitStatus.value = false
+    if (
+      formDataEducation.value[i].graduationTime == null ||
+      formDataEducation.value[i].graduationTime == undefined ||
+      formDataEducation.value[i].graduationTime === ""
+    ) {
       formDataEducation.value[i].graduationTime = "2000-01-01"
-      console.log("触发返回formDataEducation" + i)
-
-      console.log("触发返回formDataEducation长度" + formDataEducation.value.length)
       canSubmit.value = false
     }
     adapter.push({
@@ -368,11 +367,11 @@ const submit = () => {
     })
   }
   for (let i = 0; i < work_time.value.length; i++) {
-    if (work_time.value[i] == undefined || work_time.value[i] === "") {
-      submitStatus.value = false
-      // work_time.value[i][0] = "2000-01"
+    if (work_time.value[i] == null || work_time.value[i] == undefined || work_time.value[i] === "") {
+      work_time.value[i] = "2000-01"
+      console.log()
+
       // work_time.value[i][1] = "2000-01"
-      console.log("触发返回work_time" + i + "长度" + work_time.value.length)
       canSubmit.value = false
     }
     const element = work_time.value[i]
@@ -416,10 +415,9 @@ const submit = () => {
       // submitStatus.value = false
     })
     .finally(() => {
-      if (!submitStatus.value) {
-        ElMessage.error("提交失败")
-        closeDrawer()
-      } else submitUpload()
+      uploading.value = false
+      closeDrawer()
+      submitUpload()
     })
 }
 // const uploadPath = "https://supposedly-credible-cougar.ngrok-free.app/Recruit/api/userResume"
@@ -472,10 +470,9 @@ const submitUpload = async () => {
     upload.value!.submit()
   }
   fileUploading.value = false
-  if (submitStatus.value) {
-    ElMessage.success("提交成功")
-    closeDrawer()
-  }
+
+  ElMessage.success("提交成功")
+  closeDrawer()
 }
 /** 上传完成处理函数 */
 const handleUploadComplete = () => {}
