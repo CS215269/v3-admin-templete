@@ -346,6 +346,10 @@ const canSubmit = ref(true)
 
 const submit = () => {
   uploading.value = true
+  // 过滤空数据
+  if (formDataWorkExperience.value.length == 1 && formDataWorkExperience.value.at(0)?.company === "")
+    // 清空 formDataWorkExperience
+    formDataWorkExperience.value = []
   const adapter: Type.Education[] = []
   for (let i = 0; i < formDataEducation.value.length; i++) {
     if (
