@@ -134,6 +134,8 @@ const showinfo = (thingId: number, code: string) => {
         return
       }
       formDataUserInfo.value = res.data.userinfo
+      console.log("获取性别")
+      console.log(res.data.userinfo.sex)
       formDataEducation.value = res.data.education
       formDataWorkExperience.value = res.data.workExperience
       formDataPaper.value = res.data.paper

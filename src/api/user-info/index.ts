@@ -32,15 +32,3 @@ export function setRealNameInfoApi(data: Table.SetRealNameRequestData) {
     data
   })
 }
-
-// /** 查询是否实名认证 */
-// export function getBatchDataApi(params: Table.GetTableRequestData) {
-//   return request<Table.GetTableResponseData>({
-//     url: "tableBatch",
-//     method: "get",
-//     headers: {
-//       "ngrok-skip-browser-warning": "123"
-//     },
-//     params
-//   })
-// }

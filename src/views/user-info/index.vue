@@ -87,12 +87,20 @@ const editedUserinfo = ref<UserInfoData>({
   /** 资格证 */
   specialtiesCertificates: ""
 })
+const sex = ref("")
 
 const getUserData = () => {
   loading.value = true
   getUserInfoApi()
     .then((res) => {
       userinfo.value = res.data.user
+      console.log("获取值,又是男?")
+      console.log(res.data.user.sex)
+
+      sex.value = res.data.user.sex == 1 ? "男" : "女"
+      console.log("结果")
+      console.log(sex.value)
+
       uid.value = res.data.user.id
       canEdit.value = res.data.canEdit
     })
@@ -140,6 +148,7 @@ const startEditing = () => {
 }
 const saveChanges = () => {
   // 处理数据并发送put请求到服务器
+  if (sex.value == "男" || sex.value == "1") editedUserinfo.value.sex = 1
   setUserInfoApi(editedUserinfo.value)
     .then((res) => {
       ElMessage.info(res.message)
@@ -189,11 +198,11 @@ onMounted(getUserData)
             <template v-else> <el-input v-model="editedUserinfo.name" /> </template
           ></el-descriptions-item>
           <el-descriptions-item label="性别" label-align="center" align="left">
-            <template v-if="!isEditing">{{ userinfo?.sex }}</template>
+            <template v-if="!isEditing">{{ sex }}</template>
             <template v-else>
-              <el-select id="usersex" v-model="editedUserinfo.sex">
-                <el-option label="男" value="男" />
-                <el-option label="女" value="女" />
+              <el-select id="usersex" v-model="sex">
+                <el-option label="男" :value="1" />
+                <el-option label="女" :value="2" />
               </el-select> </template
           ></el-descriptions-item>
           <el-descriptions-item label="婚否" label-align="center" align="left">
@@ -217,13 +226,10 @@ onMounted(getUserData)
           ></el-descriptions-item>
           <el-descriptions-item label="政治面貌" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.zzmm }}</template>
-            <template v-else
-              ><el-select id="userzzmm" v-model="editedUserinfo.zzmm">
-                <el-option label="群众" value="群众" />
-                <el-option label="团员" value="团员" />
-                <el-option label="党员" value="党员" />
-              </el-select> </template
-          ></el-descriptions-item>
+            <template v-else>
+              <el-input id="userzzmm" v-model="editedUserinfo.zzmm" />
+            </template>
+          </el-descriptions-item>
           <el-descriptions-item label="户口所在地" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.nativePlace }}</template>
             <template v-else> <el-input v-model="editedUserinfo.nativePlace" /> </template

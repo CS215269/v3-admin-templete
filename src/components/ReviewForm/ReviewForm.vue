@@ -383,8 +383,7 @@ const submit = () => {
   formDataPartA.info = formDataUserInfo.value
   console.log("为男?" + sex.value == "1" ? 1 : 2)
   console.log("为男?" + sex.value)
-
-  formDataPartA.info.sex = sex.value == "1" ? 1 : 2
+  if (sex.value == "1" || sex.value == "男") formDataPartA.info.sex = 1
   console.log("报错之后")
   console.log(formDataPartA.info.sex)
 
@@ -520,8 +519,6 @@ const handleExceed: UploadProps["onExceed"] = (files) => {
 onMounted(() => {
   getUserInfoApi()
     .then((res) => {
-      // 不能编辑就代表已经投递
-      delivered.value = !res.data.canEdit
       formDataUserInfo.value = res.data.user
       sex.value = res.data.user.sex == 1 ? "男" : "女"
     })
@@ -536,6 +533,23 @@ onMounted(() => {
 <template>
   <el-row justify="center">
     <el-col :span="23">
+      <el-row justify="space-evenly">
+        <el-col>
+          <el-text><h2>说明：</h2></el-text>
+          <br />
+          <el-text tag="p" type="danger"
+            >1.请报考者认真阅读《招聘公告》后如实准确填写。报考者隐瞒有关情况或提供虚假材料的，取消其考试或聘用资格，并按有关规定严肃处理。</el-text
+          >
+          <el-text tag="p" type="danger">2.所有上传的佐证材料应真实有效,并根据其内容命名</el-text>
+          <el-text tag="p" type="danger"
+            >3.教育经历请从专科及以上开始填写，并按照时间专科、本科、研究生、博士的顺序填写。</el-text
+          >
+          <el-text tag="p" type="danger"
+            >4.“直系亲属及主要社会关系”包括夫妻关系、直系血亲关系、三代以内旁系血亲和近姻亲关系。</el-text
+          >
+          <el-text tag="p" type="danger">5.请在“身份证号码”一栏上传包含身份证正反面照片的PDF文件</el-text>
+        </el-col>
+      </el-row>
       <el-row justify="center">
         <el-text tag="p" size="large"><b>基础信息</b></el-text>
       </el-row>
@@ -621,6 +635,7 @@ onMounted(() => {
               accept="application/pdf"
               :limit="1"
               :on-exceed="handleExceed"
+              :on-change="handleChange"
               :auto-upload="false"
               :headers="myHeaders"
             >
@@ -1135,16 +1150,6 @@ onMounted(() => {
             ><el-form-item label="备注">
               <el-input v-model="note" type="textarea" />
             </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row justify="space-evenly">
-          <el-col>
-            <el-text tag="p"
-              >说明：<br />
-              1.请报考者认真阅读《招聘公告》后如实准确填写。报考者隐瞒有关情况或提供虚假材料的，取消其考试或聘用资格，并按有关规定严肃处理。<br />
-              2.教育经历请从专科及以上开始填写，并按照时间专科、本科、研究生、博士的顺序填写。<br />
-              3.“直系亲属及主要社会关系”包括夫妻关系、直系血亲关系、三代以内旁系血亲和近姻亲关系。
-            </el-text>
           </el-col>
         </el-row>
         <el-row justify="space-evenly">

@@ -41,6 +41,8 @@ export type GetCurrentBatchResponseData = ApiResponseData<{
   oneBatch: GetBatchData
   /** 用户是否实名认证 */
   infoIntegrity: number
+  /** 用户是否有正在投递的岗位 */
+  alreadyRecruit: boolean
 }>
 export type GetBatchResponseData = ApiResponseData<{
   /** 岗位列表 */

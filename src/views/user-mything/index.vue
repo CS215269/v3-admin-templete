@@ -12,6 +12,8 @@ defineOptions({
 const loading = ref<boolean>(false)
 /** 用于存储用户的投递的数据 */
 const positions = ref<GetTableRequestData[]>([])
+/** 用于打开指定的对话框 */
+const showDialog = ref<boolean[]>([])
 
 const getTableData = () => {
   loading.value = true
@@ -119,8 +121,8 @@ onMounted(getTableData)
               <el-text v-if="position.status == -2">原因: {{ position.qualificationResult }}</el-text>
               <br />
               <el-popconfirm
-                confirm-button-text="Yes"
-                cancel-button-text="No"
+                confirm-button-text="确认"
+                cancel-button-text="取消"
                 title="您确定要放弃投递吗?这会删除您的报考信息"
                 @confirm="abandon(position.thingId)"
               >
@@ -128,11 +130,12 @@ onMounted(getTableData)
                   <el-button>放弃</el-button>
                 </template>
               </el-popconfirm>
+              <el-button @click="showDialog[index] = true">查看报名资格审查表</el-button>
               <el-button :loading="loading" v-if="position.status == 2" @click="exportForm(position.thingId)"
                 >导出报名资格审查表</el-button
               >
             </div>
-            <el-dialog>
+            <el-dialog v-model="showDialog[index]" width="70%">
               <UserReview :code="position.code" :thingId="position.thingId" />
             </el-dialog>
           </el-card>

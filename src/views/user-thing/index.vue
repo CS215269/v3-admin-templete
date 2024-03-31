@@ -104,6 +104,10 @@ const formRules: FormRules = reactive({
   ]
 })
 const clickHandle = (index: number) => {
+  if (alreadyRecruit.value) {
+    ElMessage.warning("一次只能投递一个岗位")
+    return
+  }
   if (infoIntegrity.value) drawerOpenIndex[index] = true
   else showRealNameMessageBox.value = true
 }
@@ -126,13 +130,16 @@ const sendRealName = () => {
     }
   })
 }
-
+const alreadyRecruit = ref(false)
 const getBatchData = () => {
   loading.value = true
   getBatchDataApi()
     .then((res) => {
       currentBatch.value = res.data.oneBatch
       listUtil.num = res.data.oneBatch.positionNum
+      console.log(alreadyRecruit.value)
+      alreadyRecruit.value = res.data.alreadyRecruit
+      console.log(alreadyRecruit.value)
       infoIntegrity.value = res.data.infoIntegrity == 0 ? false : true
       loadData()
     })
