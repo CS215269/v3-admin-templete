@@ -186,13 +186,38 @@ onMounted(getBatchData)
       </div>
       <ul v-infinite-scroll="loadData" :infinite-scroll-disabled="true" class="infinite-list" style="overflow: auto">
         <li>
-          <el-text tag="p">
-            特别说明：1.专业技术岗位招聘要求还符合《安徽工商职业学院周转池编制人才标准》对应的要求（详见本次招聘附件2）；
-            <br />
-            2.国家认可的国（境）外大学相关专业毕业生也可报考。
-            <br />
-            2.每人只可投递一个岗位。
-          </el-text>
+          <el-row>
+            <el-col>
+              <el-text tag="p" type="danger"> 填报须知：</el-text>
+              <el-text tag="p" type="danger">
+                <b
+                  >请报考者认真阅读《招聘公告》后如实准确填写，所选报考岗位必须符合招聘公告相关要求。报考者隐瞒有关情况或提供虚假材料的，取消其考试或聘用资格，并按有关规定严肃处理。</b
+                >
+              </el-text>
+              <el-text tag="p" type="danger">
+                <b
+                  >2.所有上传的佐证材料均应为PDF格式文件，证明材料应真实有效，单个PDF证明文件大小在5M以下,并根据证明材料的内容命名上传。</b
+                >
+              </el-text>
+              <el-text tag="p" type="danger"> <b>3.请在“身份证号码”一栏上传身份证正反面照片的PDF文件。</b></el-text>
+              <el-text tag="p" type="danger">
+                <b
+                  >4.教育经历请从专科及以上开始填写，并按照时间专科、本科、研究生、博士的顺序依次填写，并依次上传佐证材料。</b
+                ></el-text
+              >
+              <el-text type="danger">
+                <b
+                  >5.专业技术岗位报考还需符合《安徽工商职业学院周转池编制人才标准》对应的要求，详见招聘公告附件2。</b
+                ></el-text
+              >
+              <el-text tag="p" type="danger">
+                <b
+                  >6.如因个人或者资格审查不通过要变更报考岗位，请在我的投递中点击放弃后，再选择符合申报条件的岗位报名。每人限报一个岗位。</b
+                ></el-text
+              >
+              <el-text tag="p" type="danger"
+            /></el-col>
+          </el-row>
         </li>
         <li v-for="(p, index) in positions" :key="p.id">
           <el-card style="margin-top: 0.1em">
@@ -249,28 +274,6 @@ onMounted(getBatchData)
           </el-drawer>
         </li>
       </ul>
-
-      <!-- <el-collapse v-model="activeNames">
-            <el-collapse-item
-              v-for="(batch, index) in batches"
-              :key="batch.id"
-              :name="index.toString()"
-              :title="batch.name"
-              @click="handleChange(index)"
-            >
-              <template v-if="isExpanded[index]">
-                <JobBatchItem
-                  v-for="position in positions[index]"
-                  :key="position.id"
-                  :position="position"
-                  :batchid="batch.id"
-                />
-              </template>
-            </el-collapse-item>
-          </el-collapse> -->
-      <!-- <el-collapse v-model="activeCollapse">
-            <Batches v-for="batch in batches" :key="batch.id" :batch="batch" />
-          </el-collapse> -->
       <el-dialog v-model="showRealNameMessageBox" title="开始投递前,请先进行实名认证" width="30%">
         <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px" label-position="left">
           <el-form-item prop="name" label="姓名">

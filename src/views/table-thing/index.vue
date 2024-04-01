@@ -51,7 +51,8 @@ const tableData = ref<GetTableThingData[]>([])
 const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
   batches: [],
-  jobTitle: []
+  jobTitle: [],
+  status: []
 })
 const getTableData = () => {
   loading.value = true
@@ -59,7 +60,8 @@ const getTableData = () => {
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
     batches: searchData.batches,
-    jobTitles: searchData.jobTitle
+    jobTitles: searchData.jobTitle,
+    status: searchData.status
   })
     .then((res) => {
       paginationData.total = res.data.total
@@ -166,6 +168,22 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             <el-option v-for="item in positionList" :key="item.id" :label="item.jobTitle" :value="item.id" />
           </el-select>
         </el-form-item>
+        <el-form-item prop="status" label="岗位名" size="large">
+          <el-select
+            v-model="searchData.status"
+            filterable
+            collapse-tags
+            collapse-tags-tooltip
+            multiple
+            placeholder="请输入"
+          >
+            <el-option label="未处理" :value="0" />
+            <el-option label="同意待审核" :value="1" />
+            <el-option label="拒绝待审核" :value="-1" />
+            <el-option label="同意" :value="2" />
+            <el-option label="拒绝" :value="-2" />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
           <el-button :icon="Refresh" @click="resetSearch">重置</el-button>
@@ -196,7 +214,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             </template>
           </el-table-column>
           <el-table-column prop="username" sortable label="用户姓名" align="center" />
-          <el-table-column prop="school" sortable label="毕业院校" align="center" />
+          <el-table-column prop="time" sortable label="创建时间" align="center" />
           <el-table-column prop="degree" sortable label="学位要求" align="center">
             <template #default="educationScope">
               {{ getDegreeLabel(educationScope.row) }}

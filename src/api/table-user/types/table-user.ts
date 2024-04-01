@@ -11,13 +11,7 @@ export interface CreateTableRequestData {
 export interface UpdateTableRequestData {
   id: number
   name: string
-  sex: string
-  age: string
-  education: number
-  degree: number
-  zzmm: string
-  school: string
-  native_place: string
+  idnum: string
 }
 
 export interface GetTableRequestData {
@@ -42,7 +36,7 @@ export interface GetTableUserData {
   /** 姓名 */
   name: string
   /** 身份证号码 */
-  idnum: number
+  idnum: string
   /** 电话号码 */
   tel: number
   /** 性别 */
@@ -75,3 +69,5 @@ export type GetTableResponseData = ApiResponseData<{
   list: GetTableUserData[]
   total: number
 }>
+
+export type GetAlreadyRecruit = ApiResponseData<Boolean>

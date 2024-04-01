@@ -362,6 +362,11 @@ const submit = () => {
     formDataEducation.value = []
   const adapter: Type.Education[] = []
 
+  for (let i = 0; i < formDataWorkExperience.value.length; i++) {
+    formDataWorkExperience.value[i].work_time_start = work_time.value[i][0]
+    formDataWorkExperience.value[i].work_time_end = work_time.value[i][1]
+  }
+
   for (let i = 0; i < formDataEducation.value.length; i++) {
     if (
       formDataEducation.value[i].graduationTime == null ||
@@ -381,11 +386,7 @@ const submit = () => {
     })
   }
   formDataPartA.info = formDataUserInfo.value
-  console.log("为男?" + sex.value == "1" ? 1 : 2)
-  console.log("为男?" + sex.value)
   if (sex.value == "1" || sex.value == "男") formDataPartA.info.sex = 1
-  console.log("报错之后")
-  console.log(formDataPartA.info.sex)
 
   formDataPartA.education = adapter
   formDataPartA.workExperience = formDataWorkExperience.value
@@ -535,20 +536,35 @@ onMounted(() => {
     <el-col :span="23">
       <el-row justify="space-evenly">
         <el-col>
-          <el-text><h2>说明：</h2></el-text>
-          <br />
-          <el-text tag="p" type="danger"
-            >1.请报考者认真阅读《招聘公告》后如实准确填写。报考者隐瞒有关情况或提供虚假材料的，取消其考试或聘用资格，并按有关规定严肃处理。</el-text
+          <el-text tag="p" type="danger"> 填报须知：</el-text>
+          <el-text tag="p" type="danger">
+            <b
+              >请报考者认真阅读《招聘公告》后如实准确填写，所选报考岗位必须符合招聘公告相关要求。报考者隐瞒有关情况或提供虚假材料的，取消其考试或聘用资格，并按有关规定严肃处理。</b
+            ></el-text
           >
-          <el-text tag="p" type="danger">2.所有上传的佐证材料应真实有效,并根据其内容命名</el-text>
-          <el-text tag="p" type="danger"
-            >3.教育经历请从专科及以上开始填写，并按照时间专科、本科、研究生、博士的顺序填写。</el-text
+          <el-text tag="p" type="danger">
+            <b
+              >2.所有上传的佐证材料均应为PDF格式文件，证明材料应真实有效，单个PDF证明文件大小在5M以下,并根据证明材料的内容命名上传。</b
+            ></el-text
+          >
+          <el-text tag="p" type="danger"> <b>3.请在“身份证号码”一栏上传身份证正反面照片的PDF文件。</b></el-text>
+          <el-text tag="p" type="danger">
+            <b
+              >4.教育经历请从专科及以上开始填写，并按照时间专科、本科、研究生、博士的顺序依次填写，并依次上传佐证材料。</b
+            ></el-text
+          >
+          <el-text tag="p" type="danger">
+            <b
+              >5.专业技术岗位报考还需符合《安徽工商职业学院周转池编制人才标准》对应的要求，详见招聘公告附件2。</b
+            ></el-text
+          >
+          <el-text tag="p" type="danger">
+            <b
+              >6.如因个人或者资格审查不通过要变更报考岗位，请在我的投递中点击放弃后，再选择符合申报条件的岗位报名。每人限报一个岗位。</b
+            ></el-text
           >
           <el-text tag="p" type="danger"
-            >4.“直系亲属及主要社会关系”包括夫妻关系、直系血亲关系、三代以内旁系血亲和近姻亲关系。</el-text
-          >
-          <el-text tag="p" type="danger">5.请在“身份证号码”一栏上传包含身份证正反面照片的PDF文件</el-text>
-        </el-col>
+        /></el-col>
       </el-row>
       <el-row justify="center">
         <el-text tag="p" size="large"><b>基础信息</b></el-text>
@@ -760,6 +776,7 @@ onMounted(() => {
         <el-row v-for="(item, index) in formDataWorkExperience" :key="index">
           <el-col :span="6">
             <el-form-item>
+              {{ work_time[index] }}
               <el-date-picker
                 v-model="work_time[index]"
                 type="monthrange"

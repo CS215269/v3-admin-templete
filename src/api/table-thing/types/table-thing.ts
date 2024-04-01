@@ -8,7 +8,7 @@ export interface GetTableRequestData {
   /** 查询参数：批次名称 */
   batches?: number[]
   /** 查询参数：部门 */
-  departments?: number[]
+  status?: number[]
 }
 
 export interface GetTableThingData {
@@ -27,6 +27,7 @@ export interface GetTableThingData {
   userId: number
   username: string
   status: number
+  time: Date
 }
 
 export interface ThingInfoData {

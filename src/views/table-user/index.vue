@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { reactive, ref, watch } from "vue"
-import { createTableDataApi, deleteTableDataApi, updateTableDataApi, getTableDataApi } from "@/api/table-user"
+import { deleteTableDataApi, updateTableDataApi, getTableDataApi, getAlreadyRecruitApi } from "@/api/table-user"
 import { type GetTableUserData } from "@/api/table-user/types/table-user"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox, ElTooltipProps } from "element-plus"
 import { Search, Refresh, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
@@ -50,62 +50,43 @@ const dialogVisible = ref<boolean>(false)
 const formRef = ref<FormInstance | null>(null)
 const formData = reactive({
   name: "",
-  sex: "",
-  age: "",
-  education: 0,
-  degree: 0,
-  zzmm: "",
-  school: "",
-  native_place: ""
+  idnum: ""
 })
-const formRules: FormRules = reactive({})
+const formRules: FormRules = reactive({
+  name: [{ required: true, trigger: "blur", message: "请输入姓名" }],
+  idnum: [
+    { required: true, trigger: "blur", message: "请输入身份证号码" },
+    {
+      pattern: /^[1-9]\d{5}(?:18|19|20)\d{2}(?:0[1-9]|10|11|12)(?:0[1-9]|[1-2]\d|30|31)\d{3}[\dXx]$/,
+      trigger: "blur",
+      message: "请输入有效的身份证号码"
+    }
+  ]
+})
 const handleCreate = () => {
   formRef.value?.validate((valid: boolean, fields) => {
     if (valid) {
-      if (currentUpdateId.value === undefined) {
-        createTableDataApi(formData)
-          .then(() => {
-            ElMessage.success("新增成功")
-            getTableData()
-          })
-          .finally(() => {
-            dialogVisible.value = false
-          })
-      } else {
-        updateTableDataApi({
-          id: currentUpdateId.value,
-          name: formData.name,
-          sex: formData.sex,
-          age: formData.age,
-          education: formData.education,
-          degree: formData.degree,
-          zzmm: formData.zzmm,
-          school: formData.school,
-          native_place: formData.native_place
+      updateTableDataApi({
+        id: currentUpdateId.value,
+        name: formData.name,
+        idnum: formData.idnum
+      })
+        .then(() => {
+          ElMessage.success("修改成功")
+          getTableData()
         })
-          .then(() => {
-            ElMessage.success("修改成功")
-            getTableData()
-          })
-          .finally(() => {
-            dialogVisible.value = false
-          })
-      }
+        .finally(() => {
+          dialogVisible.value = false
+        })
     } else {
       console.error("表单校验不通过", fields)
     }
   })
 }
 const resetForm = () => {
-  currentUpdateId.value = undefined
+  currentUpdateId.value = -1
   formData.name = ""
-  formData.sex = ""
-  formData.age = ""
-  formData.education = 0
-  formData.degree = 0
-  formData.zzmm = ""
-  formData.school = ""
-  formData.native_place = ""
+  formData.idnum = ""
 }
 //#endregion
 
@@ -125,15 +106,23 @@ const handleDelete = (row: GetTableUserData) => {
 //#endregion
 
 //#region 改
-const currentUpdateId = ref<undefined | number>(undefined)
+const currentUpdateId = ref<number>(0)
 const handleUpdate = (row: GetTableUserData) => {
-  currentUpdateId.value = row.id
-  formData.name = row.name
-  formData.sex = row.sex
-  formData.education = row.education
-  formData.degree = row.degree
-  formData.age = row.age
-  dialogVisible.value = true
+  getAlreadyRecruitApi({ id: row.id })
+    .then((res) => {
+      if (res.data) {
+        ElMessage.error("用户有正在进行的投递")
+        return
+      } else {
+        currentUpdateId.value = row.id
+        formData.name = row.name
+        formData.idnum = row.idnum
+        dialogVisible.value = true
+      }
+    })
+    .finally(() => {
+      getTableData()
+    })
 }
 //#endregion
 
@@ -143,7 +132,6 @@ const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
   name: "",
   phone: "",
-  education: "",
   idnum: ""
 })
 const getTableData = () => {
@@ -152,7 +140,6 @@ const getTableData = () => {
     currentPage: paginationData.currentPage,
     size: paginationData.pageSize,
     name: searchData.name || undefined,
-    education: searchData.education || undefined,
     idnum: searchData.idnum || undefined,
     phone: searchData.phone || undefined
   })
@@ -201,16 +188,6 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         </el-form-item>
         <el-form-item prop="idnum" label="身份证号码">
           <el-input v-model="searchData.idnum" placeholder="请输入" />
-        </el-form-item>
-        <el-form-item prop="education" label="学历">
-          <el-select v-model="searchData.education" placeholder="请输入">
-            <el-option value="" label="不限" />
-            <el-option value="1" label="高职" />
-            <el-option value="2" label="大专" />
-            <el-option value="3" label="本科" />
-            <el-option value="4" label="硕士" />
-            <el-option value="5" label="博士" />
-          </el-select>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>
@@ -300,18 +277,8 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         <el-form-item prop="name" label="用户姓名">
           <el-input v-model="formData.name" placeholder="请输入" />
         </el-form-item>
-        <el-form-item prop="sex" label="用户性别">
-          <!--  v-if="currentUpdateId === undefined" 让组件在修改对话框不可见 -->
-          <el-select v-model="formData.sex" placeholder="请输入">
-            <el-option label="男" value="男" />
-            <el-option label="女" value="女" />
-          </el-select>
-        </el-form-item>
-        <el-form-item prop="age" label="年龄">
-          <el-date-picker v-model="formData.age" placeholder="请输入" />
-        </el-form-item>
-        <el-form-item prop="zzmm" label="政治面貌">
-          <el-input v-model="formData.zzmm" placeholder="请输入" />
+        <el-form-item prop="idnum" label="用户身份证号码">
+          <el-input v-model="formData.idnum" placeholder="请输入" />
         </el-form-item>
       </el-form>
       <template #footer>

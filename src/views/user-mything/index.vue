@@ -130,7 +130,7 @@ onMounted(getTableData)
                   <el-button>放弃</el-button>
                 </template>
               </el-popconfirm>
-              <el-button @click="showDialog[index] = true">查看报名资格审查表</el-button>
+              <el-button @click="showDialog[index] = true">查看报名信息</el-button>
               <el-button :loading="loading" v-if="position.status == 2" @click="exportForm(position.thingId)"
                 >导出报名资格审查表</el-button
               >

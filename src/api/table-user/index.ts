@@ -35,3 +35,12 @@ export function getTableDataApi(data: Table.GetTableRequestData) {
     data
   })
 }
+
+/** 查是否有正在进行的投递 */
+export function getAlreadyRecruitApi(params: { id: number }) {
+  return request<Table.GetAlreadyRecruit>({
+    url: "userAlreadyRecruit",
+    method: "get",
+    params
+  })
+}
