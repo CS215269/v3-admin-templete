@@ -52,7 +52,8 @@ const searchFormRef = ref<FormInstance | null>(null)
 const searchData = reactive({
   batches: [],
   jobTitle: [],
-  status: []
+  status: [],
+  name: ""
 })
 const getTableData = () => {
   loading.value = true
@@ -61,7 +62,8 @@ const getTableData = () => {
     size: paginationData.pageSize,
     batches: searchData.batches,
     jobTitles: searchData.jobTitle,
-    status: searchData.status
+    status: searchData.status,
+    name: searchData.name
   })
     .then((res) => {
       paginationData.total = res.data.total
@@ -168,7 +170,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             <el-option v-for="item in positionList" :key="item.id" :label="item.jobTitle" :value="item.id" />
           </el-select>
         </el-form-item>
-        <el-form-item prop="status" label="岗位名" size="large">
+        <el-form-item prop="status" label="审核进度" size="large">
           <el-select
             v-model="searchData.status"
             filterable
@@ -183,6 +185,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             <el-option label="同意" :value="2" />
             <el-option label="拒绝" :value="-2" />
           </el-select>
+        </el-form-item>
+        <el-form-item prop="status" label="用户姓名" size="large">
+          <el-input v-model="searchData.name" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch">查询</el-button>

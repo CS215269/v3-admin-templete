@@ -9,6 +9,8 @@ export interface GetTableRequestData {
   batches?: number[]
   /** 查询参数：部门 */
   status?: number[]
+  /** 查询参数：部门 */
+  name?: string
 }
 
 export interface GetTableThingData {

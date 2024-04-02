@@ -168,10 +168,7 @@ const showinfo = (thingId: number, code: string) => {
       formDataResearch.value = res.data.research
       formDataFamilyConnections.value = res.data.family
       note.value = res.data.note
-      console.log("身份证1" + fileListIDPhoto.value)
       qualificationResult.value = res.data.qualificationResult
-      console.log("拒绝理由" + qualificationResult.value)
-      console.log("身份证2" + fileListIDPhoto.value)
       awardsAndPunishments.value = res.data.awardsAndPunishments
       if (res.data.file0 != null) fileList0.value = res.data.file0.reverse()
       if (res.data.file1 != null) fileList1.value = res.data.file1.reverse()

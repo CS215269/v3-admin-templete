@@ -14,6 +14,12 @@ const loading = ref<boolean>(false)
 const positions = ref<GetTableRequestData[]>([])
 /** 用于打开指定的对话框 */
 const showDialog = ref<boolean[]>([])
+/** 用于打开抽屉 */
+const drawerOpen = ref<boolean>()
+/** 抽屉中的岗位id */
+const activeThingId = ref<number>(0)
+/** 抽屉中的岗位代码 */
+const activeCode = ref<string>("")
 
 const getTableData = () => {
   loading.value = true
@@ -67,6 +73,12 @@ const exportForm = (id: number) => {
       loading.value = false
       getTableData()
     })
+}
+
+const openHandle = (id: number, code: string) => {
+  drawerOpen.value = true
+  activeCode.value = code
+  activeThingId.value = id
 }
 const step = (status: number) => {
   switch (Math.abs(status)) {
@@ -134,10 +146,24 @@ onMounted(getTableData)
               <el-button :loading="loading" v-if="position.status == 2" @click="exportForm(position.thingId)"
                 >导出报名资格审查表</el-button
               >
+              <el-button
+                :loading="loading"
+                v-if="position.status == -2"
+                @click="openHandle(position.thingId, position.code)"
+                >修改信息后重新提交</el-button
+              >
             </div>
             <el-dialog v-model="showDialog[index]" width="70%">
               <UserReview :code="position.code" :thingId="position.thingId" />
             </el-dialog>
+            <el-drawer v-model="drawerOpen" direction="rtl" size="75%" :destroy-on-close="true">
+              <template #header>
+                <h4>重新投递: 岗位代码 {{ activeCode }}</h4>
+              </template>
+              <template #default>
+                <ReviewForm :recruitId="activeThingId" :code="activeCode" @close-drawer="drawerOpen = false" />
+              </template>
+            </el-drawer>
           </el-card>
         </div>
 
