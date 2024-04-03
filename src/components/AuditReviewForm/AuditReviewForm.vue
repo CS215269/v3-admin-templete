@@ -340,7 +340,7 @@ onMounted(() => {
           </el-row>
           <el-row>
             <el-col :span="24">
-              <el-text tag="p" style="margin-bottom: 20px">
+              <el-text style="margin-bottom: 20px">
                 {{ fileListIDPhoto.split("/").slice(-1) }}
               </el-text>
               <el-button @click="showUserFile(fileListIDPhoto)" :loading="showUserFileLoading">查看</el-button>
@@ -404,7 +404,7 @@ onMounted(() => {
             <el-col :span="12">
               <el-row v-for="url in fileList0" :key="url">
                 <el-col :span="24">
-                  <el-text tag="p" style="margin-bottom: 20px">
+                  <el-text style="margin-bottom: 20px">
                     {{ url.split("/").slice(-1) }}
                   </el-text>
                   <el-button @click="showUserFile(url)" :loading="showUserFileLoading">查看</el-button>
@@ -454,7 +454,7 @@ onMounted(() => {
               <!-- ref="setUploadRef" -->
               <el-row v-for="url in fileList1" :key="url">
                 <el-col :span="24">
-                  <el-text tag="p" style="margin-bottom: 20px">
+                  <el-text style="margin-bottom: 20px">
                     {{ url.split("/").slice(-1) }}
                   </el-text>
                   <el-button @click="showUserFile(url)" :loading="showUserFileLoading">查看</el-button>
@@ -507,7 +507,7 @@ onMounted(() => {
             <el-col :span="12">
               <el-row v-for="url in fileList2" :key="url">
                 <el-col :span="24">
-                  <el-text tag="p" style="margin-bottom: 20px">
+                  <el-text style="margin-bottom: 20px">
                     {{ url.split("/").slice(-1) }}
                   </el-text>
                   <el-button @click="showUserFile(url)" :loading="showUserFileLoading">查看</el-button>
@@ -560,7 +560,7 @@ onMounted(() => {
             <el-col :span="12">
               <el-row v-for="url in fileList3" :key="url">
                 <el-col :span="24">
-                  <el-text tag="p" style="margin-bottom: 20px">
+                  <el-text style="margin-bottom: 20px">
                     {{ url.split("/").slice(-1) }}
                   </el-text>
                   <el-button @click="showUserFile(url)" :loading="showUserFileLoading">查看</el-button>
@@ -621,7 +621,7 @@ onMounted(() => {
             <el-col :span="12">
               <el-row v-for="url in fileList4" :key="url">
                 <el-col :span="24">
-                  <el-text tag="p" style="margin-bottom: 20px">
+                  <el-text style="margin-bottom: 20px">
                     {{ url.split("/").slice(-1) }}
                   </el-text>
                   <el-button @click="showUserFile(url)" :loading="showUserFileLoading">查看</el-button>
@@ -674,7 +674,7 @@ onMounted(() => {
             <el-col :span="12">
               <el-row v-for="url in fileList5" :key="url">
                 <el-col :span="24">
-                  <el-text tag="p" style="margin-bottom: 20px">
+                  <el-text style="margin-bottom: 20px">
                     {{ url.split("/").slice(-1) }}
                   </el-text>
                   <el-button @click="showUserFile(url)" :loading="showUserFileLoading">查看</el-button>
@@ -699,17 +699,15 @@ onMounted(() => {
                 <el-text>{{ item.name }}</el-text>
               </el-form-item>
             </el-col>
-            <el-col :span="12">
-              <el-row v-for="url in fileList6" :key="url">
-                <el-col :span="24">
-                  <el-text tag="p" style="margin-bottom: 20px">
-                    {{ url.split("/").slice(-1) }}
-                  </el-text>
-                  <el-button @click="showUserFile(url)" :loading="showUserFileLoading">查看</el-button>
-                </el-col>
-              </el-row>
-            </el-col>
             <el-col :span="12" v-if="formDataResearch.length == 0"><el-text> 暂无记录 </el-text></el-col>
+          </el-row>
+          <el-row v-for="url in fileList6" :key="url">
+            <el-col :span="24">
+              <el-text style="margin-bottom: 20px">
+                {{ url.split("/").slice(-1) }}
+              </el-text>
+              <el-button @click="showUserFile(url)" :loading="showUserFileLoading">查看</el-button>
+            </el-col>
           </el-row>
           <el-row>
             <el-col :span="24"
