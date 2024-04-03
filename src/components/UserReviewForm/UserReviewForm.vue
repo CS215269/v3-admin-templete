@@ -14,7 +14,7 @@ import {
 import { setDegree, setEducation, getDegree, getEducation } from "@/utils/degree"
 import type * as Type from "./type/data"
 import { getThingInfoApi, preViewUserFileApi } from "./api"
-import { reTryJobApplicationPartA, submitJobApplicationPartB, submitJobApplicationPartC } from "@/api/user-batch"
+import { submitJobApplicationPartA, submitJobApplicationPartB, reTryJobApplicationPartC } from "@/api/user-batch"
 import { useUserStore } from "@/store/modules/user"
 
 defineComponent({
@@ -510,7 +510,7 @@ const submit = () => {
     thingID: props.thingId
   }
 
-  reTryJobApplicationPartA(formDataPartA)
+  submitJobApplicationPartA(formDataPartA)
     .then((res) => {
       if (res.code != 0) {
         uploadError.value = true
@@ -526,7 +526,7 @@ const submit = () => {
     .catch(() => {})
     .finally(() => {})
 
-  submitJobApplicationPartC(formDataPartC.value)
+  reTryJobApplicationPartC(formDataPartC.value)
     .then(() => {})
     .catch(() => {})
     .finally(() => {

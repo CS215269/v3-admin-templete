@@ -56,3 +56,11 @@ export function submitJobApplicationPartC(data: Type.FormDataPartC) {
     data
   })
 }
+
+export function reTryJobApplicationPartC(data: Type.FormDataPartC) {
+  return request({
+    url: `submitC`,
+    method: "put",
+    data
+  })
+}
