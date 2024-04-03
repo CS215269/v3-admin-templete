@@ -349,10 +349,7 @@ onMounted(() => {
           <el-row>
             <el-col :span="24">
               <el-form-item label="户口所在地（应届毕业生填入学前的）">
-                <el-input
-                  v-model="formDataUserInfo.nativePlace"
-                  placeholder="** 省（市、自治区）** 市（州）** 县（市、区）"
-                />
+                <el-text>{{ formDataUserInfo.nativePlace }}</el-text>
               </el-form-item>
             </el-col>
           </el-row>
@@ -366,7 +363,7 @@ onMounted(() => {
           <el-row>
             <el-col :span="24">
               <el-form-item label="曾获何种专业证书，有何特长">
-                <el-input type="textarea" v-model="formDataUserInfo.specialtiesCertificates" />
+                <el-text>{{ formDataUserInfo.specialtiesCertificates }}</el-text>
               </el-form-item>
             </el-col>
           </el-row>

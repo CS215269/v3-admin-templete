@@ -187,7 +187,7 @@ onMounted(getBatchData)
       <ul v-infinite-scroll="loadData" :infinite-scroll-disabled="true" class="infinite-list" style="overflow: auto">
         <li>
           <el-row>
-            <el-col>
+            <el-col style="text-align: start">
               <el-text tag="p" type="danger"> 填报须知：</el-text>
               <el-text tag="p" type="danger">
                 <b
