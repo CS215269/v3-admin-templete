@@ -11,11 +11,11 @@ import {
   UploadUserFile,
   genFileId
 } from "element-plus"
-import { setDegree, setEducation } from "@/utils/degree"
+import { setDegree, setEducation, getDegree, getEducation } from "@/utils/degree"
 import type * as Type from "./type/data"
-import { submitJobApplicationPartA, submitJobApplicationPartB, submitJobApplicationPartC } from "@/api/user-batch"
-import { useUserStore } from "@/store/modules/user"
 import { getThingInfoApi, preViewUserFileApi } from "./api"
+import { reTryJobApplicationPartA, submitJobApplicationPartB, submitJobApplicationPartC } from "@/api/user-batch"
+import { useUserStore } from "@/store/modules/user"
 
 defineComponent({
   name: "ReviewForm"
@@ -30,7 +30,7 @@ const closeDrawer = () => {
 }
 
 const props = defineProps<{
-  recruitId: number
+  thingId: number
   code: string
 }>()
 
@@ -110,9 +110,6 @@ const addFormItemEducation = () => {
     education: "",
     specialty: ""
   })
-  // nextTick(() => {
-  // 可选: 自动聚焦到新添加的表单项
-  // })
 }
 const delFormItemEducation = (item: formDataTypeEducation) => {
   let currentId = item.id
@@ -136,10 +133,10 @@ const formDataWorkExperience = ref<Type.WorkExperience[]>([
     position: ""
   }
 ])
-const work_time = ref<string[]>([""])
+const work_time = ref<[string, string][]>([["", ""]])
 
 const addFormItemWorkExperience = () => {
-  work_time.value.push("")
+  work_time.value.push(["", ""])
   formDataWorkExperience.value = [
     ...formDataWorkExperience.value,
     { id: 0, company: "", work_time_start: "", work_time_end: "", position: "" }
@@ -221,7 +218,7 @@ const formDataProject1 = ref<Type.Project[]>([
   }
 ])
 const addFormItemProject1 = () => {
-  formDataProject1.value.push({ type: 0, id: formDataProject1.value.length, time: "", title: "", level: "", rank: "" })
+  formDataProject1.value.push({ type: 1, id: formDataProject1.value.length, time: "", title: "", level: "", rank: "" })
 }
 const delFormItemProject1 = (item: Type.Project) => {
   let currentId = item.id
@@ -310,19 +307,14 @@ const delFormItemFamilyConnections = (item: Type.FamilyConnections) => {
 const note = ref<string>("")
 
 const formDataPartA = reactive<Type.FormDataPartA>({
-  recruitId: props.recruitId,
+  recruitId: props.thingId,
   code: props.code,
   info: formDataUserInfo.value,
   education: [],
   workExperience: []
 })
 const formDataPartB = ref<Type.FormDataPartB>()
-const formDataPartC = reactive<Type.FormDataPartC>({
-  research: formDataResearch.value,
-  awardsAndPunishments: awardsAndPunishments.value,
-  family: formDataFamilyConnections.value,
-  note: note.value
-})
+const formDataPartC = ref<Type.FormDataPartC>()
 
 const loading = ref<boolean>(false)
 const showinfo = (thingId: number, code: string) => {
@@ -334,8 +326,37 @@ const showinfo = (thingId: number, code: string) => {
         return
       }
       formDataUserInfo.value = res.data.userinfo
-      formDataEducation.value = res.data.education
+      sex.value = res.data.userinfo.sex == 1 ? "男" : "女"
+      if (res.data.education && Array.isArray(res.data.education)) {
+        formDataEducation.value = []
+        for (let i = 0; i < res.data.education.length; i++) {
+          const element = res.data.education[i]
+          formDataEducation.value.push({
+            id: element.id,
+            school: element.school,
+            graduationTime: element.graduationTime,
+            degree: getDegree(element.degree),
+            education: getEducation(element.education),
+            specialty: element.specialty
+          })
+        }
+      }
       formDataWorkExperience.value = res.data.workExperience
+      if (res.data.workExperience && Array.isArray(res.data.workExperience)) {
+        formDataWorkExperience.value = []
+        work_time.value = []
+        for (let i = 0; i < res.data.workExperience.length; i++) {
+          const element = res.data.workExperience[i]
+          work_time.value.push([element.work_time_start, element.work_time_end])
+          formDataWorkExperience.value.push({
+            id: element.id,
+            company: element.company,
+            work_time_start: "",
+            work_time_end: "",
+            position: element.position
+          })
+        }
+      }
       formDataPaper.value = res.data.paper
       if (res.data && res.data.project && Array.isArray(res.data.project)) {
         formDataProject0.value = res.data.project.filter((item) => item.type === 0)
@@ -355,18 +376,75 @@ const showinfo = (thingId: number, code: string) => {
           const element = res.data.file0[i]
           fileList0.value.push({
             url: element,
-            name: element.split("/").slice(-1)
+            name: element.split("/").slice(-1)[0]
           })
         }
-        fileList0.value = res.data.file0.reverse()
       }
-      if (res.data.file1 != null) fileList1.value = res.data.file1.reverse()
-      if (res.data.file2 != null) fileList2.value = res.data.file2.reverse()
-      if (res.data.file3 != null) fileList3.value = res.data.file3.reverse()
-      if (res.data.file4 != null) fileList4.value = res.data.file4.reverse()
-      if (res.data.file5 != null) fileList5.value = res.data.file5.reverse()
-      if (res.data.file6 != null) fileList6.value = res.data.file6.reverse()
-      if (res.data.IDPhoto != null) fileIdNum.value = res.data.IDPhoto
+      if (res.data.file1 != null) {
+        for (let i = 0; i < res.data.file1.length; i++) {
+          const element = res.data.file1[i]
+          fileList1.value.push({
+            url: element,
+            name: element.split("/").slice(-1)[0]
+          })
+        }
+      }
+      if (res.data.file2 != null) {
+        for (let i = 0; i < res.data.file2.length; i++) {
+          const element = res.data.file2[i]
+          fileList2.value.push({
+            url: element,
+            name: element.split("/").slice(-1)[0]
+          })
+        }
+      }
+      if (res.data.file3 != null) {
+        for (let i = 0; i < res.data.file3.length; i++) {
+          const element = res.data.file3[i]
+          fileList3.value.push({
+            url: element,
+            name: element.split("/").slice(-1)[0]
+          })
+        }
+      }
+      if (res.data.file4 != null) {
+        for (let i = 0; i < res.data.file4.length; i++) {
+          const element = res.data.file4[i]
+          fileList4.value.push({
+            url: element,
+            name: element.split("/").slice(-1)[0]
+          })
+        }
+      }
+      if (res.data.file5 != null) {
+        for (let i = 0; i < res.data.file5.length; i++) {
+          const element = res.data.file5[i]
+          fileList5.value.push({
+            url: element,
+            name: element.split("/").slice(-1)[0]
+          })
+        }
+      }
+      if (res.data.file6 != null) {
+        for (let i = 0; i < res.data.file6.length; i++) {
+          const element = res.data.file6[i]
+          fileList6.value.push({
+            url: element,
+            name: element.split("/").slice(-1)[0]
+          })
+        }
+      }
+      // if (res.data.file1 != null) fileList1.value = res.data.file1.reverse()
+      // if (res.data.file2 != null) fileList2.value = res.data.file2.reverse()
+      // if (res.data.file3 != null) fileList3.value = res.data.file3.reverse()
+      // if (res.data.file4 != null) fileList4.value = res.data.file4.reverse()
+      // if (res.data.file5 != null) fileList5.value = res.data.file5.reverse()
+      // if (res.data.file6 != null) fileList6.value = res.data.file6.reverse()
+      if (res.data.IDPhoto != null)
+        fileIdNum.value[0] = {
+          url: res.data.IDPhoto,
+          name: res.data.IDPhoto.split("/").slice(-1)[0]
+        }
     })
     .catch(() => {})
     .finally(() => {
@@ -374,9 +452,9 @@ const showinfo = (thingId: number, code: string) => {
     })
 }
 
-const percentage = ref(0)
 const uploading = ref(false)
 const fileUploading = ref(false)
+const uploadError = ref(false)
 
 const submit = () => {
   if (delivered.value) {
@@ -420,39 +498,37 @@ const submit = () => {
 
   formDataPartA.education = adapter
   formDataPartA.workExperience = formDataWorkExperience.value
-  formDataPartC.note = note.value
-  formDataPartC.awardsAndPunishments = awardsAndPunishments.value
+  formDataPartB.value = {
+    paper: formDataPaper.value,
+    project: formDataProject0.value.concat(formDataProject1.value, formDataProject2.value)
+  }
+  formDataPartC.value = {
+    research: formDataResearch.value,
+    awardsAndPunishments: awardsAndPunishments.value,
+    family: formDataFamilyConnections.value,
+    note: note.value,
+    thingID: props.thingId
+  }
 
-  submitJobApplicationPartA(formDataPartA)
+  reTryJobApplicationPartA(formDataPartA)
     .then((res) => {
-      if (res.code == 0) {
-        percentage.value += 10
-        return true
+      if (res.code != 0) {
+        uploadError.value = true
       }
     })
     .catch(() => {
       // submitStatus.value = false
     })
     .finally(() => {})
-  formDataPartB.value = {
-    paper: formDataPaper.value,
-    project: formDataProject0.value.concat(formDataProject1.value, formDataProject2.value)
-  }
+
   submitJobApplicationPartB(formDataPartB.value)
-    .then(() => {
-      percentage.value += 10
-    })
-    .catch(() => {
-      // submitStatus.value = false
-    })
+    .then(() => {})
+    .catch(() => {})
     .finally(() => {})
-  submitJobApplicationPartC(formDataPartC)
-    .then(() => {
-      percentage.value += 10
-    })
-    .catch(() => {
-      // submitStatus.value = false
-    })
+
+  submitJobApplicationPartC(formDataPartC.value)
+    .then(() => {})
+    .catch(() => {})
     .finally(() => {
       uploading.value = false
       submitUpload()
@@ -478,7 +554,7 @@ const fileList3 = ref<UploadUserFile[]>([])
 const fileList4 = ref<UploadUserFile[]>([])
 const fileList5 = ref<UploadUserFile[]>([])
 const fileList6 = ref<UploadUserFile[]>([])
-const fileIdNum = ref<UploadUserFile>()
+const fileIdNum = ref<UploadUserFile[]>([])
 
 const token = useUserStore().token
 const myHeaders = new Headers()
@@ -526,11 +602,11 @@ const submitUpload = async () => {
   }
   fileUploading.value = false
 
-  ElMessage.success("提交成功")
+  if (uploadError.value) {
+    ElMessage.error("投递异常")
+  } else ElMessage.success("提交成功")
   closeDrawer()
 }
-/** 上传完成处理函数 */
-const handleUploadComplete = () => {}
 
 const handleChange: UploadProps["onChange"] = (uploadFile, uploadFiles) => {
   if (!uploadFile || !uploadFile.raw) {
@@ -590,15 +666,15 @@ const showUserFile = (path0: string | undefined) => {
 }
 
 onMounted(() => {
-  showinfo(props.recruitId, props.code)
+  showinfo(props.thingId, props.code)
 })
 </script>
 
 <template>
   <el-row justify="center">
     <el-col :span="23">
-      <el-row justify="space-evenly">
-        <el-col>
+      <el-row>
+        <el-col class="text-left-override">
           <el-text tag="p" type="danger"> 填报须知：</el-text>
           <el-text tag="p" type="danger">
             <b
@@ -712,6 +788,7 @@ onMounted(() => {
               v-model:file-list="fileIdNum"
               ref="upload"
               :action="uploadPath2"
+              :show-file-list="false"
               accept="application/pdf"
               :limit="1"
               :on-exceed="handleExceed"
@@ -726,6 +803,23 @@ onMounted(() => {
                 <div class="el-upload__tip">上传一个PDF文件,包含身份证正反面照片</div>
               </template>
             </el-upload>
+            <el-space direction="vertical" size="small">
+              <el-text tag="p" v-for="(file, index) in fileIdNum" :key="index">
+                {{ file.name }}
+                <el-button
+                  v-if="file.url != undefined"
+                  @click="showUserFile(file.url)"
+                  :loading="showUserFileLoading"
+                  type=""
+                  text
+                  bg
+                  size="small"
+                >
+                  查看
+                </el-button>
+                <el-button type="danger" text bg size="small" @click="fileIdNum.splice(index, 1)"> 删除 </el-button>
+              </el-text>
+            </el-space>
           </el-col>
         </el-row>
         <el-row>
@@ -809,7 +903,6 @@ onMounted(() => {
               :auto-upload="false"
               accept="application/pdf"
               :on-exceed="handleExceed"
-              :on-success="handleUploadComplete"
               :on-change="handleChange"
               :headers="myHeaders"
               :data="{
@@ -820,12 +913,23 @@ onMounted(() => {
               <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
             </el-upload>
-            <el-text v-for="(file, index) in fileList0" :key="index">
-              {{ file.name }}
-
-              <el-button @click="showUserFile()" :loading="showUserFileLoading" type="" text bg> 查看 </el-button>
-              <el-button type="danger" text bg> 删除 </el-button>
-            </el-text>
+            <el-space direction="vertical" size="small">
+              <el-text tag="p" v-for="(file, index) in fileList0" :key="index">
+                {{ file.name }}
+                <el-button
+                  v-if="file.url != undefined"
+                  @click="showUserFile(file.url)"
+                  :loading="showUserFileLoading"
+                  type=""
+                  text
+                  bg
+                  size="small"
+                >
+                  查看
+                </el-button>
+                <el-button type="danger" text bg size="small" @click="fileList0.splice(index, 1)"> 删除 </el-button>
+              </el-text>
+            </el-space>
           </el-col>
           <el-col :span="12" v-if="formDataEducation.length == 0"><el-text> 暂无记录 </el-text></el-col>
           <el-col :span="4"><el-button @click="addFormItemEducation()">增加一条记录</el-button> </el-col>
@@ -848,7 +952,6 @@ onMounted(() => {
         <el-row v-for="(item, index) in formDataWorkExperience" :key="index">
           <el-col :span="6">
             <el-form-item>
-              {{ work_time[index] }}
               <el-date-picker
                 v-model="work_time[index]"
                 type="monthrange"
@@ -881,9 +984,9 @@ onMounted(() => {
               ref="uploadRef1"
               :action="uploadPath"
               :auto-upload="false"
+              :show-file-list="false"
               accept="application/pdf"
               :on-exceed="handleExceed"
-              :on-success="handleUploadComplete"
               :on-change="handleChange"
               :headers="myHeaders"
               :data="{
@@ -894,6 +997,23 @@ onMounted(() => {
               <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
             </el-upload>
+            <el-space direction="vertical" size="small">
+              <el-text tag="p" v-for="(file, index) in fileList1" :key="index">
+                {{ file.name }}
+                <el-button
+                  v-if="file.url != undefined"
+                  @click="showUserFile(file.url)"
+                  :loading="showUserFileLoading"
+                  type=""
+                  text
+                  bg
+                  size="small"
+                >
+                  查看
+                </el-button>
+                <el-button type="danger" text bg size="small" @click="fileList1.splice(index, 1)"> 删除 </el-button>
+              </el-text>
+            </el-space>
           </el-col>
           <el-col :span="12" v-if="formDataWorkExperience.length == 0"><el-text> 暂无记录 </el-text></el-col>
           <el-col :span="4"><el-button @click="addFormItemWorkExperience()">增加一条记录</el-button> </el-col>
@@ -942,10 +1062,10 @@ onMounted(() => {
               v-model:file-list="fileList2"
               :action="uploadPath"
               ref="uploadRef2"
+              :show-file-list="false"
               :auto-upload="false"
               accept="application/pdf"
               :on-exceed="handleExceed"
-              :on-success="handleUploadComplete"
               :on-change="handleChange"
               :headers="myHeaders"
               :data="{
@@ -956,6 +1076,23 @@ onMounted(() => {
               <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
             </el-upload>
+            <el-space direction="vertical" size="small">
+              <el-text tag="p" v-for="(file, index) in fileList2" :key="index">
+                {{ file.name }}
+                <el-button
+                  v-if="file.url != undefined"
+                  @click="showUserFile(file.url)"
+                  :loading="showUserFileLoading"
+                  type=""
+                  text
+                  bg
+                  size="small"
+                >
+                  查看
+                </el-button>
+                <el-button type="danger" text bg size="small" @click="fileList2.splice(index, 1)"> 删除 </el-button>
+              </el-text>
+            </el-space>
           </el-col>
           <el-col :span="12" v-if="formDataPaper.length == 0"><el-text> 暂无记录 </el-text></el-col>
           <el-col :span="4"><el-button @click="addFormItemPaper()">增加一条记录</el-button> </el-col>
@@ -1011,9 +1148,9 @@ onMounted(() => {
               :action="uploadPath"
               ref="uploadRef3"
               :auto-upload="false"
+              :show-file-list="false"
               accept="application/pdf"
               :on-exceed="handleExceed"
-              :on-success="handleUploadComplete"
               :on-change="handleChange"
               :headers="myHeaders"
               :data="{
@@ -1024,6 +1161,23 @@ onMounted(() => {
               <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
             </el-upload>
+            <el-space direction="vertical" size="small">
+              <el-text tag="p" v-for="(file, index) in fileList3" :key="index">
+                {{ file.name }}
+                <el-button
+                  v-if="file.url != undefined"
+                  @click="showUserFile(file.url)"
+                  :loading="showUserFileLoading"
+                  type=""
+                  text
+                  bg
+                  size="small"
+                >
+                  查看
+                </el-button>
+                <el-button type="danger" text bg size="small" @click="fileList3.splice(index, 1)"> 删除 </el-button>
+              </el-text>
+            </el-space>
           </el-col>
           <el-col :span="12" v-if="formDataProject0.length == 0"><el-text> 暂无记录 </el-text></el-col>
           <el-col :span="4"><el-button @click="addFormItemProject0()">增加一条记录</el-button> </el-col>
@@ -1078,9 +1232,9 @@ onMounted(() => {
               :action="uploadPath"
               ref="uploadRef4"
               :auto-upload="false"
+              :show-file-list="false"
               accept="application/pdf"
               :on-exceed="handleExceed"
-              :on-success="handleUploadComplete"
               :on-change="handleChange"
               :headers="myHeaders"
               :data="{
@@ -1091,6 +1245,23 @@ onMounted(() => {
               <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
             </el-upload>
+            <el-space direction="vertical" size="small">
+              <el-text tag="p" v-for="(file, index) in fileList4" :key="index">
+                {{ file.name }}
+                <el-button
+                  v-if="file.url != undefined"
+                  @click="showUserFile(file.url)"
+                  :loading="showUserFileLoading"
+                  type=""
+                  text
+                  bg
+                  size="small"
+                >
+                  查看
+                </el-button>
+                <el-button type="danger" text bg size="small" @click="fileList4.splice(index, 1)"> 删除 </el-button>
+              </el-text>
+            </el-space>
           </el-col>
 
           <el-col :span="12" v-if="formDataProject1.length == 0"><el-text> 暂无记录 </el-text></el-col>
@@ -1140,9 +1311,9 @@ onMounted(() => {
               :action="uploadPath"
               ref="uploadRef5"
               :auto-upload="false"
+              :show-file-list="false"
               accept="application/pdf"
               :on-exceed="handleExceed"
-              :on-success="handleUploadComplete"
               :on-change="handleChange"
               :headers="myHeaders"
               :data="{
@@ -1153,6 +1324,23 @@ onMounted(() => {
               <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
             </el-upload>
+            <el-space direction="vertical" size="small">
+              <el-text tag="p" v-for="(file, index) in fileList5" :key="index">
+                {{ file.name }}
+                <el-button
+                  v-if="file.url != undefined"
+                  @click="showUserFile(file.url)"
+                  :loading="showUserFileLoading"
+                  type=""
+                  text
+                  bg
+                  size="small"
+                >
+                  查看
+                </el-button>
+                <el-button type="danger" text bg size="small" @click="fileList5.splice(index, 1)"> 删除 </el-button>
+              </el-text>
+            </el-space>
           </el-col>
           <el-col :span="12" v-if="formDataProject2.length == 0"><el-text> 暂无记录 </el-text></el-col>
           <el-col :span="4"><el-button @click="addFormItemProject2()">增加一条记录</el-button> </el-col>
@@ -1183,9 +1371,9 @@ onMounted(() => {
               :action="uploadPath"
               ref="uploadRef6"
               :auto-upload="false"
+              :show-file-list="false"
               accept="application/pdf"
               :on-exceed="handleExceed"
-              :on-success="handleUploadComplete"
               :on-change="handleChange"
               :headers="myHeaders"
               :data="{
@@ -1196,6 +1384,23 @@ onMounted(() => {
               <el-button type="primary" size="small" plain>上传佐证文件</el-button>
               <template #tip> <div class="el-upload__tip">只能上传PDF</div> </template>
             </el-upload>
+            <el-space direction="vertical" size="small">
+              <el-text tag="p" v-for="(file, index) in fileList6" :key="index">
+                {{ file.name }}
+                <el-button
+                  v-if="file.url != undefined"
+                  @click="showUserFile(file.url)"
+                  :loading="showUserFileLoading"
+                  type=""
+                  text
+                  bg
+                  size="small"
+                >
+                  查看
+                </el-button>
+                <el-button type="danger" text bg size="small" @click="fileList6.splice(index, 1)"> 删除 </el-button>
+              </el-text>
+            </el-space>
           </el-col>
           <el-col :span="12" v-if="formDataResearch.length == 0"><el-text> 暂无记录 </el-text></el-col>
           <el-col :span="4">
@@ -1252,7 +1457,9 @@ onMounted(() => {
             <el-text v-if="uploading">上传中</el-text>
           </el-col>
           <el-col :span="4">
-            <el-button :loading="uploading" type="warning" size="large" plain @click="submit()">提交</el-button>
+            <el-button :loading="uploading || fileUploading" type="warning" size="large" plain @click="submit()"
+              >提交</el-button
+            >
           </el-col>
         </el-row>
       </el-form>
@@ -1264,6 +1471,9 @@ onMounted(() => {
   text-align: center;
   padding: 0.5em 0.8em;
   outline: transparent 1px solid;
+}
+.el-drawer__body .text-left-override {
+  text-align: left;
 }
 .el-drawer__body .el-row {
   margin-top: 0.3em;

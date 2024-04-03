@@ -33,6 +33,14 @@ export function submitJobApplicationPartA(data: Type.FormDataPartA) {
   })
 }
 
+export function reTryJobApplicationPartA(data: Type.FormDataPartA) {
+  return request<Type.SubmitDataRequest>({
+    url: `submitA`,
+    method: "put",
+    data
+  })
+}
+
 export function submitJobApplicationPartB(data: Type.FormDataPartB) {
   return request({
     url: `submitB`,

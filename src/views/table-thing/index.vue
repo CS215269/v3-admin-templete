@@ -85,11 +85,6 @@ const resetSearch = () => {
 }
 //#endregion
 
-const handleCloseDrawer = () => {
-  drawerVisible.value.fill(false)
-  getTableData()
-}
-
 const positionList = ref<{ id: number; jobTitle: string }[]>([])
 const batchList = ref<{ id: number; name: string }[]>([])
 
@@ -113,18 +108,28 @@ onMounted(() => {
 })
 
 /** 详细信息弹框开关 */
-const drawerVisible = ref<boolean[]>([false])
+const drawerVisible = ref<boolean>(false)
 /** 详细信息:code */
 const code = ref<string>("")
 /** 详细信息thingId */
 const thingId = ref<number>(0)
 const status = ref<number>(0)
-const showinfoHandle = (row: GetTableThingData, index: number) => {
+const showinfoHandle = (row: GetTableThingData) => {
   code.value = row.code
   thingId.value = row.thingId
   status.value = row.status
-  drawerVisible.value[index] = true
+  drawerVisible.value = true
+  console.log("打开框")
+  console.log(row.username)
+  console.log(code.value)
+  console.log(thingId.value)
 }
+
+const handleCloseDrawer = () => {
+  drawerVisible.value = false
+  getTableData()
+}
+
 /** 表格引用 */
 const multipleTableRef = ref<InstanceType<typeof ElTable>>()
 /** 选中行 */
@@ -246,9 +251,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           </el-table-column>
           <el-table-column fixed="right" label="操作" min-width="200px" align="left">
             <template #default="scope">
-              <el-button type="info" bg size="small" @click="showinfoHandle(scope.row, scope.$index)"
-                >详细信息</el-button
-              >
+              <el-button type="info" bg size="small" @click="showinfoHandle(scope.row)"> 详细信息 </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -266,135 +269,9 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         />
       </div>
     </el-card>
-    <el-drawer v-for="(t, index) in tableData" :key="t.thingId" v-model="drawerVisible[index]" size="80%">
-      <AuditReviewForm :code="t.code" :thingId="t.thingId" :status="t.status" @close-drawer="handleCloseDrawer()" />
+    <el-drawer v-model="drawerVisible" size="80%" :destroy-on-close="true">
+      <AuditReviewForm :code="code" :thingId="thingId" :status="status" @close-drawer="handleCloseDrawer()" />
     </el-drawer>
-    <!-- 详细信息
-    <el-dialog v-model="dialogVisible" title="简历详情" width="80%">
-      <el-row :gutter="20">
-        <el-col :span="16">
-          <el-descriptions title="投递人" :column="3" border size="small">
-            <el-descriptions-item label="用户名" label-align="center" align="left">
-              {{ thingInfo?.name }}</el-descriptions-item
-            >
-            <el-descriptions-item label="年龄" label-align="center" align="left">
-              {{ thingInfo?.age }}</el-descriptions-item
-            >
-            <el-descriptions-item label="性别" label-align="center" align="left">
-              {{ thingInfo?.sex }}
-            </el-descriptions-item>
-            <el-descriptions-item label="学历" label-align="center" align="left">
-              {{ getEducationLabel2(thingInfo?.userEducation) }}
-            </el-descriptions-item>
-            <el-descriptions-item label="政治面貌" label-align="center" align="left"
-              >{{ thingInfo?.zzmm }}
-            </el-descriptions-item>
-            <el-descriptions-item label="籍贯" label-align="center" align="left"
-              >{{ thingInfo?.native_place }}
-            </el-descriptions-item>
-            <el-descriptions-item label="出生日期" label-align="center" align="left"
-              >{{ thingInfo?.birthday }}
-            </el-descriptions-item>
-            <el-descriptions-item label="民族" label-align="center" align="left"
-              >{{ thingInfo?.nation }}
-            </el-descriptions-item>
-            <el-descriptions-item label="毕业院校" label-align="center" align="left"
-              >{{ thingInfo?.school }}
-            </el-descriptions-item>
-            <el-descriptions-item label="毕业时间" label-align="center" align="left"
-              >{{ thingInfo?.graduation_time }}
-            </el-descriptions-item>
-            <el-descriptions-item label="专业" label-align="center" align="left"
-              >{{ thingInfo?.specialty }}
-            </el-descriptions-item>
-            <el-descriptions-item label="身份证号码" label-align="center" align="left"
-              >{{ thingInfo?.idnum }}
-            </el-descriptions-item>
-            <el-descriptions-item label="手机号" label-align="center" align="left"
-              >{{ thingInfo?.tel }}
-            </el-descriptions-item>
-            <el-descriptions-item label="现居地址" :span="2" label-align="center" align="left"
-              >{{ thingInfo?.address }}
-            </el-descriptions-item>
-          </el-descriptions>
-          <el-text tag="p" size="large" style="margin-top: 20px"><strong>用户资历文件</strong></el-text>
-          <template v-for="url in imgList" :key="url">
-            <el-image
-              style="width: 100px; height: 100px"
-              :src="url"
-              :zoom-rate="1.2"
-              :max-scale="4"
-              :min-scale="0.4"
-              :preview-src-list="imgList"
-              :initial-index="0"
-              fit="cover"
-            />
-          </template>
-          <template v-for="url in fileList" :key="url">
-            <el-text tag="p" style="margin-bottom: 20px">
-              {{ url.split("/").slice(-1) }}
-              <el-button @click="showUserFile(url)" :loading="showUserFileLoading">查看</el-button>
-            </el-text>
-          </template>
-          <div id="previewUserFile" />
-        </el-col>
-        <el-col :span="8">
-          <el-descriptions title="意愿岗位" :column="1" border size="small">
-            <el-descriptions-item
-              label="Username"
-              label-align="right"
-              align="center"
-              label-class-name="my-label"
-              class-name="my-content"
-              >{{ thingInfo.jobTitle }}</el-descriptions-item
-            >
-            <el-descriptions-item label="Telephone" label-align="right" align="center"
-              >18100000000</el-descriptions-item
-            >
-            <el-descriptions-item label="Place" label-align="right" align="center">Suzhou</el-descriptions-item>
-            <el-descriptions-item label="Remarks" label-align="right" align="center">
-              <el-tag size="small">School</el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="Address" label-align="right" align="center"
-              >No.1188, Wuzhong Avenue, Wuzhong District, Suzhou, Jiangsu Province</el-descriptions-item
-            >
-          </el-descriptions>
-        </el-col>
-      </el-row>
-      <template #footer>
-        <el-button type="primary" @click="dialogVisible = false">确定</el-button>
-      </template>
-    </el-dialog>
-    <el-dialog v-model="previewDialog" width="80%" title="打印预览">
-      <el-card v-loading="previewLoading">
-        <el-text tag="p">若要修改准考证模板文件,请前往服务端D:/*/*/**</el-text>
-        <el-text>生成 {{ multipleSelection.length }} 份准考证 </el-text>
-        <el-table :data="multipleSelection">
-          <el-table-column prop="username" label="用户姓名" align="center" />
-
-          <el-table-column prop="jobTitle" label="用户电话" align="center" />
-          <el-table-column label="岗位代码">
-            <template #default="{ $index }">
-              {{ previewCode[$index] }}
-            </template>
-          </el-table-column>
-          <el-table-column label="准考证号">
-            <template #default="{ $index }">
-              {{ previewCode2[$index] }}
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-text>准考证模板预览: </el-text>
-        <el-divider />
-        <div id="container_docx" />
-        <el-divider />
-      </el-card>
-
-      <template #footer>
-        <el-button type="warning" @click="previewDialog = false">取消</el-button>
-        <el-button type="primary" @click="printCertificates()">确定</el-button>
-      </template>
-    </el-dialog> -->
   </div>
 </template>
 

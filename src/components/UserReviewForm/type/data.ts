@@ -77,6 +77,7 @@ export interface FormDataPartC {
   awardsAndPunishments: string
   family: FamilyConnections[]
   note: string
+  thingID: number
 }
 
 export type SubmitDataRequest = ApiResponseData<null>

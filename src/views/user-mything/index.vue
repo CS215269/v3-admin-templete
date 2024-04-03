@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue"
 import { GetTableRequestData } from "@/api/user-thing/types/user-thing"
 import { exportFormApi, getUserThingDataApi, userAbandonApi } from "@/api/user-thing"
 import { ElMessage } from "element-plus"
+import UserReviewForm from "@/components/UserReviewForm/UserReviewForm.vue"
 import UserReview from "@/components/UserReview/UserReview.vue"
 
 defineOptions({
@@ -75,10 +76,15 @@ const exportForm = (id: number) => {
     })
 }
 
-const openHandle = (id: number, code: string) => {
+const openHandle = (thingId: number, code: string) => {
   drawerOpen.value = true
   activeCode.value = code
-  activeThingId.value = id
+  activeThingId.value = thingId
+}
+
+const closeDrawer = () => {
+  drawerOpen.value = false
+  getTableData()
 }
 const step = (status: number) => {
   switch (Math.abs(status)) {
@@ -103,13 +109,8 @@ onMounted(getTableData)
       </div>
       <div class="table-wrapper">
         <div v-if="positions.length > 0" style="margin: 0">
-          <el-card
-            v-for="(position, index) in positions"
-            :key="position.recruitId"
-            :name="index.toString()"
-            shadow="never"
-          >
-            <template #title>
+          <el-card v-for="(position, index) in positions" :key="index" :name="index.toString()" shadow="never">
+            <template #header>
               <el-text tag="b"> {{ position.code }} </el-text>
               &nbsp;
               <el-text tag="b"> {{ position.type }} </el-text>
@@ -161,7 +162,7 @@ onMounted(getTableData)
                 <h4>重新投递: 岗位代码 {{ activeCode }}</h4>
               </template>
               <template #default>
-                <ReviewForm :recruitId="activeThingId" :code="activeCode" @close-drawer="drawerOpen = false" />
+                <UserReviewForm :thingId="activeThingId" :code="activeCode" @close-drawer="closeDrawer" />
               </template>
             </el-drawer>
           </el-card>

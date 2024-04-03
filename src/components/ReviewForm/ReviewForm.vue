@@ -228,7 +228,7 @@ const formDataProject1 = ref<Type.Project[]>([
   }
 ])
 const addFormItemProject1 = () => {
-  formDataProject1.value.push({ type: 0, id: formDataProject1.value.length, time: "", title: "", level: "", rank: "" })
+  formDataProject1.value.push({ type: 1, id: formDataProject1.value.length, time: "", title: "", level: "", rank: "" })
   // nextTick(() => {
   // 可选: 自动聚焦到新添加的表单项
   // })
@@ -340,7 +340,8 @@ const formDataPartC = reactive<Type.FormDataPartC>({
   research: formDataResearch.value,
   awardsAndPunishments: awardsAndPunishments.value,
   family: formDataFamilyConnections.value,
-  note: note.value
+  note: note.value,
+  thingID: 0
 })
 const percentage = ref(0)
 const uploading = ref(false)
@@ -534,8 +535,8 @@ onMounted(() => {
 <template>
   <el-row justify="center">
     <el-col :span="23">
-      <el-row justify="space-evenly">
-        <el-col>
+      <el-row>
+        <el-col class="text-left-override">
           <el-text tag="p" type="danger"> 填报须知：</el-text>
           <el-text tag="p" type="danger">
             <b
@@ -776,7 +777,6 @@ onMounted(() => {
         <el-row v-for="(item, index) in formDataWorkExperience" :key="index">
           <el-col :span="6">
             <el-form-item>
-              {{ work_time[index] }}
               <el-date-picker
                 v-model="work_time[index]"
                 type="monthrange"
@@ -1186,6 +1186,10 @@ onMounted(() => {
   text-align: center;
   padding: 0.5em 0.8em;
   outline: transparent 1px solid;
+}
+/* 新添加的样式来覆盖text-align */
+.el-drawer__body .text-left-override {
+  text-align: left;
 }
 .el-drawer__body .el-row {
   margin-top: 0.3em;
