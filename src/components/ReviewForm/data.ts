@@ -62,7 +62,6 @@ export interface FamilyConnections {
 export interface FormDataPartA {
   info: UserInfo
   code: string
-  recruitId: number
   education: Education[]
   workExperience: WorkExperience[]
 }
@@ -78,6 +77,7 @@ export interface FormDataPartC {
   family: FamilyConnections[]
   note: string
   thingID: number
+  recruitId: number
 }
 
 export type SubmitDataRequest = ApiResponseData<null>

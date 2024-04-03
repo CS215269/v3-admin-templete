@@ -2,7 +2,7 @@
 export const getDegree = (arg: number) => {
   switch (arg) {
     case 0:
-      return "暂无"
+      return "无"
     case 1:
       return "学士"
     case 2:

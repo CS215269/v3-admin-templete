@@ -329,7 +329,6 @@ const delFormItemFamilyConnections = (item: Type.FamilyConnections) => {
 const note = ref<string>("")
 
 const formDataPartA = reactive<Type.FormDataPartA>({
-  recruitId: props.recruitId,
   code: props.code,
   info: formDataUserInfo.value,
   education: [],
@@ -337,6 +336,7 @@ const formDataPartA = reactive<Type.FormDataPartA>({
 })
 const formDataPartB = ref<Type.FormDataPartB>()
 const formDataPartC = reactive<Type.FormDataPartC>({
+  recruitId: props.recruitId,
   research: formDataResearch.value,
   awardsAndPunishments: awardsAndPunishments.value,
   family: formDataFamilyConnections.value,
