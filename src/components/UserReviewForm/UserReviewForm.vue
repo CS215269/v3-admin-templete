@@ -639,8 +639,9 @@ const handleExceed: UploadProps["onExceed"] = (files) => {
 }
 
 const showUserFileLoading = ref<boolean>(false)
-const showUserFile = (path0: string | undefined) => {
-  const path: string = path0 == undefined ? "urlError" : path0
+const showUserFile = (path: string | undefined) => {
+  // 如果参数为空,说明是刚刚上传的,直接返回
+  if (path == undefined) return
   showUserFileLoading.value = true
   preViewUserFileApi({ path })
     .then((res) => {
@@ -664,6 +665,32 @@ const showUserFile = (path0: string | undefined) => {
       showUserFileLoading.value = false
     })
 }
+// const removeUserFile = (path: string | undefined) => {
+//   // 如果参数为空,说明是刚刚上传的,直接返回
+//   if (path == undefined) return
+//   showUserFileLoading.value = true
+//   preViewUserFileApi({ path })
+//     .then((res) => {
+//       // Determine the file extension
+//       const fileExtension = path.slice(path.lastIndexOf(".") + 1).toLowerCase()
+//       if (fileExtension == "pdf") {
+//         const mimeType = "application/pdf"
+//         const blob = new Blob([res], { type: mimeType })
+//         // Handle PDF files: open in a new tab
+//         const pdfURL = URL.createObjectURL(blob)
+//         window.open(pdfURL, "_blank")
+//       } else {
+//         console.log("Unsupported file type")
+//       }
+//     })
+//     .catch((e) => {
+//       ElMessage.error("预览用户资历文件服务异常")
+//       console.log(e)
+//     })
+//     .finally(() => {
+//       showUserFileLoading.value = false
+//     })
+// }
 
 onMounted(() => {
   showinfo(props.thingId, props.code)

@@ -1174,7 +1174,9 @@ onMounted(() => {
             <el-text v-if="uploading">上传中</el-text>
           </el-col>
           <el-col :span="4">
-            <el-button :loading="uploading" type="warning" size="large" plain @click="submit()">提交</el-button>
+            <el-button :loading="uploading || fileUploading" type="warning" size="large" plain @click="submit()"
+              >提交</el-button
+            >
           </el-col>
         </el-row>
       </el-form>

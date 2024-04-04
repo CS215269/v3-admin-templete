@@ -143,6 +143,11 @@ const batchSort = (a: GetTableThingData, b: GetTableThingData) => {
   return a.batchId - b.batchId
 }
 
+const timeSort = (a: GetTableThingData, b: GetTableThingData) => {
+  if (a.time == b.time) return 0
+  return a.time > b.time ? 1 : -1
+}
+
 /** 监听分页参数的变化 */
 watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })
 </script>
@@ -224,7 +229,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
             </template>
           </el-table-column>
           <el-table-column prop="username" sortable label="用户姓名" align="center" />
-          <el-table-column prop="time" sortable label="创建时间" align="center" />
+          <el-table-column prop="time" sortable :sort-method="timeSort" label="创建时间" align="center" />
           <el-table-column prop="degree" sortable label="学位要求" align="center">
             <template #default="educationScope">
               {{ getDegreeLabel(educationScope.row) }}
