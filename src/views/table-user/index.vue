@@ -1,6 +1,12 @@
 <script lang="ts" setup>
 import { reactive, ref, watch } from "vue"
-import { deleteTableDataApi, updateTableDataApi, getTableDataApi, getAlreadyRecruitApi } from "@/api/table-user"
+import {
+  deleteTableDataApi,
+  updateTableDataApi,
+  getTableDataApi,
+  getAlreadyRecruitApi,
+  resetPassWordApi
+} from "@/api/table-user"
 import { type GetTableUserData } from "@/api/table-user/types/table-user"
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox, ElTooltipProps } from "element-plus"
 import { Search, Refresh, Delete, Download, RefreshRight } from "@element-plus/icons-vue"
@@ -11,36 +17,6 @@ defineOptions({
   name: "TableUser"
 })
 
-// 计算属性
-const getEducationLabel = (education: number) => {
-  switch (education) {
-    case 1:
-      return "高职"
-    case 2:
-      return "大专"
-    case 3:
-      return "本科"
-    case 4:
-      return "硕士"
-    case 5:
-      return "博士"
-    default:
-      return "未知"
-  }
-}
-// 计算属性
-const getDegreeLabel = (degree: number) => {
-  switch (degree) {
-    case 1:
-      return "学士"
-    case 2:
-      return "硕士"
-    case 3:
-      return "博士"
-    default:
-      return "未知"
-  }
-}
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
 
@@ -117,6 +93,8 @@ const handleUpdate = (row: GetTableUserData) => {
         currentUpdateId.value = row.id
         formData.name = row.name
         formData.idnum = row.idnum
+        activeName.value = row.name
+        activeId.value = row.id
         dialogVisible.value = true
       }
     })
@@ -172,6 +150,26 @@ const showUserInfo = (id: number) => {
   console.log("用户信息" + id)
 }
 
+const activeId = ref(0)
+const activeName = ref("")
+
+const resetPwd = (id: number | undefined) => {
+  if (id !== undefined) {
+    activeId.value = id
+  }
+  resetPassWordApi({ id: activeId.value })
+    .then(() => {
+      ElMessage.success("密码重置成功")
+    })
+    .catch(() => {
+      tableData.value = []
+    })
+    .finally(() => {
+      loading.value = false
+      getTableData()
+    })
+}
+
 /** 监听分页参数的变化 */
 watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })
 </script>
@@ -211,43 +209,31 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
       </div>
       <div class="table-wrapper">
         <el-table :data="tableData" :tooltip-options="tableTooltipOption">
-          <!-- id: number
-          name: string
-          idnum: number
-          tel: number
-          sex: string
-          age: string
-          education: number
-          zzmm: string
-          school: string
-          nation: string
-          birthday: string
-          native_place: string
-          address: string
-          graduation_time: string
-          specialty: string -->
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column prop="name" label="姓名" align="center" />
-          <el-table-column prop="sex" label="性别" align="center" />
-          <el-table-column prop="idnum" label="身份证" align="center" />
-          <el-table-column prop="education" label="学历" align="center">
+          <el-table-column prop="sex" label="性别" align="center">
             <template #default="scope">
-              {{ getEducationLabel(scope.row.education) }}
+              {{ scope.row.sex === 1 ? "男" : "女" }}
             </template>
           </el-table-column>
-          <el-table-column prop="degree" label="学位" align="center">
-            <template #default="scope">
-              {{ getDegreeLabel(scope.row.degree) }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="address" label="地址" align="center" show-overflow-tooltip />
-          <el-table-column prop="school" label="毕业院校" align="center" />
-          <el-table-column prop="graduation_time" label="毕业时间" align="center" />
-          <el-table-column fixed="right" label="操作" width="250" align="center">
+          <el-table-column prop="idnum" label="身份证" width="180" align="center" />
+          <el-table-column prop="address" label="地址" width="200" align="center" show-overflow-tooltip />
+          <el-table-column fixed="right" label="操作" width="300" align="center">
             <template #default="scope">
               <el-button type="info" text bg size="small" @click="showUserInfo(scope.row)">详细</el-button>
               <el-button type="primary" text bg size="small" @click="handleUpdate(scope.row)">修改</el-button>
               <el-button type="danger" text bg size="small" @click="handleDelete(scope.row)">删除</el-button>
+
+              <el-popconfirm
+                confirm-button-text="确认"
+                cancel-button-text="取消"
+                :title="`你确定要重置TA的密码为'12345678'吗?`"
+                @confirm="resetPwd(scope.row.id)"
+              >
+                <template #reference>
+                  <el-button type="danger" text bg size="small">重置密码</el-button>
+                </template>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -281,6 +267,18 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-input v-model="formData.idnum" placeholder="请输入" />
         </el-form-item>
       </el-form>
+      <el-divider />
+
+      <el-popconfirm
+        confirm-button-text="确认"
+        cancel-button-text="取消"
+        :title="`你确定要重置${activeName}的密码吗?`"
+        @confirm="resetPwd(undefined)"
+      >
+        <template #reference>
+          <el-button>重置密码</el-button>
+        </template>
+      </el-popconfirm>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="handleCreate">确认</el-button>

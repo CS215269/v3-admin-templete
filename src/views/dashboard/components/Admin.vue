@@ -1,24 +1,60 @@
 <script lang="ts" setup>
-import { getDashboardDataApi } from "@/api/dashboard"
+import { getDashboardDataApi, getExportTotalExcelApi, setOpenRegisterApi } from "@/api/dashboard"
 import { ElMessage } from "element-plus"
 import { onMounted, ref } from "vue"
 const userTotal = ref<number>()
 const openBatchTotal = ref<number>()
 const unsettledThingsNum = ref<number>()
-const num = ref<number>(0)
+const methodOpen = ref<boolean>(true)
 const getDashboardData = () => {
   getDashboardDataApi()
     .then((res) => {
-      userTotal.value = res.data.unsettledThingsNum
+      userTotal.value = res.data.userTotal
       openBatchTotal.value = res.data.openBatchTotal
       unsettledThingsNum.value = res.data.unsettledThingsNum
-      num.value = res.data.num
+      methodOpen.value = res.data.methodOpen == 1 ? true : false
     })
     .catch(() => {
       ElMessage.error("首页加载异常")
     })
     .finally(() => {})
 }
+
+const switchLoading = ref(false)
+
+const beforeChange1 = () => {
+  return async () => {
+    switchLoading.value = true
+    try {
+      await setOpenRegisterApi({ open: !methodOpen.value ? 1 : 0 })
+      ElMessage.success("操作成功")
+      switchLoading.value = false
+      return true
+    } catch (error) {
+      ElMessage.error("操作失败")
+      switchLoading.value = false
+      return false
+    }
+  }
+}
+
+const getExcel = () => {
+  getExportTotalExcelApi()
+    .then((res) => {
+      const blob = new Blob([res])
+      const url = window.URL.createObjectURL(blob)
+
+      const a = document.createElement("a")
+      a.href = url
+      a.download = "总表.docx"
+      a.click()
+    })
+    .catch(() => {
+      ElMessage.error("导出失败")
+    })
+    .finally(() => {})
+}
+
 onMounted(getDashboardData)
 </script>
 <template>
@@ -80,11 +116,18 @@ onMounted(getDashboardData)
       </el-col>
       <el-col :span="10">
         <div class="statistic-card">
-          <el-statistic :value="num" title="New transactions today">
-            <template #title>
-              <div style="display: inline-flex; align-items: center">New transactions today</div>
-            </template>
-          </el-statistic>
+          <el-button @click="getExcel()"> 导出招聘情况总表 </el-button>
+          &nbsp;
+          <el-divider direction="vertical" />
+          &nbsp;
+          <el-switch
+            v-model="methodOpen"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            active-text="启用注册"
+            inactive-text="关闭注册"
+            :before-change="beforeChange1()"
+          />
         </div>
       </el-col>
     </el-row>

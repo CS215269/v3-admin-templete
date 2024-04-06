@@ -27,6 +27,15 @@ export function updateTableDataApi(data: Table.UpdateTableRequestData) {
   })
 }
 
+/** 改 */
+export function resetPassWordApi(params: { id: number }) {
+  return request({
+    url: "userNewPwd",
+    method: "get",
+    params
+  })
+}
+
 /** 查 */
 export function getTableDataApi(data: Table.GetTableRequestData) {
   return request<Table.GetTableResponseData>({

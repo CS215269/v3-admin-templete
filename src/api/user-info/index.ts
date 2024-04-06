@@ -32,3 +32,11 @@ export function setRealNameInfoApi(data: Table.SetRealNameRequestData) {
     data
   })
 }
+/** 修改密码 */
+export function newPwdApi(data: { oldPwd: string; newPwd: string }) {
+  return request({
+    url: "user/pwd",
+    method: "post",
+    data
+  })
+}

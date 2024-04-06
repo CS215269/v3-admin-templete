@@ -158,12 +158,10 @@ onMounted(getBatchData)
 <template>
   <div class="app-container">
     <div class="toolbar-wrapper" style="margin-bottom: 20px">
-      <el-row justify="space-around">
-        <el-col :span="8">
+      <el-row justify="center">
+        <el-col :span="18" class="text-center">
           <el-text class="mx-1" size="large">{{ currentBatch.name }}</el-text>
-        </el-col>
-        <el-col :span="4">
-          <el-text class="mx-1" size="large"><el-button>切换批次</el-button> </el-text>
+          <el-divider direction="horizontal" />
         </el-col>
       </el-row>
       <el-card>

@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from "vue"
-import { getUserInfoApi, setRealNameInfoApi, setUserInfoApi } from "@/api/user-info"
-import { UserInfoData } from "@/api/user-info/types/user-info"
 import { ElMessage, FormInstance, FormRules } from "element-plus"
+import { Lock } from "@element-plus/icons-vue"
+import { getUserInfoApi, setRealNameInfoApi, setUserInfoApi, newPwdApi } from "@/api/user-info"
+import { UserInfoData } from "@/api/user-info/types/user-info"
 
 defineOptions({
   name: "UserInfo"
@@ -171,6 +172,61 @@ const cancelEditing = () => {
     editedUserinfo.value = obj
   }
 }
+
+const newPwdDialog = ref<boolean>(false)
+/** 注册表单元素的引用 */
+const pwdFormRef = ref<FormInstance | null>(null)
+/** 注册表单数据 */
+const pwdFormData = reactive({
+  oldpassword: "",
+  password: "",
+  confirmPassword: ""
+})
+/** 确认密码校验规则 */
+const validatePassword2 = (rule: any, value: string, callback: Function) => {
+  console.log("xiaoyshengxiao")
+  if (value !== pwdFormData.password) {
+    callback(new Error("两次输入的密码不一致"))
+  } else {
+    callback()
+  }
+}
+
+/** 注册表单校验规则 */
+const pwdFormRules: FormRules = {
+  oldpassword: [
+    { required: true, message: "请输入密码", trigger: "blur" },
+    { min: 8, max: 16, message: "长度在 8 到 16 个字符", trigger: "blur" }
+  ],
+  password: [
+    { required: true, message: "请输入密码", trigger: "blur" },
+    { min: 8, max: 16, message: "长度在 8 到 16 个字符", trigger: "blur" }
+  ],
+  confirmPassword: [
+    { required: true, message: "请确认密码", trigger: "blur" },
+    { validator: validatePassword2, message: "密码不同", trigger: "blur" }
+  ]
+}
+const newPwd = () => {
+  pwdFormRef.value?.validate((valid: boolean, fields) => {
+    if (valid) {
+      newPwdDialog.value = true
+      newPwdApi({ oldPwd: pwdFormData.oldpassword, newPwd: pwdFormData.password })
+        .then(() => {
+          ElMessage.success("修改成功")
+        })
+        .catch(() => {
+          ElMessage.error("修改失败,请重试")
+        })
+        .finally(() => {
+          newPwdDialog.value = false
+        })
+    } else {
+      console.log("formError表单数据错误")
+      console.log(fields)
+    }
+  })
+}
 onMounted(getUserData)
 </script>
 
@@ -189,14 +245,14 @@ onMounted(getUserData)
             </div>
             <div v-else>
               <el-button @click="startEditing">编辑</el-button>
+              <el-button @click="newPwdDialog = true">修改密码</el-button>
             </div>
           </template>
 
           <el-descriptions-item label="用户名" label-align="center" align="left">
-            <!-- label-class-name="my-label" 自定義樣式 -->
             <template v-if="!isEditing">{{ userinfo?.name }}</template>
-            <template v-else> <el-input v-model="editedUserinfo.name" /> </template
-          ></el-descriptions-item>
+            <template v-else> <el-input v-model="editedUserinfo.name" /> </template>
+          </el-descriptions-item>
           <el-descriptions-item label="性别" label-align="center" align="left">
             <template v-if="!isEditing">{{ sex }}</template>
             <template v-else>
@@ -216,14 +272,9 @@ onMounted(getUserData)
           <el-descriptions-item label="出生地" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.birthPlace }}</template>
             <template v-else>
-              <el-input id="birthPlace" v-model="editedUserinfo.birthPlace">
-                <el-option label="高职" value="1" />
-                <el-option label="大专" value="2" />
-                <el-option label="本科" value="3" />
-                <el-option label="硕士" value="4" />
-                <el-option label="博士" value="5" />
-              </el-input> </template
-          ></el-descriptions-item>
+              <el-input id="birthPlace" v-model="editedUserinfo.birthPlace" />
+            </template>
+          </el-descriptions-item>
           <el-descriptions-item label="政治面貌" label-align="center" align="left">
             <template v-if="!isEditing">{{ userinfo?.zzmm }}</template>
             <template v-else>
@@ -300,6 +351,41 @@ onMounted(getUserData)
         <span class="dialog-footer">
           <el-button @click="showRealNameMessageBox = false">取消</el-button>
           <el-button type="primary" @click="sendRealName()"> 确定 </el-button>
+        </span>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="newPwdDialog" title="修改密码" width="30%">
+      <el-form ref="pwdFormRef" :model="pwdFormData" :rules="pwdFormRules" label-width="100px" label-position="left">
+        <el-form-item prop="oldpassword" label="旧密码">
+          <el-input v-model.trim="pwdFormData.oldpassword" placeholder="请输入" clearable />
+        </el-form-item>
+        <el-form-item prop="password" label="新密码">
+          <el-input
+            v-model.trim="pwdFormData.password"
+            placeholder="请输入新密码"
+            type="password"
+            tabindex="2"
+            :prefix-icon="Lock"
+            show-password
+            clearable
+          />
+        </el-form-item>
+        <el-form-item prop="confirmPassword" label="确认密码">
+          <el-input
+            v-model.trim="pwdFormData.confirmPassword"
+            placeholder="请确认密码"
+            type="password"
+            tabindex="2"
+            :prefix-icon="Lock"
+            show-password
+            clearable
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="newPwdDialog = false">取消</el-button>
+          <el-button type="primary" @click="newPwd()"> 确定 </el-button>
         </span>
       </template>
     </el-dialog>
