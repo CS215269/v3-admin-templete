@@ -227,7 +227,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               <el-popconfirm
                 confirm-button-text="确认"
                 cancel-button-text="取消"
-                :title="`你确定要重置TA的密码为'12345678'吗?`"
+                :title="`你确定要重置${scope.row.name}的密码为'12345678'吗?`"
                 @confirm="resetPwd(scope.row.id)"
               >
                 <template #reference>

@@ -2,6 +2,9 @@
 import { getDashboardDataApi, getExportTotalExcelApi, setOpenRegisterApi } from "@/api/dashboard"
 import { ElMessage } from "element-plus"
 import { onMounted, ref } from "vue"
+import { useUserStore } from "@/store/modules/user"
+const userStore = useUserStore()
+const isAdmin = userStore.roles.includes("superadmin")
 const userTotal = ref<number>()
 const openBatchTotal = ref<number>()
 const unsettledThingsNum = ref<number>()
@@ -46,7 +49,7 @@ const getExcel = () => {
 
       const a = document.createElement("a")
       a.href = url
-      a.download = "总表.docx"
+      a.download = "总表.xlsx"
       a.click()
     })
     .catch(() => {
@@ -114,7 +117,7 @@ onMounted(getDashboardData)
           </el-statistic>
         </div>
       </el-col>
-      <el-col :span="10">
+      <el-col v-if="isAdmin" :span="10">
         <div class="statistic-card">
           <el-button @click="getExcel()"> 导出招聘情况总表 </el-button>
           &nbsp;

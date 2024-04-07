@@ -188,7 +188,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-table-column prop="account" label="账号" align="center" />
           <el-table-column prop="promise" label="权限" align="center">
             <template #default="scope">
-              <el-text v-if="scope.row.promise == 0">全职管理员</el-text>
+              <el-text v-if="scope.row.promise == 1">全职管理员</el-text>
               <el-text v-else>仅查看管理员</el-text>
             </template>
           </el-table-column>

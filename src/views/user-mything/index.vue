@@ -64,7 +64,7 @@ const exportForm = (id: number) => {
       a.href = url
       a.download = "安徽工商职业学院公开招聘人员报名资格审查表.docx"
       a.click()
-      ElMessage.success("下载准考证成功")
+      ElMessage.success("下载资格审查表成功")
     })
     .catch((e) => {
       ElMessage.error("操作失败")

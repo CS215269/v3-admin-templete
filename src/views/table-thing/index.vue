@@ -254,9 +254,10 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               </template>
             </template>
           </el-table-column>
-          <el-table-column fixed="right" label="操作" min-width="200px" align="left">
+          <el-table-column fixed="right" label="操作" align="left">
             <template #default="scope">
               <el-button type="info" bg size="small" @click="showinfoHandle(scope.row)"> 详细信息 </el-button>
+              <el-button type="primary" bg size="small" @click="null"> 导出准考证 </el-button>
             </template>
           </el-table-column>
         </el-table>
