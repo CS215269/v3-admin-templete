@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import { GetTableRequestData } from "@/api/user-thing/types/user-thing"
-import { exportFormApi, getUserThingDataApi, userAbandonApi } from "@/api/user-thing"
+import { exportBlankFormApi, exportFormApi, getUserThingDataApi, userAbandonApi } from "@/api/user-thing"
 import { ElMessage } from "element-plus"
 import UserReviewForm from "@/components/UserReviewForm/UserReviewForm.vue"
 import UserReview from "@/components/UserReview/UserReview.vue"
@@ -56,28 +56,46 @@ const abandon = (id: number) => {
 const exportForm = (id: number | undefined) => {
   loading.value = true
   if (!id) {
-    ElMessage.error("请选择需要导出的报名信息")
-    return
-  }
-  exportFormApi({ id })
-    .then((res) => {
-      const blob = new Blob([res])
-      const url = window.URL.createObjectURL(blob)
+    exportBlankFormApi()
+      .then((res) => {
+        const blob = new Blob([res])
+        const url = window.URL.createObjectURL(blob)
 
-      const a = document.createElement("a")
-      a.href = url
-      a.download = "安徽工商职业学院公开招聘人员报名资格审查表.docx"
-      a.click()
-      ElMessage.success("下载资格审查表成功")
-    })
-    .catch((e) => {
-      ElMessage.error("操作失败")
-      console.log(e)
-    })
-    .finally(() => {
-      loading.value = false
-      getTableData()
-    })
+        const a = document.createElement("a")
+        a.href = url
+        a.download = "安徽工商职业学院公开招聘人员空白报名资格审查表.docx"
+        a.click()
+        ElMessage.success("下载空白资格审查表成功")
+      })
+      .catch((e) => {
+        ElMessage.error("操作失败")
+        console.log(e)
+      })
+      .finally(() => {
+        loading.value = false
+        getTableData()
+      })
+  } else {
+    exportFormApi({ id })
+      .then((res) => {
+        const blob = new Blob([res])
+        const url = window.URL.createObjectURL(blob)
+
+        const a = document.createElement("a")
+        a.href = url
+        a.download = "安徽工商职业学院公开招聘人员报名资格审查表.docx"
+        a.click()
+        ElMessage.success("下载资格审查表成功")
+      })
+      .catch((e) => {
+        ElMessage.error("操作失败")
+        console.log(e)
+      })
+      .finally(() => {
+        loading.value = false
+        getTableData()
+      })
+  }
 }
 
 const openHandle = (thingId: number, code: string) => {
