@@ -14,3 +14,5 @@ export type RegisterCodeResponseData = ApiResponseData<{ code: string }>
 export type RegisterResponseData = ApiResponseData<{ token: string }>
 
 export type UserInfoResponseData = ApiResponseData<{ username: string; roles: string[] }>
+
+export type CanRegisterResponseData = ApiResponseData<number>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, ref } from "vue"
+import { onMounted, reactive, ref } from "vue"
 import { useRouter } from "vue-router"
 import { useUserStore } from "@/store/modules/user"
 import { ElMessage, type FormInstance, type FormRules } from "element-plus"
@@ -8,6 +8,7 @@ import { Lock, Phone } from "@element-plus/icons-vue"
 // import { getRegisterCodeApi } from "@/api/register"
 import { type RegisterRequestData } from "@/api/register/types/register"
 import ThemeSwitch from "@/components/ThemeSwitch/index.vue"
+import { canRegisterApi } from "@/api/register"
 
 const router = useRouter()
 
@@ -74,6 +75,23 @@ const handleRegister = () => {
   })
 }
 
+const canRegister = ref(true)
+/** 查询能否注册 */
+const canRegisterHandler = () => {
+  canRegisterApi()
+    .then((res) => {
+      if (res.data == 0) {
+        canRegister.value = false
+        ElMessage.error("注册功能已经关闭")
+      }
+    })
+    .catch(() => {
+      canRegister.value = false
+      ElMessage.error("注册系统异常,请联系管理员")
+    })
+}
+
+onMounted(canRegisterHandler)
 /** 短信验证码冷却 */
 // const registerCode = ref<boolean>(false)
 /** 短信验证码冷却 */
@@ -119,6 +137,7 @@ const handleRegister = () => {
       <div class="title">
         <img src="@/assets/layouts/logo-text-2.png" />
         <el-text size="large">手机号注册</el-text>
+        <el-text v-if="!canRegister" type="warning" tag="p">已到报名截止时间，停止注册</el-text>
       </div>
       <div class="content">
         <el-form

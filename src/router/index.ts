@@ -85,7 +85,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     meta: {
       title: "管理员后台",
       svgIcon: "avatar",
-      roles: ["admin", "superadmin"] // 可以在根路由中设置角色
+      roles: ["superadmin"] // 可以在根路由中设置角色
     },
     children: [
       {
@@ -107,7 +107,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     meta: {
       title: "管理员后台",
       svgIcon: "user",
-      roles: ["admin", "superadmin"] // 可以在根路由中设置角色
+      roles: ["superadmin"] // 可以在根路由中设置角色
     },
     children: [
       {
@@ -129,7 +129,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     meta: {
       title: "管理员后台",
       svgIcon: "unocss",
-      roles: ["admin", "superadmin"]
+      roles: ["superadmin"]
     },
     children: [
       {
@@ -151,7 +151,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     meta: {
       title: "管理员后台",
       svgIcon: "unocss",
-      roles: ["admin", "superadmin"]
+      roles: ["superadmin"]
     },
     children: [
       {
@@ -195,7 +195,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     meta: {
       title: "招聘",
       svgIcon: "unocss",
-      roles: ["admin", "superadmin"]
+      roles: ["superadmin"]
     },
     children: [
       {

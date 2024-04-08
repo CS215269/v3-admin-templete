@@ -23,10 +23,14 @@ export function registerApi(data: Register.RegisterRequestData) {
 export function getUserInfoApi() {
   return request<Register.UserInfoResponseData>({
     url: "users/info",
-    method: "get",
-    /** 内网穿透用,跳过无意义的响应 */
-    headers: {
-      "ngrok-skip-browser-warning": "123"
-    }
+    method: "get"
+  })
+}
+
+/** 查询能否注册 */
+export function canRegisterApi() {
+  return request<Register.CanRegisterResponseData>({
+    url: "switch/register",
+    method: "get"
   })
 }

@@ -43,3 +43,11 @@ export function exportFormApi(params: { id: number }) {
     params
   })
 }
+/** 下载空白表格 */
+export function exportBlankFormApi() {
+  return request<BlobPart>({
+    responseType: "blob",
+    url: `exportBlankForm`,
+    method: "get"
+  })
+}

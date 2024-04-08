@@ -53,8 +53,12 @@ const abandon = (id: number) => {
     })
 }
 
-const exportForm = (id: number) => {
+const exportForm = (id: number | undefined) => {
   loading.value = true
+  if (!id) {
+    ElMessage.error("请选择需要导出的报名信息")
+    return
+  }
   exportFormApi({ id })
     .then((res) => {
       const blob = new Blob([res])
@@ -146,6 +150,9 @@ onMounted(getTableData)
               <el-button v-if="position.status != -2" @click="showDialog[index] = true">查看报名信息</el-button>
               <el-button :loading="loading" v-if="position.status == 2" @click="exportForm(position.thingId)"
                 >导出报名资格审查表</el-button
+              >
+              <el-button :loading="loading" v-if="position.status == 2" @click="exportForm(undefined)"
+                >导出空白资格审查表</el-button
               >
               <el-button
                 :loading="loading"
