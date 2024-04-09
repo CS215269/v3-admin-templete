@@ -173,7 +173,7 @@ const prePrintCertificates = (id: number) => {
     })
     .finally(() => {})
 
-  prePrintfCertificatesApi()
+  prePrintfCertificatesApi({ id })
     .then((res) => {
       console.log(res)
       blob.value = new Blob([res])
