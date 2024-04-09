@@ -152,19 +152,22 @@ const timeSort = (a: GetTableThingData, b: GetTableThingData) => {
   return a.time > b.time ? 1 : -1
 }
 
-/** 打印准考证预览 */
+/** 打印准考证预览对话框 */
 const previewDialog = ref<boolean>(false)
 /** 准考证预览正在加载 */
 const previewLoading = ref<boolean>(false)
 /** 准考证预览准考证号 */
 const previewCode2 = ref<number>(0)
+/** 当前准考证预览的thingId */
+const activeThingId = ref<number>(0)
 /** 暂存的blob对象 */
 const blob = ref<Blob>()
 /** 打印准考证预览 */
 const prePrintCertificates = (id: number) => {
   previewLoading.value = true
   previewDialog.value = true
-  prePrintfCertificatesApi({ id })
+  activeThingId.value = id
+  prePrintfCertificatesApi({ activeThingId: id })
     .then((res) => {
       console.log(res)
       blob.value = new Blob([res])
@@ -186,6 +189,17 @@ const prePrintCertificates = (id: number) => {
 
 /** 下载缓存的blob对象 */
 const downloadBlob = () => {
+  printfCertificatesApi({ activeThingId: activeThingId.value })
+    .then(() => {
+      ElMessage.success("导出成功")
+    })
+    .catch(() => {
+      ElMessage.error("导出失败")
+    })
+    .finally(() => {
+      previewDialog.value = false
+    })
+
   if (blob.value) {
     const a = document.createElement("a")
     a.href = URL.createObjectURL(blob.value)
@@ -323,8 +337,11 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         />
       </div>
     </el-card>
-    <el-dialog title="准考证预览" v-model:visible="previewDialog" width="80%">
-      <el-card v-loading="previewLoading" shadow="never">
+    <el-dialog title="准考证预览" v-model="previewDialog" width="80%">
+      <template #header>
+        <el-text type="warning" size="small" v-if="previewLoading">正在加载</el-text>
+      </template>
+      <el-card shadow="never">
         <div id="container_docx" />
       </el-card>
       <template #footer>
