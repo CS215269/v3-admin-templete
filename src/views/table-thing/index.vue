@@ -1,14 +1,15 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref, watch } from "vue"
-import { ElTable, type FormInstance } from "element-plus"
+import { ElMessage, ElTable, type FormInstance } from "element-plus"
 // import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Download, RefreshRight } from "@element-plus/icons-vue"
-import { getTableDataBySearchApi } from "@/api/table-thing"
+import { getTableDataBySearchApi, prePrintfCertificatesApi, prePrintfCertificatesDataApi } from "@/api/table-thing"
 import { type GetTableThingData } from "@/api/table-thing/types/table-thing"
 import { getBatchOptionsApi } from "@/api/table-batch"
 import { getPositionOptionApi } from "@/api/table-position"
 import AuditReviewForm from "@/components/AuditReviewForm/AuditReviewForm.vue"
 import { usePagination } from "@/hooks/usePagination"
+import { renderAsync } from "docx-preview"
 
 defineOptions({
   // 命名当前组件
@@ -148,6 +149,60 @@ const timeSort = (a: GetTableThingData, b: GetTableThingData) => {
   return a.time > b.time ? 1 : -1
 }
 
+/** 打印准考证预览 */
+const previewDialog = ref<boolean>(false)
+/** 准考证预览正在加载 */
+const previewLoading = ref<boolean>(false)
+/** 准考证预览准考证号 */
+const previewCode2 = ref<number>(0)
+/** 准考证预览岗位号 */
+const previewCode = ref<number>(0)
+/** 暂存的blob对象 */
+const blob = ref<Blob>()
+/** 打印准考证预览 */
+const prePrintCertificates = (id: number) => {
+  previewLoading.value = true
+  previewDialog.value = true
+  prePrintfCertificatesDataApi({ id })
+    .then((res) => {
+      previewCode.value = res.data.code
+      previewCode2.value = res.data.codeWithUser
+    })
+    .catch((e) => {
+      console.log(e)
+    })
+    .finally(() => {})
+
+  prePrintfCertificatesApi()
+    .then((res) => {
+      console.log(res)
+      blob.value = new Blob([res])
+      // 在这里使用docData渲染docx文档
+      const container = document.getElementById("container_docx")
+      if (container) {
+        renderAsync(blob.value, container).then(() => console.log("docx: finished"))
+      } else {
+        console.log("Can not find container element")
+      }
+    })
+    .catch(() => {
+      ElMessage.error("预览准考证服务异常")
+    })
+    .finally(() => {
+      previewLoading.value = false
+    })
+}
+
+/** 下载缓存的blob对象 */
+const downloadBlob = () => {
+  if (blob.value) {
+    const a = document.createElement("a")
+    a.href = URL.createObjectURL(blob.value)
+    a.download = `准考证_${previewCode2.value}.docx`
+    a.click()
+  }
+}
+
 /** 监听分页参数的变化 */
 watch([() => paginationData.currentPage, () => paginationData.pageSize], getTableData, { immediate: true })
 </script>
@@ -254,10 +309,12 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
               </template>
             </template>
           </el-table-column>
-          <el-table-column fixed="right" label="操作" align="left">
+          <el-table-column fixed="right" label="操作" min-width="150" align="left">
             <template #default="scope">
               <el-button type="info" bg size="small" @click="showinfoHandle(scope.row)"> 详细信息 </el-button>
-              <el-button type="primary" bg size="small" @click="null"> 导出准考证 </el-button>
+              <el-button type="primary" bg size="small" @click="prePrintCertificates(scope.row.id)">
+                下载准考证
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -275,6 +332,20 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
         />
       </div>
     </el-card>
+    <el-dialog title="准考证预览" v-model:visible="previewDialog" width="80%">
+      <el-card v-loading="previewLoading" shadow="never">
+        <div id="container_docx" />
+      </el-card>
+      <template #footer>
+        <el-button type="primary" @click="previewDialog = false">关闭</el-button>
+
+        <el-popconfirm title="准考证不可撤回,你确定要导出吗？" @confirm="downloadBlob">
+          <template #reference>
+            <el-button type="primary">导出</el-button>
+          </template>
+        </el-popconfirm>
+      </template>
+    </el-dialog>
     <el-drawer v-model="drawerVisible" size="80%" :destroy-on-close="true">
       <AuditReviewForm :code="code" :thingId="thingId" :status="status" @close-drawer="handleCloseDrawer()" />
     </el-drawer>

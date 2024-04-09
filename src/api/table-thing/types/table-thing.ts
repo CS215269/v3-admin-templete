@@ -87,4 +87,4 @@ export type GetTableResponseData = ApiResponseData<{
 }>
 export type GetThingInfoData = ApiResponseData<{ data: ThingInfoData; file: string[]; img: string[] }>
 export type ThingIdToPrintResult = ApiResponseData<{ total: number; error: number }>
-export type prePrintfCertificatesData = ApiResponseData<{ code: number[]; codeWithUser: number[] }>
+export type prePrintfCertificatesData = ApiResponseData<{ code: number; codeWithUser: number }>

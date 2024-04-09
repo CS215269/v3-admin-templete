@@ -11,7 +11,7 @@ export function accept3ThingApi(data: { thingId: number }) {
 }
 
 /** 获取预览打印准考证号等数据 */
-export function prePrintfCertificatesDataApi(data: { id: number[] }) {
+export function prePrintfCertificatesDataApi(data: { id: number }) {
   return request<Table.prePrintfCertificatesData>({
     url: "previewData",
     method: "post",
@@ -20,20 +20,21 @@ export function prePrintfCertificatesDataApi(data: { id: number[] }) {
 }
 
 /** 预览打印准考证 */
-export function prePrintfCertificatesApi() {
+export function prePrintfCertificatesApi(params: { id: number }) {
   return request<BlobPart>({
     responseType: "blob",
-    url: "print",
-    method: "get"
+    url: "previewTicket",
+    method: "get",
+    params
   })
 }
 
 /** 打印准考证 */
-export function printfCertificatesApi(data: { id: number[] }) {
-  return request<Table.ThingIdToPrintResult>({
+export function printfCertificatesApi(params: { id: number }) {
+  return request<ApiResponseData<null>>({
     url: "print",
-    method: "post",
-    data
+    method: "get",
+    params
   })
 }
 
