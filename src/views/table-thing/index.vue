@@ -167,7 +167,7 @@ const prePrintCertificates = (id: number) => {
   previewLoading.value = true
   previewDialog.value = true
   activeThingId.value = id
-  prePrintfCertificatesApi({ activeThingId: id })
+  prePrintfCertificatesApi({ id })
     .then((res) => {
       console.log(res)
       blob.value = new Blob([res])
@@ -189,7 +189,7 @@ const prePrintCertificates = (id: number) => {
 
 /** 下载缓存的blob对象 */
 const downloadBlob = () => {
-  printfCertificatesApi({ activeThingId: activeThingId.value })
+  printfCertificatesApi({ id: activeThingId.value })
     .then(() => {
       ElMessage.success("导出成功")
     })
