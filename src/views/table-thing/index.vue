@@ -3,13 +3,14 @@ import { onMounted, reactive, ref, watch } from "vue"
 import { ElMessage, ElTable, type FormInstance } from "element-plus"
 // import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from "element-plus"
 import { Search, Refresh, CirclePlus, Download, RefreshRight } from "@element-plus/icons-vue"
-import { getTableDataBySearchApi, prePrintfCertificatesApi, prePrintfCertificatesDataApi } from "@/api/table-thing"
+import { getTableDataBySearchApi, prePrintfCertificatesApi } from "@/api/table-thing"
 import { type GetTableThingData } from "@/api/table-thing/types/table-thing"
 import { getBatchOptionsApi } from "@/api/table-batch"
 import { getPositionOptionApi } from "@/api/table-position"
 import AuditReviewForm from "@/components/AuditReviewForm/AuditReviewForm.vue"
 import { usePagination } from "@/hooks/usePagination"
 import { renderAsync } from "docx-preview"
+import { useUserStore } from "@/store/modules/user"
 
 defineOptions({
   // 命名当前组件
@@ -19,6 +20,8 @@ defineOptions({
 const loading = ref<boolean>(false)
 const { paginationData, handleCurrentChange, handleSizeChange } = usePagination()
 
+const userStore = useUserStore()
+const isAdmin = userStore.roles.includes("superadmin")
 // 计算属性
 const getDegreeLabel = (row: { degree: number }) => {
   switch (row.degree) {
@@ -155,24 +158,12 @@ const previewDialog = ref<boolean>(false)
 const previewLoading = ref<boolean>(false)
 /** 准考证预览准考证号 */
 const previewCode2 = ref<number>(0)
-/** 准考证预览岗位号 */
-const previewCode = ref<number>(0)
 /** 暂存的blob对象 */
 const blob = ref<Blob>()
 /** 打印准考证预览 */
 const prePrintCertificates = (id: number) => {
   previewLoading.value = true
   previewDialog.value = true
-  prePrintfCertificatesDataApi({ id })
-    .then((res) => {
-      previewCode.value = res.data.code
-      previewCode2.value = res.data.codeWithUser
-    })
-    .catch((e) => {
-      console.log(e)
-    })
-    .finally(() => {})
-
   prePrintfCertificatesApi({ id })
     .then((res) => {
       console.log(res)
@@ -312,7 +303,7 @@ watch([() => paginationData.currentPage, () => paginationData.pageSize], getTabl
           <el-table-column fixed="right" label="操作" min-width="150" align="left">
             <template #default="scope">
               <el-button type="info" bg size="small" @click="showinfoHandle(scope.row)"> 详细信息 </el-button>
-              <el-button type="primary" bg size="small" @click="prePrintCertificates(scope.row.id)">
+              <el-button v-if="isAdmin" type="primary" bg size="small" @click="prePrintCertificates(scope.row.thingId)">
                 下载准考证
               </el-button>
             </template>
